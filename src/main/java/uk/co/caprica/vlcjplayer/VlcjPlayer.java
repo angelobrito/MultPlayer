@@ -27,10 +27,13 @@ import java.awt.event.WindowEvent;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 
+import MixTrackerPlayer.MixTrackerScreenHandler;
 import uk.co.caprica.vlcj.component.EmbeddedMediaPlayerComponent;
 import uk.co.caprica.vlcj.discovery.NativeDiscovery;
 import uk.co.caprica.vlcj.log.NativeLog;
+import uk.co.caprica.vlcj.player.MediaPlayer;
 import uk.co.caprica.vlcj.player.embedded.EmbeddedMediaPlayer;
 import uk.co.caprica.vlcj.runtime.RuntimeUtil;
 import uk.co.caprica.vlcj.runtime.streams.NativeStreams;
@@ -71,10 +74,10 @@ public class VlcjPlayer {
 
     private final NativeLog nativeLog;
 
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) throws InterruptedException, ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException {
         // This will locate LibVLC for the vast majority of cases
         new NativeDiscovery().discover();
-
+        
         setLookAndFeel();
 
         SwingUtilities.invokeLater(new Runnable() {
@@ -102,7 +105,7 @@ public class VlcjPlayer {
     }
 
     public VlcjPlayer() {
-        EmbeddedMediaPlayerComponent mediaPlayerComponent = application().mediaPlayerComponent();
+        MixTrackerScreenHandler mediaPlayerComponent = application().mediaPlayerComponent();
 
         mainFrame = new MainFrame();
         mainFrame.addWindowListener(new WindowAdapter() {
@@ -122,8 +125,9 @@ public class VlcjPlayer {
         });
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        EmbeddedMediaPlayer embeddedMediaPlayer = mediaPlayerComponent.getMediaPlayer();
-        embeddedMediaPlayer.setFullScreenStrategy(new VlcjPlayerFullScreenStrategy(mainFrame));
+        // TODO Update the Fullscreen strategy
+        //EmbeddedMediaPlayer embeddedMediaPlayer = mediaPlayerComponent.getMediaPlayer();
+        //embeddedMediaPlayer.setFullScreenStrategy(new VlcjPlayerFullScreenStrategy(mainFrame));
 
         nativeLog = mediaPlayerComponent.getMediaPlayerFactory().newLog();
 

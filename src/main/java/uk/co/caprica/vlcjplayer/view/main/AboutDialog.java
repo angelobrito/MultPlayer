@@ -43,7 +43,12 @@ import uk.co.caprica.vlcj.version.LibVlcVersion;
 
 final class AboutDialog extends JDialog {
 
-    AboutDialog(Window owner) {
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 9159057228235442665L;
+
+	AboutDialog(Window owner) {
         super(owner, resources().getString("dialog.about"), Dialog.ModalityType.DOCUMENT_MODAL);
 
         Properties properties = new Properties();
@@ -56,9 +61,12 @@ final class AboutDialog extends JDialog {
 
         setLayout(new MigLayout("insets 30, fillx", "[shrink]30[shrink][grow]", "[]30[]10[]10[]30[]10[]10[]0[]"));
         getContentPane().setBackground(Color.white);
+        
+        ImageIcon img = new ImageIcon(getClass().getResource("/MultTecnologia-logo.png"));
+        this.setIconImage(img.getImage());
 
         JLabel logoLabel = new JLabel();
-        logoLabel.setIcon(new ImageIcon(getClass().getResource("/vlcj-logo.png")));
+        logoLabel.setIcon(new ImageIcon(getClass().getResource("/MultTecnologia-logo-name.png")));
 
         JLabel applicationLabel = new JLabel();
         applicationLabel.setFont(applicationLabel.getFont().deriveFont(30.0f));
@@ -120,7 +128,12 @@ final class AboutDialog extends JDialog {
 
     private class ValueLabel extends JLabel {
 
-        public ValueLabel() {
+        /**
+		 * 
+		 */
+		private static final long serialVersionUID = 8595718080095164467L;
+
+		public ValueLabel() {
             setFont(getFont().deriveFont(Font.BOLD));
         }
     }

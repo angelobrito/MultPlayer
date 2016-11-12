@@ -38,7 +38,7 @@ public abstract class BaseFrame extends JFrame {
     public BaseFrame(String title) {
         super(title);
         try {
-            setIconImage(ImageIO.read(getClass().getResource("/vlcj-logo-frame.png")));
+            setIconImage(ImageIO.read(getClass().getResource("/MultTecnologia-logo.png")));
         }
         catch (IOException e) {
         }

@@ -36,6 +36,8 @@ import uk.co.caprica.vlcjplayer.view.action.mediaplayer.MediaPlayerActions;
 
 import com.google.common.eventbus.EventBus;
 
+import MixTrackerPlayer.MixTrackerScreenHandler;
+
 /**
  * Global application state.
  */
@@ -49,7 +51,7 @@ public final class Application {
 
     private final EventBus eventBus;
 
-    private final EmbeddedMediaPlayerComponent mediaPlayerComponent;
+    private final MixTrackerScreenHandler multiMediaPlayerComponent;
 
     private final MediaPlayerActions mediaPlayerActions;
 
@@ -71,13 +73,18 @@ public final class Application {
 
     private Application() {
         eventBus = new EventBus();
-        mediaPlayerComponent = new EmbeddedMediaPlayerComponent() {
-            @Override
+        multiMediaPlayerComponent = new MixTrackerScreenHandler(4) {
+            /**
+			 * 
+			 */
+			private static final long serialVersionUID = 3106592667852822185L;
+
+			@Override
             protected String[] onGetMediaPlayerFactoryExtraArgs() {
                 return new String[] {"--no-osd"}; // Disables the display of the snapshot filename (amongst other things)
             }
         };
-        mediaPlayerActions = new MediaPlayerActions(mediaPlayerComponent.getMediaPlayer());
+        mediaPlayerActions = new MediaPlayerActions(multiMediaPlayerComponent.getMediaPlayer());
         tickService.scheduleWithFixedDelay(new Runnable() {
             @Override
             public void run() {
@@ -105,8 +112,8 @@ public final class Application {
         }
     }
 
-    public EmbeddedMediaPlayerComponent mediaPlayerComponent() {
-        return mediaPlayerComponent;
+    public MixTrackerScreenHandler mediaPlayerComponent() {
+        return multiMediaPlayerComponent;
     }
 
     public MediaPlayerActions mediaPlayerActions() {
