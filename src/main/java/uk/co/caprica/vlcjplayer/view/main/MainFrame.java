@@ -52,19 +52,12 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JSeparator;
-import javax.swing.JTree;
 import javax.swing.KeyStroke;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreeModel;
 
 import com.google.common.eventbus.Subscribe;
 
 import MixTrackerPlayer.MixTrackerScreenHandler;
-import fileHandlers.CreateChildNodes;
-import fileHandlers.FileNode;
 import net.miginfocom.swing.MigLayout;
-import uk.co.caprica.vlcj.component.EmbeddedMediaPlayerComponent;
 import uk.co.caprica.vlcj.player.MediaPlayer;
 import uk.co.caprica.vlcj.player.MediaPlayerEventAdapter;
 import uk.co.caprica.vlcjplayer.event.AfterExitFullScreenEvent;
@@ -118,10 +111,9 @@ public final class MainFrame extends BaseFrame {
 	private final JMenu audioDeviceMenu;
 
 	private final JMenu videoMenu;
-	private final JMenu videoTrackMenu;
 	private final JMenu videoZoomMenu;
-	private final JMenu videoAspectRatioMenu;
 	private final JMenu videoCropMenu;
+	private final JMenuItem videoSnapshot;
 
 	private final JMenu toolsMenu;
 
@@ -146,14 +138,14 @@ public final class MainFrame extends BaseFrame {
 	private int screensQtt;
 
 	public MainFrame() {
-		super("MixTRacker Player");
+		super(resource("main.aplication.name").name());
 
-		// TODO For now it only supports 4 screens
+		// FIXME For now it only supports 4 screens
 		this.screensQtt = 4; 
 	
 		this.multiMediaPlayerComponent = application().mediaPlayerComponent();
 		this.multiMediaPlayerComponent.setMinimumSize(new Dimension(800, 600));
-		application().mediaPlayerComponent();
+		this.multiMediaPlayerComponent.setScreenQuantity(screensQtt);
 
 		MediaPlayerActions mediaPlayerActions = application().mediaPlayerActions();
 
@@ -164,6 +156,10 @@ public final class MainFrame extends BaseFrame {
 				// Fetch the Video folder (it depends on user interaction after the click Open Folder)
 				if (JFileChooser.APPROVE_OPTION == fileChooser.showOpenDialog(MainFrame.this)) {
 					playlistPane.updateWorkingDirTree(getMediaDirectory());
+					videoContentPane.showVideo();
+					// FIXME Load player screen that is not working
+					multiMediaPlayerComponent.start();
+					updateEnabledComponents();
 				}
 			}
 		};
@@ -179,7 +175,7 @@ public final class MainFrame extends BaseFrame {
 		videoFullscreenAction = new StandardAction(resource("menu.video.item.fullscreen")) {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				multiMediaPlayerComponent.getMediaPlayer().toggleFullScreen();
+				multiMediaPlayerComponent.getSelectedScreen().toggleFullScreen();
 			}
 		};
 
@@ -192,7 +188,7 @@ public final class MainFrame extends BaseFrame {
 					JCheckBoxMenuItem menuItem = (JCheckBoxMenuItem)source;
 					onTop = menuItem.isSelected();
 				}
-				else {
+				else { 
 					throw new IllegalStateException("Don't know about source " + source);
 				}
 				setAlwaysOnTop(onTop);
@@ -235,6 +231,7 @@ public final class MainFrame extends BaseFrame {
 		fileMenu = new JMenu(resource("menu.media").name());
 		fileMenu.setMnemonic(resource("menu.media").mnemonic());
 		fileMenu.add(new JMenuItem(mediaOpenAction));
+		
 		mediaRecentMenu = new RecentMediaMenu(resource("menu.media.item.recent")).menu();
 		fileMenu.add(mediaRecentMenu);
 		fileMenu.add(new JSeparator());
@@ -243,8 +240,8 @@ public final class MainFrame extends BaseFrame {
 
 		playbackMenu = new JMenu(resource("menu.playback").name());
 		playbackMenu.setMnemonic(resource("menu.playback").mnemonic());
-
 		playbackMenu.add(new JSeparator());
+		
 		playbackSpeedMenu = new JMenu(resource("menu.playback.item.speed").name());
 		playbackSpeedMenu.setMnemonic(resource("menu.playback.item.speed").mnemonic());
 		for (Action action : mediaPlayerActions.playbackSpeedActions()) {
@@ -281,11 +278,6 @@ public final class MainFrame extends BaseFrame {
 
 		videoMenu = new JMenu(resource("menu.video").name());
 		videoMenu.setMnemonic(resource("menu.video").mnemonic());
-
-		videoTrackMenu = new VideoTrackMenu().menu();
-
-		videoMenu.add(videoTrackMenu);
-		videoMenu.add(new JSeparator());
 		videoMenu.add(new JCheckBoxMenuItem(videoFullscreenAction));
 		videoMenu.add(new JCheckBoxMenuItem(videoAlwaysOnTopAction));
 		videoMenu.add(new JSeparator());
@@ -293,16 +285,14 @@ public final class MainFrame extends BaseFrame {
 		videoZoomMenu.setMnemonic(resource("menu.video.item.zoom").mnemonic());
 		addActions(mediaPlayerActions.videoZoomActions(), videoZoomMenu/*, true*/); // FIXME how to handle zoom 1:1 and fit to window - also, probably should not use addActions to select
 		videoMenu.add(videoZoomMenu);
-		videoAspectRatioMenu = new JMenu(resource("menu.video.item.aspectRatio").name());
-		videoAspectRatioMenu.setMnemonic(resource("menu.video.item.aspectRatio").mnemonic());
-		addActions(mediaPlayerActions.videoAspectRatioActions(), videoAspectRatioMenu, true);
-		videoMenu.add(videoAspectRatioMenu);
+		
 		videoCropMenu = new JMenu(resource("menu.video.item.crop").name());
 		videoCropMenu.setMnemonic(resource("menu.video.item.crop").mnemonic());
 		addActions(mediaPlayerActions.videoCropActions(), videoCropMenu, true);
 		videoMenu.add(videoCropMenu);
 		videoMenu.add(new JSeparator());
-		videoMenu.add(new JMenuItem(mediaPlayerActions.videoSnapshotAction()));
+		videoSnapshot = new JMenuItem(mediaPlayerActions.videoSnapshotAction());
+		videoMenu.add(videoSnapshot);
 		menuBar.add(videoMenu);
 
 		toolsMenu = new JMenu(resource("menu.tools").name());
@@ -348,10 +338,10 @@ public final class MainFrame extends BaseFrame {
 		holderPane.setMinimumSize(new Dimension(200, 400));        
 
 		// TODO Implement a discrete Logo
-		holderPane.add(logoPane, BorderLayout.PAGE_END);
-		holderPane.add(playlistPane, BorderLayout.PAGE_START); 
-		contentPane.add(holderPane, BorderLayout.WEST);
-		//contentPane.add(playlistPane, BorderLayout.WEST);
+//		holderPane.add(logoPane, BorderLayout.PAGE_END);
+//		holderPane.add(playlistPane, BorderLayout.PAGE_START); 
+//		contentPane.add(holderPane, BorderLayout.WEST);
+		contentPane.add(playlistPane, BorderLayout.WEST);
 
 		bottomPane = new JPanel();
 		bottomPane.setLayout(new BorderLayout());
@@ -374,12 +364,14 @@ public final class MainFrame extends BaseFrame {
 			public void playing(MediaPlayer mediaPlayer) {
 				videoContentPane.showVideo();
 				mouseMovementDetector.start();
+				updateEnabledComponents();
 				application().post(PlayingEvent.INSTANCE);
 			}
 
 			@Override
 			public void paused(MediaPlayer mediaPlayer) {
 				mouseMovementDetector.stop();
+				updateEnabledComponents();
 				application().post(PausedEvent.INSTANCE);
 			}
 
@@ -387,6 +379,7 @@ public final class MainFrame extends BaseFrame {
 			public void stopped(MediaPlayer mediaPlayer) {
 				mouseMovementDetector.stop();
 				videoContentPane.showDefault();
+				updateEnabledComponents();
 				application().post(StoppedEvent.INSTANCE);
 			}
 
@@ -394,6 +387,7 @@ public final class MainFrame extends BaseFrame {
 			public void finished(MediaPlayer mediaPlayer) {
 				videoContentPane.showDefault();
 				mouseMovementDetector.stop();
+				updateEnabledComponents();
 				application().post(StoppedEvent.INSTANCE);
 			}
 
@@ -401,6 +395,7 @@ public final class MainFrame extends BaseFrame {
 			public void error(MediaPlayer mediaPlayer) {
 				videoContentPane.showDefault();
 				mouseMovementDetector.stop();
+				updateEnabledComponents();
 				application().post(StoppedEvent.INSTANCE);
 				JOptionPane.showMessageDialog(MainFrame.this, MessageFormat.format(resources().getString("error.errorEncountered"), fileChooser.getSelectedFile().toString()), resources().getString("dialog.errorEncountered"), JOptionPane.ERROR_MESSAGE);
 			}
@@ -421,6 +416,7 @@ public final class MainFrame extends BaseFrame {
 		mouseMovementDetector = new VideoMouseMovementDetector(multiMediaPlayerComponent.getVideoSurface(), 500, multiMediaPlayerComponent);
 
 		setMinimumSize(new Dimension(900, 580));
+		updateEnabledComponents();
 	}
 
 	private ButtonGroup addActions(List<Action> actions, JMenu menu, boolean selectFirst) {
@@ -537,20 +533,26 @@ public final class MainFrame extends BaseFrame {
 		return c.getActionMap();
 	}
 
-	// TODO implement a smart search algorithm to grab the videos inside the folders
 	public String getMediaDirectory() {
 
+		// TODO implement a smart search algorithm to grab the videos inside the folders
 		File newDirectory = fileChooser.getSelectedFile();
-		//          String mrl = file.getAbsolutePath();
-		//          application().addRecentMedia(mrl);
-		//          mediaPlayerComponent.getMediaPlayer().playMedia(mrl);
-		//      }
 		this.multiMediaPlayerComponent.setNewMediaDirectory(newDirectory.getAbsolutePath());
-		System.out.println("NewDirectory={" + newDirectory.getAbsolutePath() 
-		+ "}, Player Directory={" 
-		+ this.multiMediaPlayerComponent.getMediaDirectory().getAbsolutePath()
-		+"}");
 		return this.multiMediaPlayerComponent.getMediaDirectory().getAbsolutePath();
+	}
+	
+	public void updateEnabledComponents() {
+		boolean playerRunning = multiMediaPlayerComponent.isPlaying()
+							|| multiMediaPlayerComponent.isPlayable();
+		System.out.println("Player running:" + playerRunning);
+		
+		playbackMenu.setEnabled(playerRunning);
+		videoFullscreenAction.setEnabled(playerRunning);
+		videoZoomMenu.setEnabled(playerRunning);
+		videoCropMenu.setEnabled(playerRunning);
+		videoSnapshot.setEnabled(playerRunning);
+		controlsPane.setEnabledComponents(playerRunning);
+		multiMediaPlayerComponent.setVisible(playerRunning);
 	}
 
 	public Component getPlayerHandler(){

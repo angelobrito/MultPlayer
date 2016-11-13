@@ -20,7 +20,7 @@
 package uk.co.caprica.vlcjplayer.view.effects.video;
 
 import static uk.co.caprica.vlcjplayer.Application.application;
-import static uk.co.caprica.vlcjplayer.Application.resources;
+import static uk.co.caprica.vlcjplayer.view.action.Resource.resource;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -58,10 +58,10 @@ public class VideoAdjustPanel extends BasePanel {
     public VideoAdjustPanel() {
         this.mediaPlayerComponent = application().mediaPlayerComponent();
 
-        enableCheckBox = new JCheckBox(resources().getString("dialog.effects.tabs.video.adjust.enable"));
+        enableCheckBox = new JCheckBox(resource("dialog.effects.tabs.video.adjust.enable").name());
 
         hueLabel = new JLabel();
-        hueLabel.setText(resources().getString("dialog.effects.tabs.video.adjust.hue"));
+        hueLabel.setText(resource("dialog.effects.tabs.video.adjust.hue").name());
 
         hueSlider = new JSlider();
         hueSlider.setMinimum(LibVlcConst.MIN_HUE);
@@ -69,7 +69,7 @@ public class VideoAdjustPanel extends BasePanel {
         hueLabel.setLabelFor(hueSlider);
 
         brightnessLabel = new JLabel();
-        brightnessLabel.setText(resources().getString("dialog.effects.tabs.video.adjust.brightness"));
+        brightnessLabel.setText(resource("dialog.effects.tabs.video.adjust.brightness").name());
 
         brightnessSlider = new JSlider();
         brightnessSlider.setMinimum(Math.round(LibVlcConst.MIN_BRIGHTNESS * 100.0f));
@@ -77,7 +77,7 @@ public class VideoAdjustPanel extends BasePanel {
         brightnessLabel.setLabelFor(brightnessSlider);
 
         contrastLabel = new JLabel();
-        contrastLabel.setText(resources().getString("dialog.effects.tabs.video.adjust.contrast"));
+        contrastLabel.setText(resource("dialog.effects.tabs.video.adjust.contrast").name());
 
         contrastSlider = new JSlider();
         contrastSlider.setMinimum(Math.round(LibVlcConst.MIN_CONTRAST * 100.0f));
@@ -87,7 +87,7 @@ public class VideoAdjustPanel extends BasePanel {
         contrastLabel.setLabelFor(contrastSlider);
 
         saturationLabel = new JLabel();
-        saturationLabel.setText(resources().getString("dialog.effects.tabs.video.adjust.saturation"));
+        saturationLabel.setText(resource("dialog.effects.tabs.video.adjust.saturation").name());
 
         saturationSlider = new JSlider();
         saturationSlider.setMinimum(Math.round(LibVlcConst.MIN_SATURATION * 100.0f));
@@ -95,7 +95,7 @@ public class VideoAdjustPanel extends BasePanel {
         saturationLabel.setLabelFor(saturationSlider);
 
         gammaLabel = new JLabel();
-        gammaLabel.setText(resources().getString("dialog.effects.tabs.video.adjust.gamma"));
+        gammaLabel.setText(resource("dialog.effects.tabs.video.adjust.gamma").name());
 
         gammaSlider = new JSlider();
         gammaSlider.setMinimum(Math.round(LibVlcConst.MIN_GAMMA * 100.0f));

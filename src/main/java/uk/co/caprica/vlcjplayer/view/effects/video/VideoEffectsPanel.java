@@ -19,7 +19,7 @@
 
 package uk.co.caprica.vlcjplayer.view.effects.video;
 
-import static uk.co.caprica.vlcjplayer.Application.resources;
+import static uk.co.caprica.vlcjplayer.view.action.Resource.resource;
 
 import javax.swing.JTabbedPane;
 
@@ -36,7 +36,7 @@ public class VideoEffectsPanel extends BasePanel {
         tabbedPane = new JTabbedPane();
 
         videoAdjustPanel = new VideoAdjustPanel();
-        tabbedPane.add(videoAdjustPanel, resources().getString("dialog.effects.tabs.video.adjust"));
+        tabbedPane.add(videoAdjustPanel, resource("dialog.effects.tabs.video.adjust").name());
 
         setLayout(new MigLayout("fill", "grow", "grow"));
         add(tabbedPane, "grow");

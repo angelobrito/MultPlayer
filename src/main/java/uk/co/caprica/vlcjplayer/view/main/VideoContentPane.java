@@ -27,13 +27,11 @@ final class VideoContentPane extends JPanel {
     VideoContentPane() {
         cardLayout = new CardLayout();
         setLayout(cardLayout);
-        this.setBackground(Color.WHITE);
         
         videoBackground = new ImagePane(
         		ImagePane.Mode.CENTER, 
-				getClass().getResource("/MultTecnologia-logo-name.png"), 
-				0.3f); 
-        videoBackground.setBackground(Color.WHITE);
+				getClass().getResource("/MultTecnologia-logo.png"), 
+				0.3f);
         
         add(videoBackground, NAME_DEFAULT);
         add(application().mediaPlayerComponent(), NAME_VIDEO);

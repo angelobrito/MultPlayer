@@ -19,7 +19,7 @@
 
 package uk.co.caprica.vlcjplayer.view.main;
 
-import static uk.co.caprica.vlcjplayer.Application.resources;
+import static uk.co.caprica.vlcjplayer.view.action.Resource.resource;
 
 import java.awt.Color;
 import java.awt.Dialog;
@@ -49,7 +49,7 @@ final class AboutDialog extends JDialog {
 	private static final long serialVersionUID = 9159057228235442665L;
 
 	AboutDialog(Window owner) {
-        super(owner, resources().getString("dialog.about"), Dialog.ModalityType.DOCUMENT_MODAL);
+        super(owner, resource("dialog.about").name(), Dialog.ModalityType.DOCUMENT_MODAL);
 
         Properties properties = new Properties();
         try {
@@ -70,31 +70,31 @@ final class AboutDialog extends JDialog {
 
         JLabel applicationLabel = new JLabel();
         applicationLabel.setFont(applicationLabel.getFont().deriveFont(30.0f));
-        applicationLabel.setText(resources().getString("dialog.about.application"));
+        applicationLabel.setText(resource("dialog.about.application").name());
 
         JLabel blurb1Label = new JLabel();
-        blurb1Label.setText(resources().getString("dialog.about.blurb1"));
+        blurb1Label.setText(resource("dialog.about.blurb1").name());
 
         JLabel blurb2Label = new JLabel();
-        blurb2Label.setText(resources().getString("dialog.about.blurb2"));
+        blurb2Label.setText(resource("dialog.about.blurb2").name());
 
         JLabel attribution1Label = new JLabel();
-        attribution1Label.setText(resources().getString("dialog.about.attribution1"));
+        attribution1Label.setText(resource("dialog.about.attribution1").name());
 
         JLabel applicationVersionLabel = new JLabel();
-        applicationVersionLabel.setText(resources().getString("dialog.about.applicationVersion"));
+        applicationVersionLabel.setText(resource("dialog.about.applicationVersion").name());
 
         JLabel applicationVersionValueLabel = new ValueLabel();
         applicationVersionValueLabel.setText(properties.getProperty("application.version"));
 
         JLabel vlcjVersionLabel = new JLabel();
-        vlcjVersionLabel.setText(resources().getString("dialog.about.vlcjVersion"));
+        vlcjVersionLabel.setText(resource("dialog.about.vlcjVersion").name());
 
         JLabel vlcjVersionValueLabel = new ValueLabel();
         vlcjVersionValueLabel.setText(Info.getInstance().version().toString());
 
         JLabel vlcVersionLabel = new JLabel();
-        vlcVersionLabel.setText(resources().getString("dialog.about.vlcVersion"));
+        vlcVersionLabel.setText(resource("dialog.about.vlcVersion").name());
 
         JLabel vlcVersionValueLabel = new ValueLabel();
         vlcVersionValueLabel.setText(LibVlcVersion.getVersion().toString());

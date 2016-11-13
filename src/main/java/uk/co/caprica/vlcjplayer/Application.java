@@ -23,6 +23,7 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
+import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -30,13 +31,11 @@ import java.util.concurrent.TimeUnit;
 
 import javax.swing.SwingUtilities;
 
-import uk.co.caprica.vlcj.component.EmbeddedMediaPlayerComponent;
-import uk.co.caprica.vlcjplayer.event.TickEvent;
-import uk.co.caprica.vlcjplayer.view.action.mediaplayer.MediaPlayerActions;
-
 import com.google.common.eventbus.EventBus;
 
 import MixTrackerPlayer.MixTrackerScreenHandler;
+import uk.co.caprica.vlcjplayer.event.TickEvent;
+import uk.co.caprica.vlcjplayer.view.action.mediaplayer.MediaPlayerActions;
 
 /**
  * Global application state.
@@ -50,6 +49,8 @@ public final class Application {
     private static final int MAX_RECENT_MEDIA_SIZE = 10;
 
     private final EventBus eventBus;
+    
+    private final int screenQtt = 4;
 
     private final MixTrackerScreenHandler multiMediaPlayerComponent;
 
@@ -73,7 +74,7 @@ public final class Application {
 
     private Application() {
         eventBus = new EventBus();
-        multiMediaPlayerComponent = new MixTrackerScreenHandler(4) {
+        multiMediaPlayerComponent = new MixTrackerScreenHandler(screenQtt) {
             /**
 			 * 
 			 */

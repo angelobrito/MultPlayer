@@ -20,6 +20,7 @@
 package uk.co.caprica.vlcjplayer.view.effects;
 
 import static uk.co.caprica.vlcjplayer.Application.resources;
+import static uk.co.caprica.vlcjplayer.view.action.Resource.resource;
 
 import java.util.prefs.Preferences;
 
@@ -45,15 +46,15 @@ public class EffectsFrame extends BaseFrame {
     private final VideoEffectsPanel videoEffectsPanel;
 
     public EffectsFrame() {
-        super(resources().getString("dialog.effects"));
+        super(resource("dialog.effects").name());
 
         tabbedPane = new JTabbedPane();
 
         audioEffectsPanel = new AudioEffectsPanel();
-        tabbedPane.addTab(resources().getString("dialog.effects.tabs.audio"), audioEffectsPanel);
+        tabbedPane.addTab(resource("dialog.effects.tabs.audio").name(), audioEffectsPanel);
 
         videoEffectsPanel = new VideoEffectsPanel();
-        tabbedPane.addTab(resources().getString("dialog.effects.tabs.video"), videoEffectsPanel);
+        tabbedPane.addTab(resource("dialog.effects.tabs.video").name(), videoEffectsPanel);
 
         setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 

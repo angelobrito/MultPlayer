@@ -1,5 +1,6 @@
 package MixTrackerPlayer;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.GridLayout;
@@ -27,65 +28,47 @@ public class Screen extends EmbeddedMediaPlayerComponent {
 
 	//Keep references to the next few borders,
 	//for use in titles and compound borders.
-	private Border contourLine;
+	private Border contourLineWhite;
+	private Border contourLineYellow;
 
 	private TitledBorder titled;
 
 	public Screen(String screenTitle, String mediaPath){
 		super();
-
+		
+		this.screenTitle = screenTitle;
+		this.mediaPath   = mediaPath;
+		
 		//A border that puts 10 extra pixels at the sides and
 		//bottom of each pane.
-		contourLine = BorderFactory.createLineBorder(Color.WHITE);
-		this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-		this.setBackground(Color.BLACK);
-		//super.canvas.setBackground(Color.BLACK);
-		//this.add(videoCanvas, BorderLayout.CENTER);
+		contourLineWhite = BorderFactory.createLineBorder(Color.WHITE);
+		contourLineYellow = BorderFactory.createLineBorder(Color.YELLOW);
 		
-		titled = BorderFactory.createTitledBorder(contourLine, this.screenTitle);
-		addCompForTitledBorder(titled,
-				"Screen Holder for " + this.screenTitle,
-				TitledBorder.CENTER,
-				TitledBorder.DEFAULT_POSITION,
-				this);
+		this.setLayout(new GridLayout(1,0));
+		this.setBackground(Color.BLACK);
+		super.onGetCanvas().setBackground(Color.BLACK);
+
+	    this.deactivateScreen();
 		
 		this.addMouseListener(this);
 	}
-	
 
 	public void activateScreen() {
+		this.titled = BorderFactory.createTitledBorder(contourLineYellow, this.screenTitle);
 		this.titled.setTitleColor(Color.YELLOW);
+
+		super.getMediaPlayer().mute();
 		System.out.println("Activated?");
 	}
 	
 	public void deactivateScreen() {
+		this.titled = BorderFactory.createTitledBorder(contourLineWhite, this.screenTitle);
 		this.titled.setTitleColor(Color.WHITE);
+
+		super.getMediaPlayer().mute();
 		System.out.println("Deactivated?");
 	}
-	
-	void addCompForTitledBorder(TitledBorder border,
-			String description,
-			int justification,
-			int position,
-			Container container) {
-		border.setTitleJustification(justification);
-		border.setTitlePosition(position);
-		border.setTitleColor(Color.WHITE);
-		addCompForBorder(border, description,
-				container);
-	}
 
-	void addCompForBorder(Border border,
-			String description,
-			Container container) {
-		JPanel comp = new JPanel(new GridLayout(1, 1), false);
-		comp.setBackground(Color.BLACK);
-		//comp.add(this.getMediaPlayer()); TODO
-		comp.setBorder(border);
-		comp.setName(description);
-		container.add(comp);
-	}
-	
 	/** Returns an ImageIcon, or null if the path was invalid. */
 	protected static ImageIcon createImageIcon(String path,
 			String description) {
@@ -134,5 +117,9 @@ public class Screen extends EmbeddedMediaPlayerComponent {
 
 	public void setNewMedia(String newMediaPath) {
 		this.mediaPath = newMediaPath;
+	}
+	
+	public void start(){
+		this.getMediaPlayer().playMedia(this.mediaPath); 
 	}
 }
