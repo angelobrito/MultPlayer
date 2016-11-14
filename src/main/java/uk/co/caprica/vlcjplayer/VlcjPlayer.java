@@ -130,7 +130,8 @@ public class VlcjPlayer {
         embeddedMediaPlayer.setFullScreenStrategy(new VlcjPlayerFullScreenStrategy(mainFrame));
 
         nativeLog = mediaPlayerComponent.getMediaPlayerFactory().newLog();
-
+        
+        JFrame.setDefaultLookAndFeelDecorated(true);
         messagesFrame = new NativeLogFrame(nativeLog);
         effectsFrame = new EffectsFrame();
         debugFrame = new DebugFrame();

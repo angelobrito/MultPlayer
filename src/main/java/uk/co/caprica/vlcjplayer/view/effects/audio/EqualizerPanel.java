@@ -22,6 +22,7 @@ package uk.co.caprica.vlcjplayer.view.effects.audio;
 import static uk.co.caprica.vlcjplayer.Application.application;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -65,8 +66,8 @@ public class EqualizerPanel extends BasePanel implements ChangeListener, ItemLis
 
     public EqualizerPanel() {
         this.mediaPlayerComponent = application().mediaPlayerComponent();
-
         this.equalizer = mediaPlayerComponent.getMediaPlayerFactory().newEqualizer();
+        this.setBackground(Color.WHITE);
 
         List<Float> list = mediaPlayerComponent.getMediaPlayerFactory().getEqualizerBandFrequencies();
         List<String> presets = mediaPlayerComponent.getMediaPlayerFactory().getEqualizerPresetNames();

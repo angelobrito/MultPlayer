@@ -22,6 +22,8 @@ package uk.co.caprica.vlcjplayer.view.effects.audio;
 import static uk.co.caprica.vlcjplayer.Application.resources;
 import static uk.co.caprica.vlcjplayer.view.action.Resource.resource;
 
+import java.awt.Color;
+
 import javax.swing.JTabbedPane;
 
 import net.miginfocom.swing.MigLayout;
@@ -35,8 +37,10 @@ public class AudioEffectsPanel extends BasePanel {
 
     public AudioEffectsPanel() {
         tabbedPane = new JTabbedPane();
+        //tabbedPane.setBackground(Color.WHITE);
 
         equalizerPanel = new EqualizerPanel();
+        //equalizerPanel.setBackground(Color.WHITE);
         tabbedPane.add(equalizerPanel, resource("dialog.effects.tabs.audio.equalizer").name());
 
         setLayout(new MigLayout("fill", "grow", "grow"));

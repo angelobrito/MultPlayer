@@ -22,6 +22,7 @@ package uk.co.caprica.vlcjplayer.view.effects;
 import static uk.co.caprica.vlcjplayer.Application.resources;
 import static uk.co.caprica.vlcjplayer.view.action.Resource.resource;
 
+import java.awt.Color;
 import java.util.prefs.Preferences;
 
 import javax.swing.BorderFactory;
@@ -49,6 +50,7 @@ public class EffectsFrame extends BaseFrame {
         super(resource("dialog.effects").name());
 
         tabbedPane = new JTabbedPane();
+        tabbedPane.setBackground(Color.WHITE);
 
         audioEffectsPanel = new AudioEffectsPanel();
         tabbedPane.addTab(resource("dialog.effects.tabs.audio").name(), audioEffectsPanel);

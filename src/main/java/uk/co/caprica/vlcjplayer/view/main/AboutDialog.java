@@ -51,6 +51,8 @@ final class AboutDialog extends JDialog {
 	AboutDialog(Window owner) {
         super(owner, resource("dialog.about").name(), Dialog.ModalityType.DOCUMENT_MODAL);
 
+        JDialog.setDefaultLookAndFeelDecorated(true);
+        
         Properties properties = new Properties();
         try {
             properties.load(getClass().getResourceAsStream("/application.properties"));

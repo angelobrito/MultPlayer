@@ -54,6 +54,7 @@ final class PlaylistPane extends JScrollPane implements ActionListener {
 		this.setMinimumSize(new Dimension(300, 400));
 		this.setPreferredSize(new Dimension(200, 400));
 
+		application().mediaPlayerComponent().setMediaDirectory(System.getProperty("user.home"));
 		this.updateWorkingDirTree(System.getProperty("user.home"));
 
 		this.playlist = new JList<String>();
@@ -87,10 +88,10 @@ final class PlaylistPane extends JScrollPane implements ActionListener {
 
 	public void jTree1ValueChanged(TreeSelectionEvent tse ) {
 		String node = tse.getNewLeadSelectionPath().getLastPathComponent().toString();
-		System.out.println("tse" + tse.toString());
-		System.out.println("LeadSelection=" + tse.getNewLeadSelectionPath().getPath()[0]);
-		System.out.println("LeadSelection=" + tse.getNewLeadSelectionPath().getPath()[1]);
-		System.out.println("LeadSelection=" + tse.getNewLeadSelectionPath().getPath()[2]);
+//		System.out.println("tse" + tse.toString());
+//		System.out.println("LeadSelection=" + tse.getNewLeadSelectionPath().getPath()[0]);
+//		System.out.println("LeadSelection=" + tse.getNewLeadSelectionPath().getPath()[1]);
+//		System.out.println("LeadSelection=" + tse.getNewLeadSelectionPath().getPath()[2]);
 		System.out.println("Node =" + node.toString());
 		application().mediaPlayerComponent().setSelectedFile(node.toString());;
 	}

@@ -154,11 +154,6 @@ public final class MainFrame extends BaseFrame {
 				// Fetch the Video folder (it depends on user interaction after the click Open Folder)
 				if (JFileChooser.APPROVE_OPTION == fileChooser.showOpenDialog(MainFrame.this)) {
 					playlistPane.updateWorkingDirTree(getMediaDirectory());
-
-					// FIXME Load player screen that is not working
-					videoContentPane.showVideo();
-//					multiMediaPlayerComponent.start();
-					updateEnabledComponents();
 				}
 			}
 		};
@@ -220,7 +215,6 @@ public final class MainFrame extends BaseFrame {
 			public void actionPerformed(ActionEvent e) {
 				AboutDialog dialog = new AboutDialog(MainFrame.this);
 				dialog.setLocationRelativeTo(MainFrame.this);
-
 				dialog.setVisible(true);
 			}
 		};
@@ -546,4 +540,8 @@ public final class MainFrame extends BaseFrame {
 	public Component getPlayerHandler(){
 		return this.multiMediaPlayerComponent;
 	}
+	
+    public PlaylistPane getPlaylistPane() {
+    	return this.playlistPane;
+    }
 }

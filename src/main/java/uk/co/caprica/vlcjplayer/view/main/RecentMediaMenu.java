@@ -67,9 +67,7 @@ final class RecentMediaMenu extends OnDemandMenu {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            //application().mediaPlayerComponent().getMediaPlayer().playMedia(mrl);
-        	application().mediaPlayerComponent().setMediaDirectory(mrl);
-        	application().mediaPlayerComponent().start();
+        	//super.getPlaylistPane().updateWorkingDirTree(mrl);
         }
     }
 

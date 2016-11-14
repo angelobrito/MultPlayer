@@ -11,7 +11,15 @@ import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.PathMatcher;
+import java.nio.file.Paths;
+import java.util.Vector;
 
+import fileHandlers.PathFinder;
 import uk.co.caprica.vlcj.binding.internal.libvlc_media_t;
 import uk.co.caprica.vlcj.component.EmbeddedMediaPlayerComponent;
 import uk.co.caprica.vlcj.discovery.NativeDiscovery;
@@ -61,6 +69,10 @@ public class MixTrackerScreenHandler extends EmbeddedMediaPlayerComponent implem
 
 	public void setMediaDirectory(String newDirectoryPath) {
 		this.mediaDir = new File(newDirectoryPath);
+	}
+
+	public MediaPlayer getHeadPlayer() {
+		return this.screens[this.selectedScreen].getMediaPlayer();
 	}
 
 	public File getMediaDirectory() {
@@ -222,16 +234,16 @@ public class MixTrackerScreenHandler extends EmbeddedMediaPlayerComponent implem
 
 	public void mute() {
 		for(int i = 0; i < this.screensQtt; i++) 
-			
+
 			if(this.forcedMute) {
-			
+
 				if(!this.screens[i].getMediaPlayer().isMute()) {
 					this.screens[i].getMediaPlayer().mute();
 				}
 				// Else do nothing
 			}
 			else {
-				
+
 				// Otherwise don't care and toggle mute state 
 				this.screens[i].getMediaPlayer().mute();
 			}
@@ -243,7 +255,7 @@ public class MixTrackerScreenHandler extends EmbeddedMediaPlayerComponent implem
 		for(int i = 0; i < this.screensQtt; i++) 
 			this.screens[i].getMediaPlayer().mute();
 	}
-	
+
 	@Override
 	public void volumeChanged(MediaPlayer mediaPlayer, float volume) {
 		for(int i = 0; i < this.screensQtt; i++) 
@@ -361,14 +373,31 @@ public class MixTrackerScreenHandler extends EmbeddedMediaPlayerComponent implem
 
 	public void setSelectedFile(String selectedFile) {
 		this.selectedFile = selectedFile;
-		System.out.println("Set new media file based on " + selectedFile);
-
-		// TODO Update the file fetching algorithm
-		this.mediaFiles[0] = this.mediaDir.getAbsolutePath() + "\\cam1\\" + selectedFile;
-		this.mediaFiles[1] = this.mediaDir.getAbsolutePath() + "\\cam2\\" + selectedFile;
-		this.mediaFiles[2] = this.mediaDir.getAbsolutePath() + "\\cam3\\" + selectedFile;
-		this.mediaFiles[3] = this.mediaDir.getAbsolutePath() + "\\cam4\\" + selectedFile;
+		
+		// FIXME maybe an improvement on how to handle these files is needed
+		Vector<String> foundFiles = this.getRelatedFiles(selectedFile);
+		for(int i = 0; i < this.screensQtt; i++) {
+			if(i < foundFiles.size()) this.mediaFiles[i] = foundFiles.get(i);
+			else this.mediaFiles[i] = "";
+		}
 
 		this.updateScreensMedia();
+	}
+
+	public Vector<String> getRelatedFiles(String fileName) {
+		
+		Vector<String> result = new Vector<String>();
+
+		try {
+		
+			Path startingDir = Paths.get(this.mediaDir.getAbsolutePath());
+			PathFinder finder = new PathFinder(fileName);
+			Files.walkFileTree(startingDir, finder);
+			result = finder.getPathsAsArray();
+			finder.done();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return result;
 	}
 }

@@ -58,19 +58,19 @@ public final class MediaPlayerActions {
     private final Action       videoSnapshotAction;
 
     public MediaPlayerActions(MixTrackerScreenHandler mediaPlayer) {
-        playbackSpeedActions    = newPlaybackSpeedActions   (mediaPlayer.getMediaPlayer());
-        playbackSkipActions     = newPlaybackSkipActions    (mediaPlayer.getMediaPlayer());
-        playbackChapterActions  = newPlaybackChapterActions (mediaPlayer.getMediaPlayer());
-        playbackControlActions  = newPlaybackControlActions (mediaPlayer.getMediaPlayer());
-        audioStereoModeActions  = newAudioStereoModeActions (mediaPlayer.getMediaPlayer());
-        audioControlActions     = newAudioControlActions    (mediaPlayer.getMediaPlayer());
-        videoZoomActions        = newVideoZoomActions       (mediaPlayer.getMediaPlayer());
-        videoAspectRatioActions = newVideoAspectRatioActions(mediaPlayer.getMediaPlayer());
-        videoCropActions        = newVideoCropActions       (mediaPlayer.getMediaPlayer());
+        playbackSpeedActions    = newPlaybackSpeedActions   (mediaPlayer.getHeadPlayer());
+        playbackSkipActions     = newPlaybackSkipActions    (mediaPlayer.getHeadPlayer());
+        playbackChapterActions  = newPlaybackChapterActions (mediaPlayer.getHeadPlayer());
+        playbackControlActions  = newPlaybackControlActions (mediaPlayer.getHeadPlayer());
+        audioStereoModeActions  = newAudioStereoModeActions (mediaPlayer.getHeadPlayer());
+        audioControlActions     = newAudioControlActions    (mediaPlayer.getHeadPlayer());
+        videoZoomActions        = newVideoZoomActions       (mediaPlayer.getHeadPlayer());
+        videoAspectRatioActions = newVideoAspectRatioActions(mediaPlayer.getHeadPlayer());
+        videoCropActions        = newVideoCropActions       (mediaPlayer.getHeadPlayer());
 
-        playbackPlayAction      = new PlayAction    (resource("menu.playback.item.play" ), mediaPlayer.getMediaPlayer());
-        playbackStopAction      = new StopAction    (resource("menu.playback.item.stop" ), mediaPlayer.getMediaPlayer());
-        videoSnapshotAction     = new SnapshotAction(resource("menu.video.item.snapshot"), mediaPlayer.getMediaPlayer());
+        playbackPlayAction      = new PlayAction    (resource("menu.playback.item.play" ), mediaPlayer.getHeadPlayer());
+        playbackStopAction      = new StopAction    (resource("menu.playback.item.stop" ), mediaPlayer.getHeadPlayer());
+        videoSnapshotAction     = new SnapshotAction(resource("menu.video.item.snapshot"), mediaPlayer.getHeadPlayer());
     }
 
     private List<Action> newPlaybackSpeedActions(MediaPlayer mediaPlayer) {

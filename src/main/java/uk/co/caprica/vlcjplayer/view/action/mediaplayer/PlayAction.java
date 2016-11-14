@@ -23,23 +23,39 @@ import static uk.co.caprica.vlcjplayer.Application.application;
 
 import java.awt.event.ActionEvent;
 
+import javax.swing.JDialog;
+import javax.swing.JOptionPane;
+
+import org.w3c.dom.events.EventException;
+
 import uk.co.caprica.vlcj.player.MediaPlayer;
 import uk.co.caprica.vlcjplayer.view.action.Resource;
 
 final class PlayAction extends MediaPlayerAction {
 
-    PlayAction(Resource resource, MediaPlayer mediaPlayer) {
-        super(resource, mediaPlayer);
-    }
+	PlayAction(Resource resource, MediaPlayer mediaPlayer) {
+		super(resource, mediaPlayer);
+	}
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        if (!mediaPlayer.isPlaying()) {
-        	System.out.println("Play Action:" + application().mediaPlayerComponent().getSelectedFile());
-            mediaPlayer.play();
-        }
-        else {
-            mediaPlayer.pause();
-        }
-    }
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		try {
+			if(mediaPlayer.isMediaParsed()) {
+				if (mediaPlayer.isPlaying()) {
+					mediaPlayer.pause();
+				} else {
+					System.out.println("Play Action:" + application().mediaPlayerComponent().getSelectedFile());
+					System.out.println("debug:" + application().mediaPlayerComponent().getSelectedScreen().toString());
+					if(mediaPlayer.isMediaParsed()) mediaPlayer.play();
+					else mediaPlayer.start();
+				}
+			} else {
+				JOptionPane.showMessageDialog(null, "Nenhum arquivo selecionado.");
+			}
+		}
+		catch (Exception e1) {
+			System.err.println(e1.toString());
+			JOptionPane.showMessageDialog(null, "Nenhum arquivo selecionado.");
+		}
+	}
 }

@@ -30,8 +30,8 @@ public class CreateChildNodes implements Runnable {
 		
 		childNode = new DefaultMutableTreeNode();
 		if (files == null) {
-			childNode.setUserObject("Sem arquivos suportados");
-			node.add(childNode); //FIXME Change Empty NodeIcon childNode.
+			//childNode.setUserObject("Sem arquivos suportados");
+			//node.add(childNode); //FIXME Change Empty NodeIcon childNode.
 		}
 		else {
 			
@@ -58,9 +58,9 @@ public class CreateChildNodes implements Runnable {
 			
 			// Check if the node has siblings
 			if(childNode.getSiblingCount() == 1) {
-				childNode = new DefaultMutableTreeNode();
-				childNode.setUserObject("Sem arquivos suportados");
-				node.add(childNode);
+				//childNode = new DefaultMutableTreeNode();
+				//childNode.setUserObject("Sem arquivos suportados");
+				//node.add(childNode);
 			}
 		}
 	}

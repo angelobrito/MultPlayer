@@ -131,6 +131,7 @@ final class ControlsPane extends BasePanel {
 		volumeSlider = new JSlider();
 		volumeSlider.setMinimum(LibVlcConst.MIN_VOLUME);
 		volumeSlider.setMaximum(LibVlcConst.MAX_VOLUME);
+		volumeSlider.setValue(LibVlcConst.MAX_VOLUME-100);
 
 
 		speedLabel = new JLabel("Velocidade: ");
@@ -155,8 +156,11 @@ final class ControlsPane extends BasePanel {
 		setLayout(layout);
 		
 		logoPane = new ImagePane(ImagePane.Mode.FIT, getClass().getResource("/MultTecnologia-logo-name.png"), 1.0f);
-		logoPane.setPreferredSize(new Dimension(50, 50));
 		logoPane.setBackground(Color.WHITE);
+		logoPane.setPreferredSize(new Dimension(50, 50));
+		logoPane.setMinimumSize(new Dimension(50, 50));
+		logoPane.setMaximumSize(new Dimension(50, 50));
+		logoPane.setSize(new Dimension(50, 50));
 		add(logoPane, "wmax 120, hmax 80");
 		
 		add(playPauseButton);
