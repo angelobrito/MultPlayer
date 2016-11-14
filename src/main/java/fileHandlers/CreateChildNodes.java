@@ -25,11 +25,13 @@ public class CreateChildNodes implements Runnable {
 		File[] files = fileRoot.listFiles();
 		DefaultMutableTreeNode childNode;
 		
+		// TODO Just Put Folders and File names.
+		// Also ignore folders with name cam* because they should be composed into a single file
+		
 		childNode = new DefaultMutableTreeNode();
 		if (files == null) {
 			childNode.setUserObject("Sem arquivos suportados");
-			//TODO Change Empty NodeIcon childNode.
-			node.add(childNode);
+			node.add(childNode); //FIXME Change Empty NodeIcon childNode.
 		}
 		else {
 			
@@ -51,7 +53,6 @@ public class CreateChildNodes implements Runnable {
 
 					childNode = new DefaultMutableTreeNode(new FileNode(file));
 					node.add(childNode);
-					//System.out.println("Node Accepted:" + childNode.toString());
 				}
 			}
 			
@@ -73,11 +74,9 @@ public class CreateChildNodes implements Runnable {
 		//System.out.println("fileName=" + fileName);
 		if(fileName.lastIndexOf(".") != -1 && fileName.lastIndexOf(".") != 0) {
 			fileExtension = fileName.substring(fileName.lastIndexOf(".")+1);
-			//System.out.println("fileExt=" + fileExtension);
 		}
-
 		
-		// TODO use a videoFileFilter from the VLCJ library to better do this?
+		// FIXME use a videoFileFilter from the VLCJ library to better do this?
 		if(fileExtension.equalsIgnoreCase("avi")) return true;
 		else if(fileExtension.equalsIgnoreCase("mp4")) return true;
 		else if(fileExtension.equalsIgnoreCase("rmvb")) return true;

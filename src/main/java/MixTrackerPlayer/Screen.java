@@ -105,14 +105,14 @@ public class Screen extends EmbeddedMediaPlayerComponent {
 
 	@Override
 	public void mousePressed(MouseEvent e) {
-		System.out.println("MouseEvent=" + "Pressed on Screen" + this.screenTitle);
-		// TODO Auto-generated method stub
+		// FIXME Auto-generated method stub
+
 	}
 
 	@Override
 	public void mouseReleased(MouseEvent e) {
-		System.out.println("MouseEvent=" + "Released Screen" + this.screenTitle);
-		// TODO Auto-generated method stub
+		// FIXME Auto-generated method stub
+
 	}
 
 	public void setNewMedia(String newMediaPath) {

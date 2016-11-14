@@ -125,8 +125,6 @@ public final class MainFrame extends BaseFrame {
 
 	private final PlaylistPane playlistPane;
 
-	private final ImagePane logoPane;
-
 	private final ControlsPane controlsPane;
 
 	private final VideoContentPane videoContentPane;
@@ -156,9 +154,10 @@ public final class MainFrame extends BaseFrame {
 				// Fetch the Video folder (it depends on user interaction after the click Open Folder)
 				if (JFileChooser.APPROVE_OPTION == fileChooser.showOpenDialog(MainFrame.this)) {
 					playlistPane.updateWorkingDirTree(getMediaDirectory());
-					videoContentPane.showVideo();
+
 					// FIXME Load player screen that is not working
-					multiMediaPlayerComponent.start();
+					videoContentPane.showVideo();
+//					multiMediaPlayerComponent.start();
 					updateEnabledComponents();
 				}
 			}
@@ -331,16 +330,6 @@ public final class MainFrame extends BaseFrame {
 
 		playlistPane = new PlaylistPane();
 		playlistPane.setSize(new Dimension(400, 300));
-		logoPane = new ImagePane(ImagePane.Mode.FIT, getClass().getResource("/MultTecnologia-logo-name.png"), 1.0f);
-		logoPane.setPreferredSize(new Dimension(200, 200));
-		logoPane.setSize(new Dimension(100, 100));
-		logoPane.setBackground(Color.WHITE);
-		holderPane.setMinimumSize(new Dimension(200, 400));        
-
-		// TODO Implement a discrete Logo
-//		holderPane.add(logoPane, BorderLayout.PAGE_END);
-//		holderPane.add(playlistPane, BorderLayout.PAGE_START); 
-//		contentPane.add(holderPane, BorderLayout.WEST);
 		contentPane.add(playlistPane, BorderLayout.WEST);
 
 		bottomPane = new JPanel();
@@ -535,9 +524,8 @@ public final class MainFrame extends BaseFrame {
 
 	public String getMediaDirectory() {
 
-		// TODO implement a smart search algorithm to grab the videos inside the folders
 		File newDirectory = fileChooser.getSelectedFile();
-		this.multiMediaPlayerComponent.setNewMediaDirectory(newDirectory.getAbsolutePath());
+		this.multiMediaPlayerComponent.setMediaDirectory(newDirectory.getAbsolutePath());
 		return this.multiMediaPlayerComponent.getMediaDirectory().getAbsolutePath();
 	}
 	

@@ -29,14 +29,17 @@ public class MixTrackerScreenHandler extends EmbeddedMediaPlayerComponent implem
 	//Our File chooser to help find a file to play
 	private File mediaDir;
 	private String[] mediaFiles;
+	private String selectedFile;
 	private Screen screens[];
 	private int screensQtt;
 	private int selectedScreen;
+	private boolean forcedMute;
 
 	public MixTrackerScreenHandler(int screensQtt) {
 
 		this.screensQtt = screensQtt;
 		this.selectedScreen = 0;
+		this.forcedMute = false;
 
 		this.mediaFiles = new String[this.screensQtt];
 		this.setLayout(new GridLayout((this.screensQtt/2), (this.screensQtt/2), 0, 0)); 
@@ -56,17 +59,8 @@ public class MixTrackerScreenHandler extends EmbeddedMediaPlayerComponent implem
 		}
 	}
 
-	public void setNewMediaDirectory(String newDirectoryPath) {
-
+	public void setMediaDirectory(String newDirectoryPath) {
 		this.mediaDir = new File(newDirectoryPath);
-
-		// TODO Update the file fetching algorithm
-		this.mediaFiles[0] = this.mediaDir.getAbsolutePath() + "\\bourne.mp4";
-		this.mediaFiles[1] = this.mediaDir.getAbsolutePath() + "\\legend.mp4";
-		this.mediaFiles[2] = this.mediaDir.getAbsolutePath() + "\\sample.mp4";
-		this.mediaFiles[3] = this.mediaDir.getAbsolutePath() + "\\simpsons.mp4";
-
-		this.updateScreensMedia();
 	}
 
 	public File getMediaDirectory() {
@@ -226,12 +220,30 @@ public class MixTrackerScreenHandler extends EmbeddedMediaPlayerComponent implem
 			this.screens[i].corked(mediaPlayer, corked);
 	}
 
-	@Override
-	public void muted(MediaPlayer mediaPlayer, boolean muted) {
+	public void mute() {
 		for(int i = 0; i < this.screensQtt; i++) 
-			this.screens[i].muted(mediaPlayer, muted);
+			
+			if(this.forcedMute) {
+			
+				if(!this.screens[i].getMediaPlayer().isMute()) {
+					this.screens[i].getMediaPlayer().mute();
+				}
+				// Else do nothing
+			}
+			else {
+				
+				// Otherwise don't care and toggle mute state 
+				this.screens[i].getMediaPlayer().mute();
+			}
 	}
 
+	public void forceMute() {
+		if(!this.forcedMute) this.forcedMute = true;
+		else this.forcedMute = false;
+		for(int i = 0; i < this.screensQtt; i++) 
+			this.screens[i].getMediaPlayer().mute();
+	}
+	
 	@Override
 	public void volumeChanged(MediaPlayer mediaPlayer, float volume) {
 		for(int i = 0; i < this.screensQtt; i++) 
@@ -341,5 +353,22 @@ public class MixTrackerScreenHandler extends EmbeddedMediaPlayerComponent implem
 
 	public EmbeddedMediaPlayer getSelectedScreen() {
 		return this.screens[this.selectedScreen].getMediaPlayer();
+	}
+
+	public String getSelectedFile() {
+		return selectedFile;
+	}
+
+	public void setSelectedFile(String selectedFile) {
+		this.selectedFile = selectedFile;
+		System.out.println("Set new media file based on " + selectedFile);
+
+		// TODO Update the file fetching algorithm
+		this.mediaFiles[0] = this.mediaDir.getAbsolutePath() + "\\cam1\\" + selectedFile;
+		this.mediaFiles[1] = this.mediaDir.getAbsolutePath() + "\\cam2\\" + selectedFile;
+		this.mediaFiles[2] = this.mediaDir.getAbsolutePath() + "\\cam3\\" + selectedFile;
+		this.mediaFiles[3] = this.mediaDir.getAbsolutePath() + "\\cam4\\" + selectedFile;
+
+		this.updateScreensMedia();
 	}
 }

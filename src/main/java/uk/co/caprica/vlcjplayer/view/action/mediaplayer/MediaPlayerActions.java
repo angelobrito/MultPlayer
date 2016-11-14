@@ -27,8 +27,11 @@ import java.util.List;
 import javax.swing.Action;
 
 import uk.co.caprica.vlcj.player.MediaPlayer;
+import uk.co.caprica.vlcj.player.embedded.EmbeddedMediaPlayer;
 
 import com.google.common.collect.ImmutableList;
+
+import MixTrackerPlayer.MixTrackerScreenHandler;
 
 // FIXME i think none of these actions need be public now?
 //       the dynamic ones currently are unfortunately... for now... (e.g. videotrack)
@@ -54,20 +57,20 @@ public final class MediaPlayerActions {
 
     private final Action       videoSnapshotAction;
 
-    public MediaPlayerActions(MediaPlayer mediaPlayer) {
-        playbackSpeedActions    = newPlaybackSpeedActions   (mediaPlayer);
-        playbackSkipActions     = newPlaybackSkipActions    (mediaPlayer);
-        playbackChapterActions  = newPlaybackChapterActions (mediaPlayer);
-        playbackControlActions  = newPlaybackControlActions (mediaPlayer);
-        audioStereoModeActions  = newAudioStereoModeActions (mediaPlayer);
-        audioControlActions     = newAudioControlActions    (mediaPlayer);
-        videoZoomActions        = newVideoZoomActions       (mediaPlayer);
-        videoAspectRatioActions = newVideoAspectRatioActions(mediaPlayer);
-        videoCropActions        = newVideoCropActions       (mediaPlayer);
+    public MediaPlayerActions(MixTrackerScreenHandler mediaPlayer) {
+        playbackSpeedActions    = newPlaybackSpeedActions   (mediaPlayer.getMediaPlayer());
+        playbackSkipActions     = newPlaybackSkipActions    (mediaPlayer.getMediaPlayer());
+        playbackChapterActions  = newPlaybackChapterActions (mediaPlayer.getMediaPlayer());
+        playbackControlActions  = newPlaybackControlActions (mediaPlayer.getMediaPlayer());
+        audioStereoModeActions  = newAudioStereoModeActions (mediaPlayer.getMediaPlayer());
+        audioControlActions     = newAudioControlActions    (mediaPlayer.getMediaPlayer());
+        videoZoomActions        = newVideoZoomActions       (mediaPlayer.getMediaPlayer());
+        videoAspectRatioActions = newVideoAspectRatioActions(mediaPlayer.getMediaPlayer());
+        videoCropActions        = newVideoCropActions       (mediaPlayer.getMediaPlayer());
 
-        playbackPlayAction      = new PlayAction    (resource("menu.playback.item.play" ), mediaPlayer);
-        playbackStopAction      = new StopAction    (resource("menu.playback.item.stop" ), mediaPlayer);
-        videoSnapshotAction     = new SnapshotAction(resource("menu.video.item.snapshot"), mediaPlayer);
+        playbackPlayAction      = new PlayAction    (resource("menu.playback.item.play" ), mediaPlayer.getMediaPlayer());
+        playbackStopAction      = new StopAction    (resource("menu.playback.item.stop" ), mediaPlayer.getMediaPlayer());
+        videoSnapshotAction     = new SnapshotAction(resource("menu.video.item.snapshot"), mediaPlayer.getMediaPlayer());
     }
 
     private List<Action> newPlaybackSpeedActions(MediaPlayer mediaPlayer) {
@@ -94,10 +97,10 @@ public final class MediaPlayerActions {
         return ImmutableList.copyOf(actions);
     }
 
-    private List<Action> newPlaybackControlActions(MediaPlayer mediaPlayer) {
+    private List<Action> newPlaybackControlActions(MediaPlayer embeddedMediaPlayer) {
         List<Action> actions = new ArrayList<>();
-        actions.add(new PlayAction(resource("menu.playback.item.play"), mediaPlayer));
-        actions.add(new StopAction(resource("menu.playback.item.stop"), mediaPlayer));
+        actions.add(new PlayAction(resource("menu.playback.item.play"), embeddedMediaPlayer));
+        actions.add(new StopAction(resource("menu.playback.item.stop"), embeddedMediaPlayer));
         return ImmutableList.copyOf(actions);
     }
 

@@ -19,6 +19,8 @@
 
 package uk.co.caprica.vlcjplayer.view.action.mediaplayer;
 
+import static uk.co.caprica.vlcjplayer.Application.application;
+
 import java.awt.event.ActionEvent;
 
 import uk.co.caprica.vlcj.player.MediaPlayer;
@@ -33,6 +35,7 @@ final class PlayAction extends MediaPlayerAction {
     @Override
     public void actionPerformed(ActionEvent e) {
         if (!mediaPlayer.isPlaying()) {
+        	System.out.println("Play Action:" + application().mediaPlayerComponent().getSelectedFile());
             mediaPlayer.play();
         }
         else {

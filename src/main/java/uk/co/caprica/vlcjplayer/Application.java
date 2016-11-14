@@ -85,7 +85,7 @@ public final class Application {
                 return new String[] {"--no-osd"}; // Disables the display of the snapshot filename (amongst other things)
             }
         };
-        mediaPlayerActions = new MediaPlayerActions(multiMediaPlayerComponent.getMediaPlayer());
+        mediaPlayerActions = new MediaPlayerActions(multiMediaPlayerComponent);
         tickService.scheduleWithFixedDelay(new Runnable() {
             @Override
             public void run() {
@@ -136,5 +136,9 @@ public final class Application {
 
     public void clearRecentMedia() {
         recentMedia.clear();
+    }
+    
+    public String playlistItem() {
+    	return "";
     }
 }
