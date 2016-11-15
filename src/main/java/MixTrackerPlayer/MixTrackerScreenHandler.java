@@ -3,19 +3,14 @@ package MixTrackerPlayer;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridLayout;
-import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
-import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.PathMatcher;
 import java.nio.file.Paths;
 import java.util.Vector;
 
@@ -35,8 +30,8 @@ public class MixTrackerScreenHandler extends EmbeddedMediaPlayerComponent implem
 	 */
 	private static final long serialVersionUID = 3731874145026049612L;
 	//Our File chooser to help find a file to play
-	private File mediaDir;
-	private String[] mediaFiles;
+	private File mediaDirectory;
+	private String[] mediaFilePath;
 	private String selectedFile;
 	private Screen screens[];
 	private int screensQtt;
@@ -49,26 +44,26 @@ public class MixTrackerScreenHandler extends EmbeddedMediaPlayerComponent implem
 		this.selectedScreen = 0;
 		this.forcedMute = false;
 
-		this.mediaFiles = new String[this.screensQtt];
-		this.setLayout(new GridLayout((this.screensQtt/2), (this.screensQtt/2), 0, 0)); 
+		this.mediaFilePath = new String[this.screensQtt];
+		this.setLayout(new GridLayout((this.screensQtt/2), (this.screensQtt/2))); 
 		this.setMinimumSize(new Dimension(600, 400));
 		this.setBackground(Color.BLACK);
 
 		this.screens = new Screen[this.screensQtt];
 		for(int i = 0; i < this.screensQtt; i++) {
-			this.screens[i] = new Screen("Camera #" + (i + 1), this.mediaFiles[i]);
+			this.screens[i] = new Screen("Camera #" + (i + 1), this.mediaFilePath[i]);
 			this.add(this.screens[i]);
 		}
 	}
 
 	private void updateScreensMedia() {
 		for(int i = 0; i < this.screensQtt; i++)  {
-			this.screens[i].setNewMedia(this.mediaFiles[i]);
+			this.screens[i].setNewMedia(this.mediaFilePath[i]);
 		}
 	}
 
 	public void setMediaDirectory(String newDirectoryPath) {
-		this.mediaDir = new File(newDirectoryPath);
+		this.mediaDirectory = new File(newDirectoryPath);
 	}
 
 	public MediaPlayer getHeadPlayer() {
@@ -76,7 +71,7 @@ public class MixTrackerScreenHandler extends EmbeddedMediaPlayerComponent implem
 	}
 
 	public File getMediaDirectory() {
-		return this.mediaDir;
+		return this.mediaDirectory;
 	}
 
 	public boolean isLibVLCPresent() {
@@ -377,8 +372,8 @@ public class MixTrackerScreenHandler extends EmbeddedMediaPlayerComponent implem
 		// FIXME maybe an improvement on how to handle these files is needed
 		Vector<String> foundFiles = this.getRelatedFiles(selectedFile);
 		for(int i = 0; i < this.screensQtt; i++) {
-			if(i < foundFiles.size()) this.mediaFiles[i] = foundFiles.get(i);
-			else this.mediaFiles[i] = "";
+			if(i < foundFiles.size()) this.mediaFilePath[i] = foundFiles.get(i);
+			else this.mediaFilePath[i] = "";
 		}
 
 		this.updateScreensMedia();
@@ -390,7 +385,7 @@ public class MixTrackerScreenHandler extends EmbeddedMediaPlayerComponent implem
 
 		try {
 		
-			Path startingDir = Paths.get(this.mediaDir.getAbsolutePath());
+			Path startingDir = Paths.get(this.mediaDirectory.getAbsolutePath());
 			PathFinder finder = new PathFinder(fileName);
 			Files.walkFileTree(startingDir, finder);
 			result = finder.getPathsAsArray();
@@ -399,5 +394,16 @@ public class MixTrackerScreenHandler extends EmbeddedMediaPlayerComponent implem
 			e.printStackTrace();
 		}
 		return result;
+	}
+	
+	public void resume() {
+		System.out.println("Resume");
+		for(int i = 0; i < screensQtt; i++){
+			System.out.println("Resume on for=" + i);
+			this.setVisible(true);
+			this.screens[i].setVisible(true);
+			this.screens[i].getMediaPlayer().play();
+			System.out.println("Player screen running?" + (this.screens[i].getMediaPlayer().isPlaying()));
+		}
 	}
 }
