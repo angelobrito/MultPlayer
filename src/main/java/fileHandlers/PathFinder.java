@@ -1,5 +1,7 @@
 package fileHandlers;
 
+import static java.nio.file.FileVisitResult.CONTINUE;
+
 /**
  * Sample code that finds files that match the specified glob pattern.
  * For more information on what constitutes a glob pattern, see
@@ -12,13 +14,14 @@ package fileHandlers;
  * in quotes, so the shell will not expand any wild cards:
  *              java Find . -name "*.java"
  */
-
-import java.io.*;
-import java.nio.file.*;
-import java.nio.file.attribute.*;
-import static java.nio.file.FileVisitResult.*;
-import static java.nio.file.FileVisitOption.*;
-import java.util.*;
+import java.io.IOException;
+import java.nio.file.FileSystems;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Path;
+import java.nio.file.PathMatcher;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.Vector;
 
 
 public class PathFinder extends SimpleFileVisitor<Path> {
