@@ -29,7 +29,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
-import MixTrackerPlayer.MixTrackerScreenHandler;
+import multiplayer.ScreenHandler;
 import uk.co.caprica.vlcj.component.EmbeddedMediaPlayerComponent;
 import uk.co.caprica.vlcj.discovery.NativeDiscovery;
 import uk.co.caprica.vlcj.log.NativeLog;
@@ -111,7 +111,7 @@ public class MultTecnologiaPlayer {
     	JFrame.setDefaultLookAndFeelDecorated(true);
     	        
     	mainFrame = application().getNewMainFrame();
-    	MixTrackerScreenHandler mediaPlayerComponent = application().getMediaPlayerComponent();
+    	ScreenHandler mediaPlayerComponent = application().getMediaPlayerComponent();
     	mainFrame.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {

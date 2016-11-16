@@ -158,8 +158,8 @@ final class ControlsPane extends BasePanel {
 		add(extendedButton, "sg 2, al left, gap 5");
 
 
-		add(speedLabel, "wmax 100");
-		add(speedSlider, "wmax 150, hmax 80, al center center");
+		add(speedLabel, "sg 2, al left, gap 5");
+		add(speedSlider, "sg 1, wmax 150, hmax 80, al left, gap 5");
 		speedSlider.addChangeListener(new ChangeListener() {
 
 			@Override
@@ -169,8 +169,8 @@ final class ControlsPane extends BasePanel {
 			}
 		});
 
-		add(muteButton, "sg 1");
-		add(volumeSlider, "wmax 150, hmax 80, al center center");
+		add(muteButton, "sg 2, al left, gap 5");
+		add(volumeSlider, "sg 1, wmax 150, hmax 80, al center center");
 
 		volumeSlider.addChangeListener(new ChangeListener() {
 			@Override

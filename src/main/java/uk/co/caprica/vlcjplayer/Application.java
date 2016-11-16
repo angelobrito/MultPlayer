@@ -35,7 +35,7 @@ import javax.swing.SwingUtilities;
 
 import com.google.common.eventbus.EventBus;
 
-import MixTrackerPlayer.MixTrackerScreenHandler;
+import multiplayer.ScreenHandler;
 import uk.co.caprica.vlcjplayer.event.TickEvent;
 import uk.co.caprica.vlcjplayer.view.action.mediaplayer.MediaPlayerActions;
 import uk.co.caprica.vlcjplayer.view.main.MainFrame;
@@ -57,7 +57,7 @@ public final class Application {
     
     private JFrame mainFrame;
 
-    private MixTrackerScreenHandler multiMediaPlayerComponent;
+    private ScreenHandler multiMediaPlayerComponent;
 
     private MediaPlayerActions mediaPlayerActions;
 
@@ -110,7 +110,7 @@ public final class Application {
         }
     }
 
-    public MixTrackerScreenHandler getMediaPlayerComponent() {
+    public ScreenHandler getMediaPlayerComponent() {
         return multiMediaPlayerComponent;
     }
 
@@ -160,8 +160,8 @@ public final class Application {
 		return mainFrame;
 	}
 
-	public MixTrackerScreenHandler getNewMediaPlayerComponent(Window container) {
-		multiMediaPlayerComponent = new MixTrackerScreenHandler(container) {
+	public ScreenHandler getNewMediaPlayerComponent(Window container) {
+		multiMediaPlayerComponent = new ScreenHandler(container) {
             /**
 			 * 
 			 */

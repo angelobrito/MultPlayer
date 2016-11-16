@@ -58,7 +58,7 @@ import javax.swing.KeyStroke;
 
 import com.google.common.eventbus.Subscribe;
 
-import MixTrackerPlayer.MixTrackerScreenHandler;
+import multiplayer.ScreenHandler;
 import net.miginfocom.swing.MigLayout;
 import uk.co.caprica.vlcj.player.MediaPlayer;
 import uk.co.caprica.vlcj.player.MediaPlayerEventAdapter;
@@ -87,7 +87,7 @@ public final class MainFrame extends BaseFrame {
 
 	private static final KeyStroke KEYSTROKE_TOGGLE_FULLSCREEN = KeyStroke.getKeyStroke("F11");
 
-	private final MixTrackerScreenHandler multiMediaPlayerComponent;
+	private final ScreenHandler multiMediaPlayerComponent;
 
 	private final Action mediaOpenAction;
 	private final Action mediaQuitAction;

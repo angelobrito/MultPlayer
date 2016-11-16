@@ -1,4 +1,4 @@
-package MixTrackerPlayer;
+package multiplayer;
 
 import java.awt.BorderLayout;
 import java.awt.Color;

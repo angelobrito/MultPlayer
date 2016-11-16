@@ -31,7 +31,7 @@ import uk.co.caprica.vlcj.player.embedded.EmbeddedMediaPlayer;
 
 import com.google.common.collect.ImmutableList;
 
-import MixTrackerPlayer.MixTrackerScreenHandler;
+import multiplayer.ScreenHandler;
 
 // FIXME i think none of these actions need be public now?
 //       the dynamic ones currently are unfortunately... for now... (e.g. videotrack)
@@ -57,7 +57,7 @@ public final class MediaPlayerActions {
 
     private final Action       videoSnapshotAction;
 
-    public MediaPlayerActions(MixTrackerScreenHandler mediaPlayer) {
+    public MediaPlayerActions(ScreenHandler mediaPlayer) {
         playbackSpeedActions    = newPlaybackSpeedActions   (mediaPlayer.getHeadPlayer());
         playbackSkipActions     = newPlaybackSkipActions    (mediaPlayer.getHeadPlayer());
         playbackChapterActions  = newPlaybackChapterActions (mediaPlayer.getHeadPlayer());

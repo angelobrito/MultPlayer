@@ -1,4 +1,4 @@
-package MixTrackerPlayer;
+package multiplayer;
 
 import static uk.co.caprica.vlcjplayer.Application.application;
 
@@ -50,7 +50,7 @@ import uk.co.caprica.vlcjplayer.Application;
 import uk.co.caprica.vlcjplayer.event.SnapshotImageEvent;
 
 
-public class MixTrackerScreenHandler extends EmbeddedMediaPlayerComponent implements MediaPlayerEventListener, MouseListener, MouseMotionListener, MouseWheelListener, KeyListener{
+public class ScreenHandler extends EmbeddedMediaPlayerComponent implements MediaPlayerEventListener, MouseListener, MouseMotionListener, MouseWheelListener, KeyListener{
 
 	/**
 	 * 
@@ -72,7 +72,7 @@ public class MixTrackerScreenHandler extends EmbeddedMediaPlayerComponent implem
 	private int selectedScreen;
 	private boolean forcedMute;
 
-	public MixTrackerScreenHandler(Window container) {
+	public ScreenHandler(Window container) {
 		JPanel contentPane = new JPanel();
 		contentPane.setBackground(Color.black);
 		contentPane.setLayout(new GridLayout(rowsNumber, collumsNumber, 16, 16));
@@ -530,7 +530,7 @@ public class MixTrackerScreenHandler extends EmbeddedMediaPlayerComponent implem
 			System.out.println("Player running?" + (this.players.get(i).mediaPlayer().isPlaying()) + " with new volume " + this.players.get(i).mediaPlayer().getVolume());
 		}
 	}
-	
+
 	public void getSnapshots() {
 		for(int i = 0; i < this.players.size(); i++){
 			if(this.players.get(i).mediaPlayer().isPlaying())
@@ -540,19 +540,22 @@ public class MixTrackerScreenHandler extends EmbeddedMediaPlayerComponent implem
 
 	@Override
 	public void snapshotTaken(MediaPlayer mediaPlayer, String outputFileDirectoryPath) {
-		// TODO is this method to be forwarded for all individual? Or should it be treated for the whole group
 		String fileName;
 		int incremental = 0;
-			fileName = outputFileDirectoryPath + "\\screenshot.png"; // TODO check if a screenshot already exists and increment name
-			while((new File(fileName)).exists()) {
-				incremental++;
-				fileName = outputFileDirectoryPath + "\\screenshot" + incremental + ".png"; 
-			}
-			BufferedImage image = mediaPlayer.getSnapshot();
-			if (image != null) {
-				application().post(new SnapshotImageEvent(image));
-			}
+
+		// check if a screenshot already exists and increment name
+		fileName = outputFileDirectoryPath + "\\screenshot.png"; 
+		while((new File(fileName)).exists()) {
+			incremental++;
+			fileName = outputFileDirectoryPath + "\\screenshot" + incremental + ".png"; 
+		}
+		BufferedImage image = mediaPlayer.getSnapshot();
+		if (image != null) {
+			
+			// FIXME This method as is doesn't uses the filename generated above it should be upgraded in near future.
+			application().post(new SnapshotImageEvent(image));
+		}
 
 	}
-	
+
 }
