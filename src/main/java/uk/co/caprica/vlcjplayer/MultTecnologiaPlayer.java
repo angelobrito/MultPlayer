@@ -47,7 +47,7 @@ import uk.co.caprica.vlcjplayer.view.messages.NativeLogFrame;
 /**
  * Application entry-point.
  */
-public class VlcjPlayer {
+public class MultTecnologiaPlayer {
 
     private static final NativeStreams nativeStreams;
 
@@ -85,7 +85,7 @@ public class VlcjPlayer {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                new VlcjPlayer().start();
+                new MultTecnologiaPlayer().start();
             }
         });
     }
@@ -106,7 +106,7 @@ public class VlcjPlayer {
         }
     }
 
-    public VlcjPlayer() {
+    public MultTecnologiaPlayer() {
         
     	JFrame.setDefaultLookAndFeelDecorated(true);
     	        
