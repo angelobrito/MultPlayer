@@ -23,10 +23,12 @@ import static uk.co.caprica.vlcjplayer.Application.application;
 import static uk.co.caprica.vlcjplayer.view.action.Resource.resource;
 
 import java.awt.event.ActionEvent;
+import java.io.File;
 import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.JFileChooser;
 import javax.swing.JMenu;
 import javax.swing.JSeparator;
 import javax.swing.KeyStroke;
@@ -37,52 +39,61 @@ import uk.co.caprica.vlcjplayer.view.action.StandardAction;
 
 final class RecentMediaMenu extends OnDemandMenu {
 
-    RecentMediaMenu(Resource resource) {
-        super(resource, true);
-    }
+	RecentMediaMenu(Resource resource) {
+		super(resource, true);
+	}
 
-    @Override
-    protected final void onPrepareMenu(JMenu menu) {
-        List<String> mrls = application().recentMedia();
-        if (!mrls.isEmpty()) {
-            int i = 1;
-            for (String mrl : mrls) {
-                menu.add(new PlayRecentAction(i++, mrl));
-            }
-            menu.add(new JSeparator());
-        }
-        menu.add(new ClearRecentMediaAction());
-    }
+	@Override
+	protected final void onPrepareMenu(JMenu menu) {
+		List<String> mrls = application().recentMedia();
+		if (!mrls.isEmpty()) {
+			int i = 1;
+			for (String mrl : mrls) {
+				menu.add(new PlayRecentAction(i++, mrl));
+			}
+			menu.add(new JSeparator());
+		}
+		menu.add(new ClearRecentMediaAction());
+	}
 
-    private class PlayRecentAction extends AbstractAction {
+	private class PlayRecentAction extends AbstractAction {
 
-        private final String mrl;
+		private final String mrl;
 
-        public PlayRecentAction(int number, String mrl) {
-            super(String.format("%d: %s", number, mrl));
-            putValue(Action.MNEMONIC_KEY, number < 10 ? number : 0);
-            putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(String.format("control %d", number < 10 ? number : 0)));
-            this.mrl = mrl;
-        }
+		public PlayRecentAction(int number, String mrl) {
+			super(String.format("%d: %s", number, mrl));
+			putValue(Action.MNEMONIC_KEY, number < 10 ? number : 0);
+			putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(String.format("control %d", number < 10 ? number : 0)));
+			this.mrl = mrl;
+		}
 
-        @Override
-        public void actionPerformed(ActionEvent e) {
-        	System.out.println("Recent action e=" + e.toString() + ", mrl=" + mrl);
-        	//super.getPlaylistPane().updateWorkingDirTree(mrl);
-        	application().getMediaPlayerComponent().setMediaDirectory(mrl);
-        	application().getMediaPlayerComponent().activateScreen(0);
-        }
-    }
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			System.out.println("Recent action e=" + e.toString() + ", mrl=" + mrl);
+			//super.getPlaylistPane().updateWorkingDirTree(mrl);
+			application().getMediaPlayerComponent().setMediaDirectory(mrl);
 
-    private class ClearRecentMediaAction extends StandardAction {
+			System.out.println("Update open folder=" + mrl);
+			File newDirectory = new File(mrl);
+			if(newDirectory.isFile()){
+				application().getMediaPlayerComponent().setSelectedFile(newDirectory.getAbsolutePath());
+				newDirectory = newDirectory.getParentFile();
+			}
+			((MainFrame) application().getMainFrame()).updateDirectoryTree(newDirectory);
+			((MainFrame) application().getMainFrame()).playbackPlayAction().actionPerformed(e);
+			((MainFrame) application().getMainFrame()).updateEnabledComponents();
+		}
+	}
 
-        public ClearRecentMediaAction() {
-            super(resource("menu.media.item.recent.item.clear"));
-        }
+	private class ClearRecentMediaAction extends StandardAction {
 
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            application().clearRecentMedia();
-        }
-    }
+		public ClearRecentMediaAction() {
+			super(resource("menu.media.item.recent.item.clear"));
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			application().clearRecentMedia();
+		}
+	}
 }

@@ -60,10 +60,6 @@ final class ControlsPane extends BasePanel {
 
 	private final Icon pauseIcon = newIcon("pause");
 
-	private final Icon previousIcon = newIcon("previous");
-
-	private final Icon nextIcon = newIcon("next");
-
 	private final Icon fullscreenIcon = newIcon("fullscreen");
 
 	private final Icon extendedIcon = newIcon("extended");
@@ -76,11 +72,7 @@ final class ControlsPane extends BasePanel {
 
 	private final JButton playPauseButton;
 
-	private final JButton previousButton;
-
 	private final JButton stopButton;
-
-	private final JButton nextButton;
 
 	private final JButton fullscreenButton;
 
@@ -109,14 +101,8 @@ final class ControlsPane extends BasePanel {
 		playPauseButton = new BigButton();
 		playPauseButton.setAction(mediaPlayerActions.playbackPlayAction());
 
-		previousButton = new StandardButton();
-		previousButton.setIcon(previousIcon);
-
 		stopButton = new StandardButton();
 		stopButton.setAction(mediaPlayerActions.playbackStopAction());
-
-		nextButton = new StandardButton();
-		nextButton.setIcon(nextIcon);
 
 		fullscreenButton = new StandardButton();
 		fullscreenButton.setIcon(fullscreenIcon);
@@ -164,9 +150,7 @@ final class ControlsPane extends BasePanel {
 		add(logoPane, "wmax 120, hmax 80");
 		
 		add(playPauseButton, "sg 2, al left, gap 5");
-		add(previousButton, "sg 2, al left, gap 5");
 		add(stopButton, "sg 2, al left, gap 5");
-		add(nextButton, "sg 2, al left, gap 5");
 
 		add(fullscreenButton, "sg 2, al left, gap 5");
 
@@ -191,7 +175,7 @@ final class ControlsPane extends BasePanel {
 		volumeSlider.addChangeListener(new ChangeListener() {
 			@Override
 			public void stateChanged(ChangeEvent e) {
-				application().getMediaPlayerComponent().getMediaPlayer().setVolume(volumeSlider.getValue());
+				application().getMediaPlayerComponent().setVolume(volumeSlider.getValue());
 			}
 		});
 
@@ -261,9 +245,7 @@ final class ControlsPane extends BasePanel {
 	}
 
 	public void setEnabledComponents(boolean newState) {
-		previousButton.setEnabled(newState);
 		stopButton.setEnabled(newState);
-		nextButton.setEnabled(newState);
 		fullscreenButton.setEnabled(newState);
 		extendedButton.setEnabled(newState);
 		snapshotButton.setEnabled(newState);

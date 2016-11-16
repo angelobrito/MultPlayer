@@ -20,18 +20,20 @@
 package uk.co.caprica.vlcjplayer.view.action.mediaplayer;
 
 import java.awt.event.ActionEvent;
-
+import static uk.co.caprica.vlcjplayer.Application.application;
 import uk.co.caprica.vlcj.player.MediaPlayer;
 import uk.co.caprica.vlcjplayer.view.action.Resource;
+import uk.co.caprica.vlcjplayer.view.main.MainFrame;
 
 final class StopAction extends MediaPlayerAction {
 
-    StopAction(Resource resource, MediaPlayer mediaPlayer) {
-        super(resource, mediaPlayer);
-    }
+	StopAction(Resource resource, MediaPlayer mediaPlayer) {
+		super(resource, mediaPlayer);
+	}
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        mediaPlayer.stop();
-    }
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		application().getMediaPlayerComponent().stop();
+		((MainFrame) application().getMainFrame()).updateEnabledComponents();
+	}
 }

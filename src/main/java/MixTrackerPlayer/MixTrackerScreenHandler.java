@@ -20,6 +20,7 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -46,6 +47,7 @@ import uk.co.caprica.vlcj.player.embedded.EmbeddedMediaPlayer;
 import uk.co.caprica.vlcj.player.embedded.FullScreenStrategy;
 import uk.co.caprica.vlcj.test.multi.PlayerInstance;
 import uk.co.caprica.vlcjplayer.Application;
+import uk.co.caprica.vlcjplayer.event.SnapshotImageEvent;
 
 
 public class MixTrackerScreenHandler extends EmbeddedMediaPlayerComponent implements MediaPlayerEventListener, MouseListener, MouseMotionListener, MouseWheelListener, KeyListener{
@@ -72,58 +74,56 @@ public class MixTrackerScreenHandler extends EmbeddedMediaPlayerComponent implem
 
 	public MixTrackerScreenHandler(Window container) {
 		JPanel contentPane = new JPanel();
-        contentPane.setBackground(Color.black);
-        contentPane.setLayout(new GridLayout(rowsNumber, collumsNumber, 16, 16));
-        contentPane.setBorder(new EmptyBorder(16, 16, 16, 16));
-        
-        players = new ArrayList<PlayerInstance>();
-        mediaFilePath = new ArrayList<String>();
+		contentPane.setBackground(Color.black);
+		contentPane.setLayout(new GridLayout(rowsNumber, collumsNumber, 16, 16));
+		contentPane.setBorder(new EmptyBorder(16, 16, 16, 16));
 
-        container = new Frame("VLCJ Test Multi Player");
-        container.setIconImage(new ImageIcon(getClass().getResource("/icons/vlcj-logo.png")).getImage());
-        container.setLayout(new BorderLayout());
-        container.setBackground(Color.black);
-        container.add(contentPane, BorderLayout.CENTER);
-        container.setBounds(100, 100, 1600, 300);
-        container.addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent evt) {
-                for(PlayerInstance pi : players) {
-                    pi.mediaPlayer().release();
-                }
-                factory.release();
-                System.exit(0);
-            }
-        });
+		players = new ArrayList<PlayerInstance>();
+		mediaFilePath = new ArrayList<String>();
 
-        container.addKeyListener(new KeyAdapter() {
+		container = new Frame("Screens");
+		container.setLayout(new BorderLayout());
+		container.setBackground(Color.black);
+		container.add(contentPane, BorderLayout.CENTER);
+		container.setBounds(100, 100, 1600, 300);
+		container.addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent evt) {
+				for(PlayerInstance pi : players) {
+					pi.mediaPlayer().release();
+				}
+				factory.release();
+				System.exit(0);
+			}
+		});
 
-            @Override
-            public void keyPressed(KeyEvent e) {
-                for(int i = 0; i < players.size(); i ++ ) {
-                    players.get(i).mediaPlayer().pause();
-                }
-            }
-        });
+		container.addKeyListener(new KeyAdapter() {
 
-        factory = new MediaPlayerFactory();
+			@Override
+			public void keyPressed(KeyEvent e) {
+				for(int i = 0; i < players.size(); i ++ ) {
+					players.get(i).mediaPlayer().pause();
+				}
+			}
+		});
 
-        FullScreenStrategy fullScreenStrategy = new DefaultFullScreenStrategy(container);
+		factory = new MediaPlayerFactory();
 
-        for(int i = 0; i < application().getScreenQtt(); i ++ ) {
-            EmbeddedMediaPlayer player = factory.newEmbeddedMediaPlayer(fullScreenStrategy);
-            PlayerInstance playerInstance = new PlayerInstance(player);
-            players.add(playerInstance);
+		FullScreenStrategy fullScreenStrategy = new DefaultFullScreenStrategy(container);
 
-            JPanel playerPanel = new JPanel();
-            playerPanel.setLayout(new BorderLayout());
-            playerPanel.setBorder(new LineBorder(Color.white, 2));
-            playerPanel.add(playerInstance.videoSurface());
+		for(int i = 0; i < application().getScreenQtt(); i ++ ) {
+			EmbeddedMediaPlayer player = factory.newEmbeddedMediaPlayer(fullScreenStrategy);
+			PlayerInstance playerInstance = new PlayerInstance(player);
+			players.add(playerInstance);
 
-            contentPane.add(playerPanel);
-        }
+			JPanel playerPanel = new JPanel();
+			playerPanel.setLayout(new BorderLayout());
+			playerPanel.setBorder(new LineBorder(Color.white, 2));
+			playerPanel.add(playerInstance.videoSurface());
 
-        container.setVisible(true);
+			contentPane.add(playerPanel);
+		}
+		container.setVisible(true);
 	}
 
 	public MediaPlayerFactory getFactory() {
@@ -133,7 +133,7 @@ public class MixTrackerScreenHandler extends EmbeddedMediaPlayerComponent implem
 	public List<PlayerInstance> getPlayers() {
 		return this.players;
 	}
-	
+
 	public void screensRelease() {
 		for(PlayerInstance pi : this.players) {
 			pi.mediaPlayer().release();
@@ -262,21 +262,6 @@ public class MixTrackerScreenHandler extends EmbeddedMediaPlayerComponent implem
 	public void titleChanged(MediaPlayer mediaPlayer, int newTitle) {
 		for(int i = 0; i < this.players.size(); i++) 
 			this.players.get(i).titleChanged(mediaPlayer, newTitle);
-	}
-
-	@Override
-	public void snapshotTaken(MediaPlayer mediaPlayer, String outputFileDirectoryPath) {
-		// TODO is this method to be forwarded for all individual? Or should it be treated for the whole group
-		String fileName;
-		int incremental = 0;
-		for(int i = 0; i < this.players.size(); i++) {
-			fileName = outputFileDirectoryPath + "\\screenshot.png"; // TODO check if a screenshot already exists and increment name
-			while((new File(fileName)).exists()) {
-				incremental++;
-				fileName = outputFileDirectoryPath + "\\screenshot" + incremental + ".png"; 
-			}
-			this.players.get(i).snapshotTaken(mediaPlayer, fileName);
-		}
 	}
 
 	@Override
@@ -498,8 +483,15 @@ public class MixTrackerScreenHandler extends EmbeddedMediaPlayerComponent implem
 	public void resume() {
 		this.setVisible(true);
 		for(int i = 0; i < this.players.size(); i++){
-			System.out.println("Resume on for=" + i);
-			this.players.get(i).mediaPlayer().play();
+
+			if(!this.players.get(i).mediaPlayer().isPlaying()){
+				System.out.println("Resume for=" + i);
+				this.players.get(i).mediaPlayer().play();
+			}
+			else {
+				System.out.println("Paused for=" + i);
+				this.players.get(i).mediaPlayer().pause();
+			}
 			System.out.println("Player screen running?" + (this.players.get(i).mediaPlayer().isPlaying()));
 		}
 	}
@@ -511,4 +503,56 @@ public class MixTrackerScreenHandler extends EmbeddedMediaPlayerComponent implem
 	public int getCollumsNumber() {
 		return collumsNumber;
 	}
+
+	public void stop() {
+		for(int i = 0; i < this.players.size(); i++){
+
+			System.out.println("Stop for=" + i);
+			this.players.get(i).mediaPlayer().stop();
+			System.out.println("Player screen running?" + (this.players.get(i).mediaPlayer().isPlaying()));
+		}
+	}
+
+	public void setRate(float rate) {
+		for(int i = 0; i < this.players.size(); i++){
+
+			System.out.println("setRate for=" + i);
+			this.players.get(i).mediaPlayer().setRate(rate);
+			System.out.println("Player running?" + (this.players.get(i).mediaPlayer().isPlaying()) + " with new rate " + this.players.get(i).mediaPlayer().getRate());
+		}
+	}
+
+	public void setVolume(int value) {
+		for(int i = 0; i < this.players.size(); i++){
+
+			System.out.println("setVolume for=" + i);
+			this.players.get(i).mediaPlayer().setVolume(value);
+			System.out.println("Player running?" + (this.players.get(i).mediaPlayer().isPlaying()) + " with new volume " + this.players.get(i).mediaPlayer().getVolume());
+		}
+	}
+	
+	public void getSnapshots() {
+		for(int i = 0; i < this.players.size(); i++){
+			if(this.players.get(i).mediaPlayer().isPlaying())
+				this.snapshotTaken(this.players.get(i).mediaPlayer(), this.mediaFilePath.get(i));
+		}
+	}
+
+	@Override
+	public void snapshotTaken(MediaPlayer mediaPlayer, String outputFileDirectoryPath) {
+		// TODO is this method to be forwarded for all individual? Or should it be treated for the whole group
+		String fileName;
+		int incremental = 0;
+			fileName = outputFileDirectoryPath + "\\screenshot.png"; // TODO check if a screenshot already exists and increment name
+			while((new File(fileName)).exists()) {
+				incremental++;
+				fileName = outputFileDirectoryPath + "\\screenshot" + incremental + ".png"; 
+			}
+			BufferedImage image = mediaPlayer.getSnapshot();
+			if (image != null) {
+				application().post(new SnapshotImageEvent(image));
+			}
+
+	}
+	
 }

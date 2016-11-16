@@ -28,6 +28,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
 import java.text.MessageFormat;
 import java.util.Arrays;
@@ -133,23 +134,19 @@ public final class MainFrame extends BaseFrame {
 	private final JPanel bottomPane;
 
 	private final MouseMovementDetector mouseMovementDetector;
+	
+	private final MediaPlayerActions mediaPlayerActions;
 
-	private int screensQtt;
-
-	private boolean debug;
 
 	public MainFrame() {
 		super(resource("main.aplication.name").name());
 
-		// FIXME For now it only supports 4 screens
-		this.screensQtt = 4; 
-		this.debug = false;
 		this.setMinimumSize(new Dimension(1100, 600));
 
 		this.multiMediaPlayerComponent = application().getNewMediaPlayerComponent(this);
 		this.multiMediaPlayerComponent.setMinimumSize(new Dimension(1100, 600));
 
-		MediaPlayerActions mediaPlayerActions = application().mediaNewPlayerActions();
+		mediaPlayerActions = application().mediaNewPlayerActions();
 
 		JPopupMenu.setDefaultLightWeightPopupEnabled(false);
 
@@ -162,7 +159,7 @@ public final class MainFrame extends BaseFrame {
 					System.out.println("Update open folder");
 					File newDirectory = fileChooser.getSelectedFile();
 					if(newDirectory.isFile()) newDirectory = newDirectory.getParentFile();
-					playlistPane.updateDirectoryTree(newDirectory);
+					updateDirectoryTree(newDirectory);
 					if(fileChooser.getSelectedFile().isFile()) { 
 						multiMediaPlayerComponent.setSelectedFile(fileChooser.getSelectedFile().getName());
 						mediaPlayerActions.playbackPlayAction().actionPerformed(e);
@@ -447,7 +444,7 @@ public final class MainFrame extends BaseFrame {
 		setAlwaysOnTop(alwaysOnTop);
 		videoAlwaysOnTopAction.select(alwaysOnTop);
 		fileChooser.setCurrentDirectory(new File(prefs.get("chooserDirectory", ".")));
-		this.playlistPane.updateDirectoryTree(fileChooser.getCurrentDirectory());
+		this.updateDirectoryTree(fileChooser.getCurrentDirectory());
 		String recentMedia = prefs.get("recentMedia", "");
 		if (recentMedia.length() > 0) {
 			List<String> mrls = Arrays.asList(prefs.get("recentMedia", "").split("\\|"));
@@ -488,6 +485,10 @@ public final class MainFrame extends BaseFrame {
 		}
 	}
 
+	public void updateDirectoryTree(File newDirectory){
+		this.playlistPane.updateDirectoryTree(newDirectory);
+	}
+	
 	@Subscribe
 	public void onBeforeEnterFullScreen(BeforeEnterFullScreenEvent event) {
 		menuBar.setVisible(false);
@@ -554,5 +555,9 @@ public final class MainFrame extends BaseFrame {
 
 	public PlaylistPane getPlaylistPane() {
 		return this.playlistPane;
+	}
+
+	public ActionListener playbackPlayAction() {
+		return this.mediaPlayerActions.playbackPlayAction();
 	}
 }

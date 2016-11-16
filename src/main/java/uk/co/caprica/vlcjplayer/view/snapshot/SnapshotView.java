@@ -55,7 +55,7 @@ public class SnapshotView extends JFrame {
 
     public SnapshotView(BufferedImage image) {
         this.image = image;
-        setTitle("vlcj-player snapshot");
+        setTitle("Mult Tecnologia Player snapshot");
         JPanel contentPane = new JPanel();
         contentPane.setLayout(new BorderLayout());
         contentPane.add(new ImagePane(Mode.DEFAULT, image, 1.0f), BorderLayout.CENTER);
@@ -92,7 +92,7 @@ public class SnapshotView extends JFrame {
 
         private ActionPane() {
             setLayout(new MigLayout("fillx", "push[]", "[]"));
-            JButton saveButton = new JButton("Save");
+            JButton saveButton = new JButton("Salvar");
             add(saveButton);
             saveButton.addActionListener(new ActionListener() {
                 @Override

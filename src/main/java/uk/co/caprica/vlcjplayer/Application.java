@@ -45,7 +45,7 @@ import uk.co.caprica.vlcjplayer.view.main.MainFrame;
  */
 public final class Application {
 
-    private static final String RESOURCE_BUNDLE_BASE_NAME = "strings/vlcj-player";
+    private static final String RESOURCE_BUNDLE_BASE_NAME = "strings/MultTecnologia-player";
 
     private static final ResourceBundle resourceBundle = ResourceBundle.getBundle(RESOURCE_BUNDLE_BASE_NAME);
 
@@ -174,4 +174,5 @@ public final class Application {
         }; 
 		return this.multiMediaPlayerComponent;
 	}
+	
 }

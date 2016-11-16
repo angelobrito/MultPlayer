@@ -23,14 +23,10 @@ import static uk.co.caprica.vlcjplayer.Application.application;
 
 import java.awt.event.ActionEvent;
 
-import javax.swing.JDialog;
-import javax.swing.JOptionPane;
-
-import org.w3c.dom.events.EventException;
-
 import MixTrackerPlayer.MixTrackerScreenHandler;
 import uk.co.caprica.vlcj.player.MediaPlayer;
 import uk.co.caprica.vlcjplayer.view.action.Resource;
+import uk.co.caprica.vlcjplayer.view.main.MainFrame;
 
 final class PlayAction extends MediaPlayerAction {
 
@@ -45,6 +41,6 @@ final class PlayAction extends MediaPlayerAction {
 		mediaPlayerComponent.resume();
 		mediaPlayerComponent.getSelectedScreen().start();
 //		FIXME UPDATE buttons and menuItems
-//		application().getMainFrame().updateEnabledComponents();
+		((MainFrame) application().getMainFrame()).updateEnabledComponents();
 	}
 }
