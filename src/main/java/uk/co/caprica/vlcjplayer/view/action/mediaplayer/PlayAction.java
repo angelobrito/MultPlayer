@@ -23,7 +23,7 @@ import static uk.co.caprica.vlcjplayer.Application.application;
 
 import java.awt.event.ActionEvent;
 
-import multiplayer.ScreenHandler;
+import multiplayer.MultiScreensHandler;
 import uk.co.caprica.vlcj.player.MediaPlayer;
 import uk.co.caprica.vlcjplayer.view.action.Resource;
 import uk.co.caprica.vlcjplayer.view.main.MainFrame;
@@ -37,7 +37,7 @@ final class PlayAction extends MediaPlayerAction {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		System.out.println("Play Action:" + e.toString());
-		ScreenHandler mediaPlayerComponent = application().getMediaPlayerComponent();
+		MultiScreensHandler mediaPlayerComponent = application().getMediaPlayerComponent();
 		mediaPlayerComponent.resume();
 		mediaPlayerComponent.getSelectedScreen().start();
 //		FIXME UPDATE buttons and menuItems

@@ -50,7 +50,7 @@ import uk.co.caprica.vlcjplayer.Application;
 import uk.co.caprica.vlcjplayer.event.SnapshotImageEvent;
 
 
-public class ScreenHandler extends EmbeddedMediaPlayerComponent implements MediaPlayerEventListener, MouseListener, MouseMotionListener, MouseWheelListener, KeyListener{
+public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements MediaPlayerEventListener, MouseListener, MouseMotionListener, MouseWheelListener, KeyListener{
 
 	/**
 	 * 
@@ -72,7 +72,7 @@ public class ScreenHandler extends EmbeddedMediaPlayerComponent implements Media
 	private int selectedScreen;
 	private boolean forcedMute;
 
-	public ScreenHandler(Window container) {
+	public MultiScreensHandler(Window container) {
 		JPanel contentPane = new JPanel();
 		contentPane.setBackground(Color.black);
 		contentPane.setLayout(new GridLayout(rowsNumber, collumsNumber, 16, 16));
@@ -114,6 +114,8 @@ public class ScreenHandler extends EmbeddedMediaPlayerComponent implements Media
 		for(int i = 0; i < application().getScreenQtt(); i ++ ) {
 			EmbeddedMediaPlayer player = factory.newEmbeddedMediaPlayer(fullScreenStrategy);
 			PlayerInstance playerInstance = new PlayerInstance(player);
+			// FIXME for debug reason all screens have sound enabled as default but shouldn't
+			//playerInstance.mediaPlayer().mute(true);
 			players.add(playerInstance);
 
 			JPanel playerPanel = new JPanel();

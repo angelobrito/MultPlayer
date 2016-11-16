@@ -29,7 +29,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
-import multiplayer.ScreenHandler;
+import multiplayer.MultiScreensHandler;
 import uk.co.caprica.vlcj.component.EmbeddedMediaPlayerComponent;
 import uk.co.caprica.vlcj.discovery.NativeDiscovery;
 import uk.co.caprica.vlcj.log.NativeLog;
@@ -111,7 +111,7 @@ public class MultTecnologiaPlayer {
     	JFrame.setDefaultLookAndFeelDecorated(true);
     	        
     	mainFrame = application().getNewMainFrame();
-    	ScreenHandler mediaPlayerComponent = application().getMediaPlayerComponent();
+    	MultiScreensHandler mediaPlayerComponent = application().getMediaPlayerComponent();
     	mainFrame.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {

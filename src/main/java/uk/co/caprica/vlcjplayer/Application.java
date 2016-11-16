@@ -35,7 +35,7 @@ import javax.swing.SwingUtilities;
 
 import com.google.common.eventbus.EventBus;
 
-import multiplayer.ScreenHandler;
+import multiplayer.MultiScreensHandler;
 import uk.co.caprica.vlcjplayer.event.TickEvent;
 import uk.co.caprica.vlcjplayer.view.action.mediaplayer.MediaPlayerActions;
 import uk.co.caprica.vlcjplayer.view.main.MainFrame;
@@ -57,7 +57,7 @@ public final class Application {
     
     private JFrame mainFrame;
 
-    private ScreenHandler multiMediaPlayerComponent;
+    private MultiScreensHandler multiMediaPlayerComponent;
 
     private MediaPlayerActions mediaPlayerActions;
 
@@ -110,7 +110,7 @@ public final class Application {
         }
     }
 
-    public ScreenHandler getMediaPlayerComponent() {
+    public MultiScreensHandler getMediaPlayerComponent() {
         return multiMediaPlayerComponent;
     }
 
@@ -160,8 +160,8 @@ public final class Application {
 		return mainFrame;
 	}
 
-	public ScreenHandler getNewMediaPlayerComponent(Window container) {
-		multiMediaPlayerComponent = new ScreenHandler(container) {
+	public MultiScreensHandler getNewMediaPlayerComponent(Window container) {
+		multiMediaPlayerComponent = new MultiScreensHandler(container) {
             /**
 			 * 
 			 */
