@@ -34,7 +34,7 @@ final class VideoContentPane extends JPanel {
 				0.3f);
         
         add(videoBackground, NAME_DEFAULT);
-        add(application().mediaPlayerComponent(), NAME_VIDEO);
+        add(application().getMediaPlayerComponent(), NAME_VIDEO);
     }
 
     public void showDefault() {

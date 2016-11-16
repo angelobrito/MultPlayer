@@ -1,18 +1,38 @@
 package MixTrackerPlayer;
 
+import static uk.co.caprica.vlcjplayer.Application.application;
+
+import java.awt.BorderLayout;
+import java.awt.Canvas;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Frame;
 import java.awt.GridLayout;
+import java.awt.Window;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
+
+import javax.swing.ImageIcon;
+import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
 
 import fileHandlers.PathFinder;
 import uk.co.caprica.vlcj.binding.internal.libvlc_media_t;
@@ -20,7 +40,12 @@ import uk.co.caprica.vlcj.component.EmbeddedMediaPlayerComponent;
 import uk.co.caprica.vlcj.discovery.NativeDiscovery;
 import uk.co.caprica.vlcj.player.MediaPlayer;
 import uk.co.caprica.vlcj.player.MediaPlayerEventListener;
+import uk.co.caprica.vlcj.player.MediaPlayerFactory;
+import uk.co.caprica.vlcj.player.embedded.DefaultFullScreenStrategy;
 import uk.co.caprica.vlcj.player.embedded.EmbeddedMediaPlayer;
+import uk.co.caprica.vlcj.player.embedded.FullScreenStrategy;
+import uk.co.caprica.vlcj.test.multi.PlayerInstance;
+import uk.co.caprica.vlcjplayer.Application;
 
 
 public class MixTrackerScreenHandler extends EmbeddedMediaPlayerComponent implements MediaPlayerEventListener, MouseListener, MouseMotionListener, MouseWheelListener, KeyListener{
@@ -28,37 +53,98 @@ public class MixTrackerScreenHandler extends EmbeddedMediaPlayerComponent implem
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 3731874145026049612L;
-	//Our File chooser to help find a file to play
+	private static final long serialVersionUID = -6723807719374506428L;
+
 	private File mediaDirectory;
-	private String[] mediaFilePath;
+	private List<String> mediaFilePath;
 	private String selectedFile;
-	private Screen screens[];
-	private int screensQtt;
+
+	private int rowsNumber = 2;
+	private int collumsNumber = 2;
+	private List<PlayerInstance> players;
+
+	private MediaPlayerFactory factory;
+
+	FullScreenStrategy fullScreenStrategy;
+
 	private int selectedScreen;
 	private boolean forcedMute;
 
-	public MixTrackerScreenHandler(int screensQtt) {
+	public MixTrackerScreenHandler(Window container) {
+		JPanel contentPane = new JPanel();
+        contentPane.setBackground(Color.black);
+        contentPane.setLayout(new GridLayout(rowsNumber, collumsNumber, 16, 16));
+        contentPane.setBorder(new EmptyBorder(16, 16, 16, 16));
+        
+        players = new ArrayList<PlayerInstance>();
+        mediaFilePath = new ArrayList<String>();
 
-		this.screensQtt = screensQtt;
-		this.selectedScreen = 0;
-		this.forcedMute = false;
+        container = new Frame("VLCJ Test Multi Player");
+        container.setIconImage(new ImageIcon(getClass().getResource("/icons/vlcj-logo.png")).getImage());
+        container.setLayout(new BorderLayout());
+        container.setBackground(Color.black);
+        container.add(contentPane, BorderLayout.CENTER);
+        container.setBounds(100, 100, 1600, 300);
+        container.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent evt) {
+                for(PlayerInstance pi : players) {
+                    pi.mediaPlayer().release();
+                }
+                factory.release();
+                System.exit(0);
+            }
+        });
 
-		this.mediaFilePath = new String[this.screensQtt];
-		this.setLayout(new GridLayout((this.screensQtt/2), (this.screensQtt/2))); 
-		this.setMinimumSize(new Dimension(600, 400));
-		this.setBackground(Color.BLACK);
+        container.addKeyListener(new KeyAdapter() {
 
-		this.screens = new Screen[this.screensQtt];
-		for(int i = 0; i < this.screensQtt; i++) {
-			this.screens[i] = new Screen("Camera #" + (i + 1), this.mediaFilePath[i]);
-			this.add(this.screens[i]);
+            @Override
+            public void keyPressed(KeyEvent e) {
+                for(int i = 0; i < players.size(); i ++ ) {
+                    players.get(i).mediaPlayer().pause();
+                }
+            }
+        });
+
+        factory = new MediaPlayerFactory();
+
+        FullScreenStrategy fullScreenStrategy = new DefaultFullScreenStrategy(container);
+
+        for(int i = 0; i < application().getScreenQtt(); i ++ ) {
+            EmbeddedMediaPlayer player = factory.newEmbeddedMediaPlayer(fullScreenStrategy);
+            PlayerInstance playerInstance = new PlayerInstance(player);
+            players.add(playerInstance);
+
+            JPanel playerPanel = new JPanel();
+            playerPanel.setLayout(new BorderLayout());
+            playerPanel.setBorder(new LineBorder(Color.white, 2));
+            playerPanel.add(playerInstance.videoSurface());
+
+            contentPane.add(playerPanel);
+        }
+
+        container.setVisible(true);
+	}
+
+	public MediaPlayerFactory getFactory() {
+		return this.factory;
+	}
+
+	public List<PlayerInstance> getPlayers() {
+		return this.players;
+	}
+	
+	public void screensRelease() {
+		for(PlayerInstance pi : this.players) {
+			pi.mediaPlayer().release();
 		}
+		this.factory.release();
 	}
 
 	private void updateScreensMedia() {
-		for(int i = 0; i < this.screensQtt; i++)  {
-			this.screens[i].setNewMedia(this.mediaFilePath[i]);
+		for(int i = 0; i < mediaFilePath.size(); i ++ ) {
+			players.get(i).mediaPlayer().prepareMedia(mediaFilePath.get(i));
+			players.get(i).mediaPlayer().setVideoSurface(factory.newVideoSurface(players.get(i).videoSurface()));
 		}
 	}
 
@@ -67,7 +153,7 @@ public class MixTrackerScreenHandler extends EmbeddedMediaPlayerComponent implem
 	}
 
 	public MediaPlayer getHeadPlayer() {
-		return this.screens[this.selectedScreen].getMediaPlayer();
+		return this.players.get(this.selectedScreen).mediaPlayer();
 	}
 
 	public File getMediaDirectory() {
@@ -90,276 +176,284 @@ public class MixTrackerScreenHandler extends EmbeddedMediaPlayerComponent implem
 	}
 
 	public void activateScreen(int screenNumber) {
-		this.screens[screenNumber].start();
+		//TODO Change screen color and unmute
 	}
 
 
 	@Override
 	public void mediaChanged(MediaPlayer mediaPlayer, libvlc_media_t media, String mrl) {
-		for(int i = 0; i < this.screensQtt; i++) 
-			this.screens[i].mediaChanged(mediaPlayer, media, mrl);
+		for(int i = 0; i < this.players.size(); i++) 
+			this.players.get(i).mediaChanged(mediaPlayer, media, mrl);
 	}
 
 	@Override
 	public void opening(MediaPlayer mediaPlayer) {
-		for(int i = 0; i < this.screensQtt; i++) 
-			this.screens[i].opening(mediaPlayer);
+		for(int i = 0; i < this.players.size(); i++) 
+			this.players.get(i).opening(mediaPlayer);
 	}
 
 	@Override
 	public void buffering(MediaPlayer mediaPlayer, float newCache) {
-		for(int i = 0; i < this.screensQtt; i++) 
-			this.screens[i].buffering(mediaPlayer, newCache);
+		for(int i = 0; i < this.players.size(); i++) 
+			this.players.get(i).buffering(mediaPlayer, newCache);
 	}
 
 	@Override
 	public void playing(MediaPlayer mediaPlayer) {
-		for(int i = 0; i < this.screensQtt; i++) 
-			this.screens[i].playing(mediaPlayer);
+		for(int i = 0; i < this.players.size(); i++) 
+			this.players.get(i).playing(mediaPlayer);
 	}
 
 	@Override
 	public void paused(MediaPlayer mediaPlayer) {
-		for(int i = 0; i < this.screensQtt; i++) 
-			this.screens[i].paused(mediaPlayer);
+		for(int i = 0; i < this.players.size(); i++) 
+			this.players.get(i).paused(mediaPlayer);
 	}
 
 	@Override
 	public void stopped(MediaPlayer mediaPlayer) {
-		for(int i = 0; i < this.screensQtt; i++) 
-			this.screens[i].stopped(mediaPlayer);
+		for(int i = 0; i < this.players.size(); i++) 
+			this.players.get(i).stopped(mediaPlayer);
 	}
 
 	@Override
 	public void forward(MediaPlayer mediaPlayer) {
-		for(int i = 0; i < this.screensQtt; i++) 
-			this.screens[i].forward(mediaPlayer);
+		for(int i = 0; i < this.players.size(); i++) 
+			this.players.get(i).forward(mediaPlayer);
 	}
 
 	@Override
 	public void backward(MediaPlayer mediaPlayer) {
-		for(int i = 0; i < this.screensQtt; i++) 
-			this.screens[i].backward(mediaPlayer);
+		for(int i = 0; i < this.players.size(); i++) 
+			this.players.get(i).backward(mediaPlayer);
 	}
 
 	@Override
 	public void finished(MediaPlayer mediaPlayer) {
-		for(int i = 0; i < this.screensQtt; i++) 
-			this.screens[i].finished(mediaPlayer);
+		for(int i = 0; i < this.players.size(); i++) 
+			this.players.get(i).finished(mediaPlayer);
 	}
 
 	@Override
 	public void timeChanged(MediaPlayer mediaPlayer, long newTime) {
-		for(int i = 0; i < this.screensQtt; i++) 
-			this.screens[i].timeChanged(mediaPlayer, newTime);
+		for(int i = 0; i < this.players.size(); i++) 
+			this.players.get(i).timeChanged(mediaPlayer, newTime);
 	}
 
 	@Override
 	public void positionChanged(MediaPlayer mediaPlayer, float newPosition) {
-		for(int i = 0; i < this.screensQtt; i++) 
-			this.screens[i].positionChanged(mediaPlayer, newPosition);
+		for(int i = 0; i < this.players.size(); i++) 
+			this.players.get(i).positionChanged(mediaPlayer, newPosition);
 	}
 
 	@Override
 	public void seekableChanged(MediaPlayer mediaPlayer, int newSeekable) {
-		for(int i = 0; i < this.screensQtt; i++) 
-			this.screens[i].seekableChanged(mediaPlayer, newSeekable);
+		for(int i = 0; i < this.players.size(); i++) 
+			this.players.get(i).seekableChanged(mediaPlayer, newSeekable);
 	}
 
 	@Override
 	public void pausableChanged(MediaPlayer mediaPlayer, int newPausable) {
-		for(int i = 0; i < this.screensQtt; i++) 
-			this.screens[i].pausableChanged(mediaPlayer, newPausable);
+		for(int i = 0; i < this.players.size(); i++) 
+			this.players.get(i).pausableChanged(mediaPlayer, newPausable);
 	}
 
 	@Override
 	public void titleChanged(MediaPlayer mediaPlayer, int newTitle) {
-		for(int i = 0; i < this.screensQtt; i++) 
-			this.screens[i].titleChanged(mediaPlayer, newTitle);
+		for(int i = 0; i < this.players.size(); i++) 
+			this.players.get(i).titleChanged(mediaPlayer, newTitle);
 	}
 
 	@Override
-	public void snapshotTaken(MediaPlayer mediaPlayer, String filename) {
+	public void snapshotTaken(MediaPlayer mediaPlayer, String outputFileDirectoryPath) {
 		// TODO is this method to be forwarded for all individual? Or should it be treated for the whole group
-		for(int i = 0; i < this.screensQtt; i++) 
-			this.screens[i].snapshotTaken(mediaPlayer, filename);
+		String fileName;
+		int incremental = 0;
+		for(int i = 0; i < this.players.size(); i++) {
+			fileName = outputFileDirectoryPath + "\\screenshot.png"; // TODO check if a screenshot already exists and increment name
+			while((new File(fileName)).exists()) {
+				incremental++;
+				fileName = outputFileDirectoryPath + "\\screenshot" + incremental + ".png"; 
+			}
+			this.players.get(i).snapshotTaken(mediaPlayer, fileName);
+		}
 	}
 
 	@Override
 	public void lengthChanged(MediaPlayer mediaPlayer, long newLength) {
-		for(int i = 0; i < this.screensQtt; i++) 
-			this.screens[i].lengthChanged(mediaPlayer, newLength);
+		for(int i = 0; i < this.players.size(); i++) 
+			this.players.get(i).lengthChanged(mediaPlayer, newLength);
 	}
 
 	@Override
 	public void videoOutput(MediaPlayer mediaPlayer, int newCount) {
-		for(int i = 0; i < this.screensQtt; i++) 
-			this.screens[i].videoOutput(mediaPlayer, newCount);
+		for(int i = 0; i < this.players.size(); i++) 
+			this.players.get(i).videoOutput(mediaPlayer, newCount);
 	}
 
 	@Override
 	public void scrambledChanged(MediaPlayer mediaPlayer, int newScrambled) {
-		for(int i = 0; i < this.screensQtt; i++) 
-			this.screens[i].scrambledChanged(mediaPlayer, newScrambled);
+		for(int i = 0; i < this.players.size(); i++) 
+			this.players.get(i).scrambledChanged(mediaPlayer, newScrambled);
 	}
 
 	@Override
 	public void elementaryStreamAdded(MediaPlayer mediaPlayer, int type, int id) {
-		for(int i = 0; i < this.screensQtt; i++) 
-			this.screens[i].elementaryStreamAdded(mediaPlayer, type, id);
+		for(int i = 0; i < this.players.size(); i++) 
+			this.players.get(i).elementaryStreamAdded(mediaPlayer, type, id);
 	}
 
 	@Override
 	public void elementaryStreamDeleted(MediaPlayer mediaPlayer, int type, int id) {
-		for(int i = 0; i < this.screensQtt; i++) 
-			this.screens[i].elementaryStreamDeleted(mediaPlayer, type, id);
+		for(int i = 0; i < this.players.size(); i++) 
+			this.players.get(i).elementaryStreamDeleted(mediaPlayer, type, id);
 	}
 
 	@Override
 	public void elementaryStreamSelected(MediaPlayer mediaPlayer, int type, int id) {
-		for(int i = 0; i < this.screensQtt; i++) 
-			this.screens[i].elementaryStreamSelected(mediaPlayer, type, id);
+		for(int i = 0; i < this.players.size(); i++) 
+			this.players.get(i).elementaryStreamSelected(mediaPlayer, type, id);
 	}
 
 	@Override
 	public void corked(MediaPlayer mediaPlayer, boolean corked) {
-		for(int i = 0; i < this.screensQtt; i++) 
-			this.screens[i].corked(mediaPlayer, corked);
+		for(int i = 0; i < this.players.size(); i++) 
+			this.players.get(i).corked(mediaPlayer, corked);
 	}
 
 	public void mute() {
-		for(int i = 0; i < this.screensQtt; i++) 
+		for(int i = 0; i < this.players.size(); i++) 
 
 			if(this.forcedMute) {
 
-				if(!this.screens[i].getMediaPlayer().isMute()) {
-					this.screens[i].getMediaPlayer().mute();
+				if(!this.players.get(i).mediaPlayer().isMute()) {
+					this.players.get(i).mediaPlayer().mute();
 				}
 				// Else do nothing
 			}
 			else {
 
 				// Otherwise don't care and toggle mute state 
-				this.screens[i].getMediaPlayer().mute();
+				this.players.get(i).mediaPlayer().mute();
 			}
+	}
+
+	public boolean isMuteForced() {
+		return this.forcedMute;
 	}
 
 	public void forceMute() {
 		if(!this.forcedMute) this.forcedMute = true;
 		else this.forcedMute = false;
-		for(int i = 0; i < this.screensQtt; i++) 
-			this.screens[i].getMediaPlayer().mute();
+		for(int i = 0; i < this.players.size(); i++) 
+			this.players.get(i).mediaPlayer().mute();
 	}
 
 	@Override
 	public void volumeChanged(MediaPlayer mediaPlayer, float volume) {
-		for(int i = 0; i < this.screensQtt; i++) 
-			this.screens[i].volumeChanged(mediaPlayer, volume);
+		for(int i = 0; i < this.players.size(); i++) 
+			this.players.get(i).volumeChanged(mediaPlayer, volume);
 	}
 
 	@Override
 	public void audioDeviceChanged(MediaPlayer mediaPlayer, String audioDevice) {
-		for(int i = 0; i < this.screensQtt; i++) 
-			this.screens[i].audioDeviceChanged(mediaPlayer, audioDevice);
+		for(int i = 0; i < this.players.size(); i++) 
+			this.players.get(i).audioDeviceChanged(mediaPlayer, audioDevice);
 	}
 
 	@Override
 	public void chapterChanged(MediaPlayer mediaPlayer, int newChapter) {
-		for(int i = 0; i < this.screensQtt; i++) 
-			this.screens[i].chapterChanged(mediaPlayer, newChapter);
+		for(int i = 0; i < this.players.size(); i++) 
+			this.players.get(i).chapterChanged(mediaPlayer, newChapter);
 	}
 
 	@Override
 	public void error(MediaPlayer mediaPlayer) {
-		for(int i = 0; i < this.screensQtt; i++) 
-			this.screens[i].error(mediaPlayer);
+		for(int i = 0; i < this.players.size(); i++) 
+			this.players.get(i).error(mediaPlayer);
 	}
 
 	@Override
 	public void mediaMetaChanged(MediaPlayer mediaPlayer, int metaType) {
-		for(int i = 0; i < this.screensQtt; i++) 
-			this.screens[i].mediaMetaChanged(mediaPlayer, metaType);
+		for(int i = 0; i < this.players.size(); i++) 
+			this.players.get(i).mediaMetaChanged(mediaPlayer, metaType);
 	}
 
 	@Override
 	public void mediaSubItemAdded(MediaPlayer mediaPlayer, libvlc_media_t subItem) {
-		for(int i = 0; i < this.screensQtt; i++) 
-			this.screens[i].mediaSubItemAdded(mediaPlayer, subItem);
+		for(int i = 0; i < this.players.size(); i++) 
+			this.players.get(i).mediaSubItemAdded(mediaPlayer, subItem);
 	}
 
 	@Override
 	public void mediaDurationChanged(MediaPlayer mediaPlayer, long newDuration) {
-		for(int i = 0; i < this.screensQtt; i++) 
-			this.screens[i].mediaDurationChanged(mediaPlayer, newDuration);
+		for(int i = 0; i < this.players.size(); i++) 
+			this.players.get(i).mediaDurationChanged(mediaPlayer, newDuration);
 	}
 
 	@Override
 	public void mediaParsedChanged(MediaPlayer mediaPlayer, int newStatus) {
-		for(int i = 0; i < this.screensQtt; i++) 
-			this.screens[i].mediaParsedChanged(mediaPlayer, newStatus);
+		for(int i = 0; i < this.players.size(); i++) 
+			this.players.get(i).mediaParsedChanged(mediaPlayer, newStatus);
 	}
 
 	@Override
 	public void mediaFreed(MediaPlayer mediaPlayer) {
-		for(int i = 0; i < this.screensQtt; i++) 
-			this.screens[i].mediaFreed(mediaPlayer);
+		for(int i = 0; i < this.players.size(); i++) 
+			this.players.get(i).mediaFreed(mediaPlayer);
 	}
 
 	@Override
 	public void mediaStateChanged(MediaPlayer mediaPlayer, int newState) {
-		for(int i = 0; i < this.screensQtt; i++) 
-			this.screens[i].mediaStateChanged(mediaPlayer, newState);
+		for(int i = 0; i < this.players.size(); i++) 
+			this.players.get(i).mediaStateChanged(mediaPlayer, newState);
 	}
 
 	@Override
 	public void mediaSubItemTreeAdded(MediaPlayer mediaPlayer, libvlc_media_t item) {
-		for(int i = 0; i < this.screensQtt; i++) 
-			this.screens[i].mediaSubItemTreeAdded(mediaPlayer, item);
+		for(int i = 0; i < this.players.size(); i++) 
+			this.players.get(i).mediaSubItemTreeAdded(mediaPlayer, item);
 	}
 
 	@Override
 	public void newMedia(MediaPlayer mediaPlayer) {
-		for(int i = 0; i < this.screensQtt; i++) 
-			this.screens[i].newMedia(mediaPlayer);
+		for(int i = 0; i < this.players.size(); i++) 
+			this.players.get(i).newMedia(mediaPlayer);
 	}
 
 	@Override
 	public void subItemPlayed(MediaPlayer mediaPlayer, int subItemIndex) {
-		for(int i = 0; i < this.screensQtt; i++) 
-			this.screens[i].subItemPlayed(mediaPlayer, subItemIndex);
+		for(int i = 0; i < this.players.size(); i++) 
+			this.players.get(i).subItemPlayed(mediaPlayer, subItemIndex);
 	}
 
 	@Override
 	public void subItemFinished(MediaPlayer mediaPlayer, int subItemIndex) {
-		for(int i = 0; i < this.screensQtt; i++) 
-			this.screens[i].subItemFinished(mediaPlayer, subItemIndex);
+		for(int i = 0; i < this.players.size(); i++) 
+			this.players.get(i).subItemFinished(mediaPlayer, subItemIndex);
 	}
 
 	@Override
 	public void endOfSubItems(MediaPlayer mediaPlayer) {
-		for(int i = 0; i < this.screensQtt; i++) 
-			this.screens[i].endOfSubItems(mediaPlayer);
-	}
-
-	public void setScreenQuantity(int newScreenQuantity) {
-		this.screensQtt = newScreenQuantity;
+		for(int i = 0; i < this.players.size(); i++) 
+			this.players.get(i).endOfSubItems(mediaPlayer);
 	}
 
 	public void start() {
-		for(int i = 0; i < this.screensQtt; i++) 
-			this.screens[i].start();
+		for(int i = 0; i < this.players.size(); i++) 
+			this.players.get(i).mediaPlayer().start();
 	}
 
 	public boolean isPlaying() {
-		return this.screens[0].getMediaPlayer().isPlaying();
+		return this.players.get(this.selectedScreen).mediaPlayer().isPlaying();
 	}
 
 	public boolean isPlayable() {
-		return this.screens[0].getMediaPlayer().isPlayable();
+		return this.players.get(this.selectedScreen).mediaPlayer().isPlayable();
 	}
 
 	public EmbeddedMediaPlayer getSelectedScreen() {
-		return this.screens[this.selectedScreen].getMediaPlayer();
+		return this.players.get(this.selectedScreen).mediaPlayer();
 	}
 
 	public String getSelectedFile() {
@@ -368,42 +462,53 @@ public class MixTrackerScreenHandler extends EmbeddedMediaPlayerComponent implem
 
 	public void setSelectedFile(String selectedFile) {
 		this.selectedFile = selectedFile;
-		
-		// FIXME maybe an improvement on how to handle these files is needed
-		Vector<String> foundFiles = this.getRelatedFiles(selectedFile);
-		for(int i = 0; i < this.screensQtt; i++) {
-			if(i < foundFiles.size()) this.mediaFilePath[i] = foundFiles.get(i);
-			else this.mediaFilePath[i] = "";
-		}
 
+		// FIXME maybe an improvement on how to handle these files is needed
+		Vector<String> foundFiles = this.getRelatedFiles(this.mediaDirectory, selectedFile);
+		this.mediaFilePath.clear();
+		for(int i = 0; i < this.players.size(); i++) {
+			if(i < foundFiles.size()) this.mediaFilePath.add(foundFiles.get(i));
+			else this.mediaFilePath.add("");
+		}
 		this.updateScreensMedia();
 	}
 
-	public Vector<String> getRelatedFiles(String fileName) {
-		
+	public Vector<String> getRelatedFiles(File workingDirectory, String fileName) {
+
 		Vector<String> result = new Vector<String>();
 
 		try {
-		
-			Path startingDir = Paths.get(this.mediaDirectory.getAbsolutePath());
+
+			Path startingDir = Paths.get(workingDirectory.getAbsolutePath());
 			PathFinder finder = new PathFinder(fileName);
 			Files.walkFileTree(startingDir, finder);
 			result = finder.getPathsAsArray();
-			finder.done();
+			finder.done(fileName);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		return result;
 	}
-	
+
+	public boolean isPlayerReady() {
+		return this.isPlaying() || 
+				this.isPlayable();
+	}
+
 	public void resume() {
-		System.out.println("Resume");
-		for(int i = 0; i < screensQtt; i++){
+		this.setVisible(true);
+		for(int i = 0; i < this.players.size(); i++){
 			System.out.println("Resume on for=" + i);
-			this.setVisible(true);
-			this.screens[i].setVisible(true);
-			this.screens[i].getMediaPlayer().play();
-			System.out.println("Player screen running?" + (this.screens[i].getMediaPlayer().isPlaying()));
+			this.players.get(i).mediaPlayer().play();
+			System.out.println("Player screen running?" + (this.players.get(i).mediaPlayer().isPlaying()));
 		}
+	}
+
+	public int getRowsNumber() {
+		return rowsNumber;
+	}
+
+	public int getCollumsNumber() {
+		return collumsNumber;
 	}
 }

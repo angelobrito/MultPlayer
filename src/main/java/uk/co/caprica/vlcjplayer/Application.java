@@ -19,6 +19,7 @@
 
 package uk.co.caprica.vlcjplayer;
 
+import java.awt.Window;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
@@ -29,6 +30,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
 import com.google.common.eventbus.EventBus;
@@ -36,6 +38,7 @@ import com.google.common.eventbus.EventBus;
 import MixTrackerPlayer.MixTrackerScreenHandler;
 import uk.co.caprica.vlcjplayer.event.TickEvent;
 import uk.co.caprica.vlcjplayer.view.action.mediaplayer.MediaPlayerActions;
+import uk.co.caprica.vlcjplayer.view.main.MainFrame;
 
 /**
  * Global application state.
@@ -50,11 +53,13 @@ public final class Application {
 
     private final EventBus eventBus;
     
-    private final int screenQtt = 4;
+    private final int screenQtt;
+    
+    private JFrame mainFrame;
 
-    private final MixTrackerScreenHandler multiMediaPlayerComponent;
+    private MixTrackerScreenHandler multiMediaPlayerComponent;
 
-    private final MediaPlayerActions mediaPlayerActions;
+    private MediaPlayerActions mediaPlayerActions;
 
     private final ScheduledExecutorService tickService = Executors.newSingleThreadScheduledExecutor();
 
@@ -74,18 +79,10 @@ public final class Application {
 
     private Application() {
         eventBus = new EventBus();
-        multiMediaPlayerComponent = new MixTrackerScreenHandler(screenQtt) {
-            /**
-			 * 
-			 */
-			private static final long serialVersionUID = 3106592667852822185L;
-
-			@Override
-            protected String[] onGetMediaPlayerFactoryExtraArgs() {
-                return new String[] {"--no-osd"}; // Disables the display of the snapshot filename (amongst other things)
-            }
-        };
-        mediaPlayerActions = new MediaPlayerActions(multiMediaPlayerComponent);
+        screenQtt = 4;
+        mainFrame = null;
+        multiMediaPlayerComponent = null;
+        mediaPlayerActions = null;
         tickService.scheduleWithFixedDelay(new Runnable() {
             @Override
             public void run() {
@@ -113,11 +110,16 @@ public final class Application {
         }
     }
 
-    public MixTrackerScreenHandler mediaPlayerComponent() {
+    public MixTrackerScreenHandler getMediaPlayerComponent() {
         return multiMediaPlayerComponent;
     }
 
     public MediaPlayerActions mediaPlayerActions() {
+        return mediaPlayerActions;
+    }
+    
+    public MediaPlayerActions mediaNewPlayerActions() {
+    	mediaPlayerActions = new MediaPlayerActions(multiMediaPlayerComponent);
         return mediaPlayerActions;
     }
 
@@ -141,4 +143,35 @@ public final class Application {
     public String playlistItem() {
     	return "";
     }
+
+	public int getScreenQtt() {
+		return screenQtt;
+	}
+
+	/**
+	 * @return the mainFrame
+	 */
+	public JFrame getMainFrame() {
+		return mainFrame;
+	}
+	
+	public JFrame getNewMainFrame() {
+		mainFrame = new MainFrame();
+		return mainFrame;
+	}
+
+	public MixTrackerScreenHandler getNewMediaPlayerComponent(Window container) {
+		multiMediaPlayerComponent = new MixTrackerScreenHandler(container) {
+            /**
+			 * 
+			 */
+			private static final long serialVersionUID = 3106592667852822185L;
+
+			@Override
+            protected String[] onGetMediaPlayerFactoryExtraArgs() {
+                return new String[] {"--no-osd"}; // Disables the display of the snapshot filename (amongst other things)
+            }
+        }; 
+		return this.multiMediaPlayerComponent;
+	}
 }

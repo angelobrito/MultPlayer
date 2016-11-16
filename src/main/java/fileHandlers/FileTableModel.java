@@ -61,7 +61,7 @@ class FileTableModel extends AbstractTableModel {
             case 9:
                 return file.isFile();
             default:
-                System.err.println("Logic Error");
+                System.err.println("Logic Error on Table.getValueAt");
         }
         return "";
     }

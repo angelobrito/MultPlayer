@@ -50,6 +50,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JSeparator;
 import javax.swing.KeyStroke;
@@ -135,17 +136,22 @@ public final class MainFrame extends BaseFrame {
 
 	private int screensQtt;
 
+	private boolean debug;
+
 	public MainFrame() {
 		super(resource("main.aplication.name").name());
 
 		// FIXME For now it only supports 4 screens
 		this.screensQtt = 4; 
-	
-		this.multiMediaPlayerComponent = application().mediaPlayerComponent();
-		this.multiMediaPlayerComponent.setMinimumSize(new Dimension(800, 600));
-		this.multiMediaPlayerComponent.setScreenQuantity(screensQtt);
+		this.debug = false;
+		this.setMinimumSize(new Dimension(1100, 600));
 
-		MediaPlayerActions mediaPlayerActions = application().mediaPlayerActions();
+		this.multiMediaPlayerComponent = application().getNewMediaPlayerComponent(this);
+		this.multiMediaPlayerComponent.setMinimumSize(new Dimension(1100, 600));
+
+		MediaPlayerActions mediaPlayerActions = application().mediaNewPlayerActions();
+
+		JPopupMenu.setDefaultLightWeightPopupEnabled(false);
 
 		mediaOpenAction = new StandardAction(resource("menu.media.item.openFile")) {
 			@Override
@@ -153,7 +159,15 @@ public final class MainFrame extends BaseFrame {
 
 				// Fetch the Video folder (it depends on user interaction after the click Open Folder)
 				if (JFileChooser.APPROVE_OPTION == fileChooser.showOpenDialog(MainFrame.this)) {
-					playlistPane.updateWorkingDirTree(getMediaDirectory());
+					System.out.println("Update open folder");
+					File newDirectory = fileChooser.getSelectedFile();
+					if(newDirectory.isFile()) newDirectory = newDirectory.getParentFile();
+					playlistPane.updateDirectoryTree(newDirectory);
+					if(fileChooser.getSelectedFile().isFile()) { 
+						multiMediaPlayerComponent.setSelectedFile(fileChooser.getSelectedFile().getName());
+						mediaPlayerActions.playbackPlayAction().actionPerformed(e);
+						updateEnabledComponents();
+					}
 				}
 			}
 		};
@@ -215,7 +229,6 @@ public final class MainFrame extends BaseFrame {
 			public void actionPerformed(ActionEvent e) {
 				AboutDialog dialog = new AboutDialog(MainFrame.this);
 				dialog.setLocationRelativeTo(MainFrame.this);
-				dialog.setVisible(true);
 			}
 		};
 
@@ -224,7 +237,7 @@ public final class MainFrame extends BaseFrame {
 		fileMenu = new JMenu(resource("menu.media").name());
 		fileMenu.setMnemonic(resource("menu.media").mnemonic());
 		fileMenu.add(new JMenuItem(mediaOpenAction));
-		
+
 		mediaRecentMenu = new RecentMediaMenu(resource("menu.media.item.recent")).menu();
 		fileMenu.add(mediaRecentMenu);
 		fileMenu.add(new JSeparator());
@@ -234,9 +247,11 @@ public final class MainFrame extends BaseFrame {
 		playbackMenu = new JMenu(resource("menu.playback").name());
 		playbackMenu.setMnemonic(resource("menu.playback").mnemonic());
 		playbackMenu.add(new JSeparator());
-		
+
 		playbackSpeedMenu = new JMenu(resource("menu.playback.item.speed").name());
 		playbackSpeedMenu.setMnemonic(resource("menu.playback.item.speed").mnemonic());
+		
+		//FIXME Update the speedSlideBar whenever the buttons are pressed
 		for (Action action : mediaPlayerActions.playbackSpeedActions()) {
 			playbackSpeedMenu.add(new JMenuItem(action));
 		}
@@ -278,7 +293,7 @@ public final class MainFrame extends BaseFrame {
 		videoZoomMenu.setMnemonic(resource("menu.video.item.zoom").mnemonic());
 		addActions(mediaPlayerActions.videoZoomActions(), videoZoomMenu/*, true*/); // FIXME how to handle zoom 1:1 and fit to window - also, probably should not use addActions to select
 		videoMenu.add(videoZoomMenu);
-		
+
 		videoCropMenu = new JMenu(resource("menu.video.item.crop").name());
 		videoCropMenu.setMnemonic(resource("menu.video.item.crop").mnemonic());
 		addActions(mediaPlayerActions.videoCropActions(), videoCropMenu, true);
@@ -318,13 +333,9 @@ public final class MainFrame extends BaseFrame {
 		setContentPane(contentPane);
 
 		fileChooser = new JFileChooser();
-		fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-
-		JPanel holderPane = new JPanel();
 
 		playlistPane = new PlaylistPane();
-		playlistPane.setSize(new Dimension(400, 300));
-		contentPane.add(playlistPane, BorderLayout.WEST);
+		contentPane.add(playlistPane.getGui(), BorderLayout.WEST);
 
 		bottomPane = new JPanel();
 		bottomPane.setLayout(new BorderLayout());
@@ -436,6 +447,7 @@ public final class MainFrame extends BaseFrame {
 		setAlwaysOnTop(alwaysOnTop);
 		videoAlwaysOnTopAction.select(alwaysOnTop);
 		fileChooser.setCurrentDirectory(new File(prefs.get("chooserDirectory", ".")));
+		this.playlistPane.updateDirectoryTree(fileChooser.getCurrentDirectory());
 		String recentMedia = prefs.get("recentMedia", "");
 		if (recentMedia.length() > 0) {
 			List<String> mrls = Arrays.asList(prefs.get("recentMedia", "").split("\\|"));
@@ -516,19 +528,18 @@ public final class MainFrame extends BaseFrame {
 		return c.getActionMap();
 	}
 
-	public String getMediaDirectory() {
-
-		File newDirectory = fileChooser.getSelectedFile();
-		this.multiMediaPlayerComponent.setMediaDirectory(newDirectory.getAbsolutePath());
-		return this.multiMediaPlayerComponent.getMediaDirectory().getAbsolutePath();
+	public File getMediaDirectory() {
+		return this.multiMediaPlayerComponent.getMediaDirectory();
 	}
-	
+
 	public void updateEnabledComponents() {
-		boolean playerRunning = multiMediaPlayerComponent.isPlaying()
-							|| multiMediaPlayerComponent.isPlayable();
+
+		boolean playerRunning = multiMediaPlayerComponent.isPlayerReady();
 		System.out.println("Player running:" + playerRunning);
-		
+
 		playbackMenu.setEnabled(playerRunning);
+		// TODO include disability of Volume Up and Volume Down for forcedMute on audioMenu
+		
 		videoFullscreenAction.setEnabled(playerRunning);
 		videoZoomMenu.setEnabled(playerRunning);
 		videoCropMenu.setEnabled(playerRunning);
@@ -540,8 +551,8 @@ public final class MainFrame extends BaseFrame {
 	public Component getPlayerHandler(){
 		return this.multiMediaPlayerComponent;
 	}
-	
-    public PlaylistPane getPlaylistPane() {
-    	return this.playlistPane;
-    }
+
+	public PlaylistPane getPlaylistPane() {
+		return this.playlistPane;
+	}
 }

@@ -28,6 +28,7 @@ import javax.swing.JOptionPane;
 
 import org.w3c.dom.events.EventException;
 
+import MixTrackerPlayer.MixTrackerScreenHandler;
 import uk.co.caprica.vlcj.player.MediaPlayer;
 import uk.co.caprica.vlcjplayer.view.action.Resource;
 
@@ -39,23 +40,11 @@ final class PlayAction extends MediaPlayerAction {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		try {
-			if(mediaPlayer.isMediaParsed()) {
-				if (mediaPlayer.isPlaying()) {
-					mediaPlayer.pause();
-				} else {
-					System.out.println("Play Action:" + application().mediaPlayerComponent().getSelectedFile());
-					System.out.println("debug:" + application().mediaPlayerComponent().getSelectedScreen().toString());
-					if(mediaPlayer.isMediaParsed()) mediaPlayer.play();
-					else mediaPlayer.start();
-				}
-			} else {
-				JOptionPane.showMessageDialog(null, "Nenhum arquivo selecionado.");
-			}
-		}
-		catch (Exception e1) {
-			System.err.println(e1.toString());
-			JOptionPane.showMessageDialog(null, "Nenhum arquivo selecionado.");
-		}
+		System.out.println("Play Action:" + e.toString());
+		MixTrackerScreenHandler mediaPlayerComponent = application().getMediaPlayerComponent();
+		mediaPlayerComponent.resume();
+		mediaPlayerComponent.getSelectedScreen().start();
+//		FIXME UPDATE buttons and menuItems
+//		application().getMainFrame().updateEnabledComponents();
 	}
 }

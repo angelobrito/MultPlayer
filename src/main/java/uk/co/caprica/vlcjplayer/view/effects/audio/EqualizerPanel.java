@@ -65,7 +65,7 @@ public class EqualizerPanel extends BasePanel implements ChangeListener, ItemLis
     private boolean applyingPreset;
 
     public EqualizerPanel() {
-        this.mediaPlayerComponent = application().mediaPlayerComponent();
+        this.mediaPlayerComponent = application().getMediaPlayerComponent();
         this.equalizer = mediaPlayerComponent.getMediaPlayerFactory().newEqualizer();
         this.setBackground(Color.WHITE);
 

@@ -10,10 +10,15 @@ import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Vector;
 
 import javax.imageio.ImageIO;
 import javax.swing.Icon;
@@ -45,6 +50,7 @@ import javax.swing.table.TableColumn;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
+import javax.swing.tree.TreeSelectionModel;
 
 /**
 A basic File Browser.  Requires 1.6+ for the Desktop & SwingWorker
@@ -70,212 +76,265 @@ rename/delete etc. are called that update nodes & file lists.
 @version 2011-06-08
 @see http://codereview.stackexchange.com/q/4446/7784
 @license LGPL
-*/
-class FileBrowser {
+ */
+public class FileBrowser {
 
-    /** Title of the application */
-    public static final String APP_TITLE = "FileBro";
-    
-    /** Used to open/edit/print files. */
-    
-    /** Provides nice icons and names for files. */
-    private FileSystemView fileSystemView;
+	/** Title of the application */
+	public static final String APP_TITLE = "FileBro";
 
-    /** currently selected File. */
-    private File currentFile;
+	/** Used to open/edit/print files. */
 
-    /** Main GUI container */
-    private JPanel gui;
+	/** Provides nice icons and names for files. */
+	private FileSystemView fileSystemView;
 
-    /** File-system tree. Built Lazily */
-    private JTree tree;
-    private DefaultTreeModel treeModel;
+	/** currently selected File. */
+	private File currentFile;
 
-    /** Directory listing */
-//    private JTable table;
-    private JProgressBar progressBar;
-   
-    /** Table model for File[]. */
-    private FileTableModel fileTableModel;
-    private ListSelectionListener listSelectionListener;
-    private boolean cellSizesSet = false;
-    private int rowIconPadding = 6;
+	/** Main GUI container */
+	private JPanel gui;
 
-    private JRadioButton isDirectory;
-    private JRadioButton isFile;
+	/** File-system tree. Built Lazily */
+	private JTree tree;
+	private DefaultTreeModel treeModel;
 
-    public Container getGui() {
-        if (gui==null) {
-            gui = new JPanel(new BorderLayout(3,3));
-            gui.setBorder(new EmptyBorder(5,5,5,5));
+	/** Directory listing */
+	//    private JTable table;
+	private JProgressBar progressBar;
 
-            fileSystemView = FileSystemView.getFileSystemView();
+	public Container getGui() {
+		if (gui==null) {
+			gui = new JPanel(new BorderLayout(3,3));
+			gui.setBorder(new EmptyBorder(5,5,5,5));
 
-            JPanel detailView = new JPanel(new BorderLayout(3,3));
+			fileSystemView = FileSystemView.getFileSystemView();
 
-//            table = new JTable();
-//            table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-//            table.setAutoCreateRowSorter(true);
-//            table.setShowVerticalLines(false);
+			// the File tree
+			DefaultMutableTreeNode root = new DefaultMutableTreeNode();
+			treeModel = new DefaultTreeModel(root);
 
-            listSelectionListener = new ListSelectionListener() {
-                @Override
-                public void valueChanged(ListSelectionEvent lse) {
-//                    int row = table.getSelectionModel().getLeadSelectionIndex();
-//                    setFileDetails( ((FileTableModel)table.getModel()).getFile(row) );
-                }
-            };
-//            table.getSelectionModel().addListSelectionListener(listSelectionListener);
+			TreeSelectionListener treeSelectionListener = new TreeSelectionListener() {
+				public void valueChanged(TreeSelectionEvent tse){
+					DefaultMutableTreeNode node =
+							(DefaultMutableTreeNode)tse.getPath().getLastPathComponent();
+					showChildren(node);
+					System.out.println("TreeSelectionListener from FileBrowser");
+				}
+			};
 
-            // the File tree
-            DefaultMutableTreeNode root = new DefaultMutableTreeNode();
-            treeModel = new DefaultTreeModel(root);
+			// show the file system roots.
+			File[] roots = fileSystemView.getRoots();
+			for (File fileSystemRoot : roots) {
+				DefaultMutableTreeNode node = new DefaultMutableTreeNode(fileSystemRoot);
+				root.add( node );
+				File[] files = fileSystemView.getFiles(fileSystemRoot, true);
+				for (File file : files) {
+					if (file.isDirectory()) {
+						node.add(new DefaultMutableTreeNode(file));
+					}
+				}
+				//
+			}
 
-            TreeSelectionListener treeSelectionListener = new TreeSelectionListener() {
-                public void valueChanged(TreeSelectionEvent tse){
-                    DefaultMutableTreeNode node =
-                        (DefaultMutableTreeNode)tse.getPath().getLastPathComponent();
-                    showChildren(node);
-//                    setFileDetails((File)node.getUserObject());
-                }
-            };
+			tree = new JTree(treeModel);
+			tree.setRootVisible(false);
+			tree.addTreeSelectionListener(treeSelectionListener);
+			tree.setCellRenderer(new FileTreeCellRenderer());
+			tree.expandRow(0);
+			tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+			JScrollPane treeScroll = new JScrollPane(tree);
 
-            // show the file system roots.
-            File[] roots = fileSystemView.getRoots();
-            for (File fileSystemRoot : roots) {
-                DefaultMutableTreeNode node = new DefaultMutableTreeNode(fileSystemRoot);
-                root.add( node );
-                File[] files = fileSystemView.getFiles(fileSystemRoot, true);
-                for (File file : files) {
-                    if (file.isDirectory()) {
-                        node.add(new DefaultMutableTreeNode(file));
-                    }
-                }
-                //
-            }
+			// as per trashgod tip
+			tree.setVisibleRowCount(15);
 
-            tree = new JTree(treeModel);
-            tree.setRootVisible(false);
-            tree.addTreeSelectionListener(treeSelectionListener);
-            tree.setCellRenderer(new FileTreeCellRenderer());
-            tree.expandRow(0);
-            JScrollPane treeScroll = new JScrollPane(tree);
+			Dimension preferredSize = treeScroll.getPreferredSize();
+			Dimension widePreferred = new Dimension(
+					200,
+					(int)preferredSize.getHeight());
+			treeScroll.setPreferredSize( widePreferred );
 
-            // as per trashgod tip
-            tree.setVisibleRowCount(15);
+			gui.add(treeScroll, BorderLayout.CENTER);
 
-            Dimension preferredSize = treeScroll.getPreferredSize();
-            Dimension widePreferred = new Dimension(
-                200,
-                (int)preferredSize.getHeight());
-            treeScroll.setPreferredSize( widePreferred );
+			JPanel simpleOutput = new JPanel(new BorderLayout(3,3));
+			progressBar = new JProgressBar();
+			simpleOutput.add(progressBar, BorderLayout.EAST);
+			progressBar.setVisible(false);
 
-            gui.add(treeScroll, BorderLayout.CENTER);
+			gui.add(simpleOutput, BorderLayout.SOUTH);
+		}
+		return gui;
+	}
 
-            JPanel simpleOutput = new JPanel(new BorderLayout(3,3));
-            progressBar = new JProgressBar();
-            simpleOutput.add(progressBar, BorderLayout.EAST);
-            progressBar.setVisible(false);
+	public void showRootFile() {
+		// ensure the main files are displayed
+		tree.setSelectionInterval(0,0);
+	}
 
-            gui.add(simpleOutput, BorderLayout.SOUTH);
+	private void showThrowable(Throwable t) {
+		t.printStackTrace();
+		JOptionPane.showMessageDialog(
+				gui,
+				t.toString(),
+				t.getMessage(),
+				JOptionPane.ERROR_MESSAGE
+				);
+		gui.repaint();
+	}
 
-        }
-        return gui;
-    }
-
-    public void showRootFile() {
-        // ensure the main files are displayed
-        tree.setSelectionInterval(0,0);
-    }
-
-    private void showThrowable(Throwable t) {
-        t.printStackTrace();
-        JOptionPane.showMessageDialog(
-            gui,
-            t.toString(),
-            t.getMessage(),
-            JOptionPane.ERROR_MESSAGE
-            );
-        gui.repaint();
-    }
-
-    // TODO Icon icon = fileSystemView.getSystemIcon(files[0]);
-
-    /** Add the files that are contained within the directory of this node.
+	/** Add the files that are contained within the directory of this node.
     Thanks to Hovercraft Full Of Eels for the SwingWorker fix. */
-    private void showChildren(final DefaultMutableTreeNode node) {
-        tree.setEnabled(false);
-        progressBar.setVisible(true);
-        progressBar.setIndeterminate(true);
+	public void showChildren(final DefaultMutableTreeNode node) {
+		tree.setEnabled(false);
+		progressBar.setVisible(true);
+		progressBar.setIndeterminate(true);
 
-        SwingWorker<Void, File> worker = new SwingWorker<Void, File>() {
-            @Override
-            public Void doInBackground() {
-                File file = (File) node.getUserObject();
-                if (file.isDirectory()) {
-                    File[] files = fileSystemView.getFiles(file, true); //!!
-                    if (node.isLeaf()) {
-                        for (File child : files) {
-                            if (child.isDirectory()) {
-                                publish(child);
-                            }
-                        }
-                    }
-                }
-                return null;
-            }
+		SwingWorker<Void, File> worker = new SwingWorker<Void, File>() {
+			@Override
+			public Void doInBackground() {
+				File file = (File) node.getUserObject();
+				if (file.isDirectory()) {
+					File[] files = fileSystemView.getFiles(file, true); //!!
+					List<File> videoFiles = new ArrayList<File>();
+					if (node.isLeaf()) {
 
-            @Override
-            protected void process(List<File> chunks) {
-                for (File child : chunks) {
-                    node.add(new DefaultMutableTreeNode(child));
-                }
-            }
+						// First run once to include all Folders
+						for (File child : files) {
+							if (child.isDirectory()) {
+								publish(child);
+							}
 
-            @Override
-            protected void done() {
-                progressBar.setIndeterminate(false);
-                progressBar.setVisible(false);
-                tree.setEnabled(true);
+							// Also include supported Video files
+							else if(isValidVideoFile(child)) {
+								videoFiles.add(child);
+							}
+						}
+						
+						// Then run twice to include just video files
+						for (File child : videoFiles) publish(child);
+					}
+				}
+				return null;
+			}
+
+			@Override
+			protected void process(List<File> chunks) {
+				for (File child : chunks) {
+					node.add(new DefaultMutableTreeNode(child));
+				}
+			}
+
+			@Override
+			protected void done() {
+				progressBar.setIndeterminate(false);
+				progressBar.setVisible(false);
+				tree.setEnabled(true);
+			}
+		};
+		worker.execute();
+	}
+
+	/** Add the files that are contained within the directory of this node.
+    Thanks to Hovercraft Full Of Eels for the SwingWorker fix. */
+	public void navitageToDirectory(File newDirectoryPath) {
+		tree.setEnabled(false);
+		progressBar.setVisible(true);
+		progressBar.setIndeterminate(true);
+
+		DefaultMutableTreeNode node = buildNodeFromString(newDirectoryPath);
+		DefaultMutableTreeNode lastLeaf = new DefaultMutableTreeNode(newDirectoryPath);
+		TreePath path = new TreePath(lastLeaf.getPath());
+		System.out.println("navigateToDirectory path=" + path);
+		tree.setSelectionPath(path);
+
+		progressBar.setIndeterminate(false);
+		progressBar.setVisible(false);
+		tree.setEnabled(true);
+		findTreePath(newDirectoryPath);
+	}
+
+	protected DefaultMutableTreeNode buildNodeFromString(File goal)
+	{
+		DefaultMutableTreeNode root = null;
+		File fileWalker = goal;
+		do {
+			fileWalker = fileWalker.getParentFile();
+		} while (fileWalker.getParentFile() != null);
+		root = new DefaultMutableTreeNode(fileWalker);
+		return root;        
+	}
+
+	public static void main(String[] args) {
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					// Significantly improves the look of the output in
+					// terms of the file names returned by FileSystemView!
+					UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+				} catch(Exception weTried) {
+				}
+				JFrame f = new JFrame(APP_TITLE);
+				f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+				FileBrowser FileBrowser = new FileBrowser();
+				f.setContentPane(FileBrowser.getGui());
+
+				try {
+					URL urlBig = FileBrowser.getClass().getResource("fb-icon-32x32.png");
+					URL urlSmall = FileBrowser.getClass().getResource("fb-icon-16x16.png");
+					ArrayList<Image> images = new ArrayList<Image>();
+					images.add( ImageIO.read(urlBig) );
+					images.add( ImageIO.read(urlSmall) );
+					f.setIconImages(images);
+				} catch(Exception weTried) {
+					System.err.println(weTried.toString());
+				}
+
+				f.pack();
+				f.setLocationByPlatform(true);
+				f.setMinimumSize(f.getSize());
+				f.setVisible(true);
+
+				FileBrowser.showRootFile();
+			}
+		});
+	}
+
+    public TreePath findTreePath(File find) {
+    	System.out.println("findTreePath find=" + find.toString());
+        for (int ii=0; ii < tree.getRowCount(); ii++) {
+            TreePath treePath = tree.getPathForRow(ii);
+            Object object = treePath.getLastPathComponent();
+            DefaultMutableTreeNode node = (DefaultMutableTreeNode) object;
+            File nodeFile = (File) node.getUserObject();
+
+            System.out.println("findTreePath nodeFile[" + ii + "/" + tree.getRowCount() + "]=" + nodeFile.toString());
+            if (nodeFile==find) {
+                return treePath;
             }
-        };
-        worker.execute();
+        }
+        // not found!
+        return null;
     }
+	
+	private boolean isValidVideoFile(File file){
 
+		String fileName;      
+		String fileExtension = ""; 
+		fileName = file.getName();
 
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                try {
-                    // Significantly improves the look of the output in
-                    // terms of the file names returned by FileSystemView!
-                    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-                } catch(Exception weTried) {
-                }
-                JFrame f = new JFrame(APP_TITLE);
-                f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		if(fileName.lastIndexOf(".") != -1 && fileName.lastIndexOf(".") != 0) {
+			fileExtension = fileName.substring(fileName.lastIndexOf(".")+1);
+		}
 
-                FileBrowser FileBrowser = new FileBrowser();
-                f.setContentPane(FileBrowser.getGui());
-
-                try {
-                    URL urlBig = FileBrowser.getClass().getResource("fb-icon-32x32.png");
-                    URL urlSmall = FileBrowser.getClass().getResource("fb-icon-16x16.png");
-                    ArrayList<Image> images = new ArrayList<Image>();
-                    images.add( ImageIO.read(urlBig) );
-                    images.add( ImageIO.read(urlSmall) );
-                    f.setIconImages(images);
-                } catch(Exception weTried) {
-                	System.err.println(weTried.toString());
-                }
-
-                f.pack();
-                f.setLocationByPlatform(true);
-                f.setMinimumSize(f.getSize());
-                f.setVisible(true);
-
-                FileBrowser.showRootFile();
-            }
-        });
-    }
+		// FIXME use a videoFileFilter from the VLCJ library to better do this?
+		if(fileExtension.equalsIgnoreCase("avi")) return true;
+		else if(fileExtension.equalsIgnoreCase("mp4")) return true;
+		else if(fileExtension.equalsIgnoreCase("rmvb")) return true;
+		else if(fileExtension.equalsIgnoreCase("mkv")) return true;
+		else if(fileExtension.equalsIgnoreCase("flv")) return true;
+		else if(fileExtension.equalsIgnoreCase("vob")) return true;
+		else if(fileExtension.equalsIgnoreCase("mov")) return true;
+		else if(fileExtension.equalsIgnoreCase("wmv")) return true;
+		//else if(fileExtension.equalsIgnoreCase("")) return true;
+		else return false;
+	}
 }

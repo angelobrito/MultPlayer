@@ -56,7 +56,7 @@ public class VideoAdjustPanel extends BasePanel {
     private final JSlider gammaSlider;
 
     public VideoAdjustPanel() {
-        this.mediaPlayerComponent = application().mediaPlayerComponent();
+        this.mediaPlayerComponent = application().getMediaPlayerComponent();
 
         enableCheckBox = new JCheckBox(resource("dialog.effects.tabs.video.adjust.enable").name());
 

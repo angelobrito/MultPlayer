@@ -19,80 +19,44 @@
 
 package uk.co.caprica.vlcjplayer.view.main;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import static uk.co.caprica.vlcjplayer.Application.application;
+
 import java.io.File;
 
-import javax.swing.JList;
-import javax.swing.JScrollPane;
 import javax.swing.JTree;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreeModel;
 
-import fileHandlers.CreateChildNodes;
-import fileHandlers.FileNode;
-import static uk.co.caprica.vlcjplayer.Application.application;
+import fileHandlers.FileBrowser;
 
-final class PlaylistPane extends JScrollPane implements ActionListener {
+final class PlaylistPane extends FileBrowser {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 6341111068079660226L;
-
-	private JList<String> playlist;
 	private File          workingDir;
 	private JTree 		  tree;
 
 	public PlaylistPane() {
 
-		this.setBackground(Color.WHITE);
-		this.setMinimumSize(new Dimension(300, 400));
-		this.setPreferredSize(new Dimension(200, 400));
-
-		application().mediaPlayerComponent().setMediaDirectory(System.getProperty("user.home"));
-		this.updateWorkingDirTree(System.getProperty("user.home"));
-
-		this.playlist = new JList<String>();
-		this.add(this.playlist);
+		application().getMediaPlayerComponent().setMediaDirectory(System.getProperty("user.home"));
 	}    
 
-	public void updateWorkingDirTree(String workingDirectoryPath) {
+	public void updateDirectoryTree(File workingDirectoryPath) {
 
-		this.workingDir = new File(workingDirectoryPath);
-		DefaultMutableTreeNode newTreeRoot = new DefaultMutableTreeNode(new FileNode(this.workingDir));
-		TreeModel treeModel = new DefaultTreeModel(newTreeRoot);
-		this.tree = new JTree(treeModel);
-		this.tree.setShowsRootHandles(true);
-		this.tree.setMinimumSize(new Dimension(100, 100));
-		this.tree.addTreeSelectionListener(new javax.swing.event.TreeSelectionListener() {
-			public void valueChanged(javax.swing.event.TreeSelectionEvent evt) {
-				jTree1ValueChanged(evt);
-			}
-		});
-		this.setViewportView(tree);
-
-		CreateChildNodes cnn = new CreateChildNodes(workingDir, newTreeRoot);
-		new Thread(cnn).start();
-	}
-
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		// FIXME Auto-generated method stub
-		System.out.println("PlaylistPane e=" + e.toString());
+		// FIXME this is not showing on guy
+		this.workingDir = workingDirectoryPath;
+		this.navitageToDirectory(workingDirectoryPath);
+		System.out.println("After Navigate");
+		
+		DefaultMutableTreeNode node = new DefaultMutableTreeNode(workingDirectoryPath);
+		this.showChildren(node);
 	}
 
 	public void jTree1ValueChanged(TreeSelectionEvent tse ) {
-		String node = tse.getNewLeadSelectionPath().getLastPathComponent().toString();
-//		System.out.println("tse" + tse.toString());
-//		System.out.println("LeadSelection=" + tse.getNewLeadSelectionPath().getPath()[0]);
-//		System.out.println("LeadSelection=" + tse.getNewLeadSelectionPath().getPath()[1]);
-//		System.out.println("LeadSelection=" + tse.getNewLeadSelectionPath().getPath()[2]);
-		System.out.println("Node =" + node.toString());
-		application().mediaPlayerComponent().setSelectedFile(node.toString());;
+		DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
+		File toTest = new File(this.workingDir + node.toString());
+		System.out.println("Node path=" + node.getPath());
+		System.out.println("Node pathStr=" + node.getPath().toString());
+		System.out.println("Node ObjPath=" + node.getUserObjectPath());
+		System.out.println("Node ObjPathstr=" + node.getUserObjectPath());
+		if (node.isLeaf()) application().getMediaPlayerComponent().setSelectedFile(node.toString());;
 	}
 }

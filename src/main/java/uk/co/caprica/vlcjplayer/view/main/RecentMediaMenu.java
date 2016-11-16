@@ -67,7 +67,10 @@ final class RecentMediaMenu extends OnDemandMenu {
 
         @Override
         public void actionPerformed(ActionEvent e) {
+        	System.out.println("Recent action e=" + e.toString() + ", mrl=" + mrl);
         	//super.getPlaylistPane().updateWorkingDirTree(mrl);
+        	application().getMediaPlayerComponent().setMediaDirectory(mrl);
+        	application().getMediaPlayerComponent().activateScreen(0);
         }
     }
 

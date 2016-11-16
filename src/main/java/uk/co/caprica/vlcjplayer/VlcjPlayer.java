@@ -37,6 +37,7 @@ import uk.co.caprica.vlcj.player.MediaPlayer;
 import uk.co.caprica.vlcj.player.embedded.EmbeddedMediaPlayer;
 import uk.co.caprica.vlcj.runtime.RuntimeUtil;
 import uk.co.caprica.vlcj.runtime.streams.NativeStreams;
+import uk.co.caprica.vlcj.test.multi.PlayerInstance;
 import uk.co.caprica.vlcjplayer.event.ShutdownEvent;
 import uk.co.caprica.vlcjplayer.view.debug.DebugFrame;
 import uk.co.caprica.vlcjplayer.view.effects.EffectsFrame;
@@ -75,11 +76,12 @@ public class VlcjPlayer {
     private final NativeLog nativeLog;
 
     public static void main(String[] args) throws InterruptedException, ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException {
-        // This will locate LibVLC for the vast majority of cases
+        
+    	// This will locate LibVLC for the vast majority of cases
         new NativeDiscovery().discover();
         
         setLookAndFeel();
-
+        
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -105,10 +107,12 @@ public class VlcjPlayer {
     }
 
     public VlcjPlayer() {
-        MixTrackerScreenHandler mediaPlayerComponent = application().mediaPlayerComponent();
-
-        mainFrame = new MainFrame();
-        mainFrame.addWindowListener(new WindowAdapter() {
+        
+    	JFrame.setDefaultLookAndFeelDecorated(true);
+    	        
+    	mainFrame = application().getNewMainFrame();
+    	MixTrackerScreenHandler mediaPlayerComponent = application().getMediaPlayerComponent();
+    	mainFrame.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
                 mediaPlayerComponent.getMediaPlayer().stop();
@@ -117,21 +121,27 @@ public class VlcjPlayer {
                     nativeStreams.release();
                 }
                 application().post(ShutdownEvent.INSTANCE);
+                for(PlayerInstance pi : mediaPlayerComponent.getPlayers()) {
+                    pi.mediaPlayer().release();
+                }
+                mediaPlayerComponent.getFactory().release();
             }
 
             @Override
             public void windowClosed(WindowEvent e) {
+            	System.exit(0);
             }
         });
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         // TODO Update the Fullscreen strategy
-        EmbeddedMediaPlayer embeddedMediaPlayer = mediaPlayerComponent.getMediaPlayer();
-        embeddedMediaPlayer.setFullScreenStrategy(new VlcjPlayerFullScreenStrategy(mainFrame));
+        for(int i = 0; i < application().getScreenQtt(); i++) {
+        	EmbeddedMediaPlayer embeddedMediaPlayer = mediaPlayerComponent.getMediaPlayer();
+        	embeddedMediaPlayer.setFullScreenStrategy(new VlcjPlayerFullScreenStrategy(mainFrame));
+        }
 
         nativeLog = mediaPlayerComponent.getMediaPlayerFactory().newLog();
         
-        JFrame.setDefaultLookAndFeelDecorated(true);
         messagesFrame = new NativeLogFrame(nativeLog);
         effectsFrame = new EffectsFrame();
         debugFrame = new DebugFrame();

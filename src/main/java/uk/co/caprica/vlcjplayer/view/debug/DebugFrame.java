@@ -72,7 +72,7 @@ public final class DebugFrame extends BaseFrame {
 
     public DebugFrame() {
         super("Debug Messages");
-        this.mediaPlayerComponent = application().mediaPlayerComponent();
+        this.mediaPlayerComponent = application().getMediaPlayerComponent();
         this.mouseEventHandler = new MouseEventHandler();
         this.mediaPlayerComponent.getVideoSurface().addMouseListener(mouseEventHandler);
         this.mediaPlayerComponent.getVideoSurface().addMouseMotionListener(mouseEventHandler);

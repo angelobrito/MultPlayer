@@ -41,7 +41,7 @@ final class ChapterMenu extends OnDemandMenu {
 
     @Override
     protected void onPrepareMenu(JMenu menu) {
-        MediaPlayer mediaPlayer = application().mediaPlayerComponent().getMediaPlayer();
+        MediaPlayer mediaPlayer = application().getMediaPlayerComponent().getMediaPlayer();
         List<String> chapters = mediaPlayer.getChapterDescriptions();
         if (chapters != null && !chapters.isEmpty()) {
             int i = 0;

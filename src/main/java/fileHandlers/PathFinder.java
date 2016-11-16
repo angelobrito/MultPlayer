@@ -37,17 +37,17 @@ public class PathFinder extends SimpleFileVisitor<Path> {
 
 	// Compares the glob pattern against
 	// the file or directory name.
-	public void find(Path file) {
-		Path name = file.getFileName();
+	public void find(Path fileName) {
+		Path name = fileName.getFileName();
 		if (name != null && matcher.matches(name)) {
 			numMatches++;
-			foundPaths.add(file.toString());
+			foundPaths.add(fileName.toString());
 		}
 	}
 
 	// Prints the total number of matches to standard out.
-	public void done() {
-		System.out.println("Matched: " + numMatches);
+	public void done(String fileName) {
+		System.out.println("PathFinder Matched " + numMatches + " with " + fileName);
 	}
 
 	public Vector<String> getPathsAsArray() {

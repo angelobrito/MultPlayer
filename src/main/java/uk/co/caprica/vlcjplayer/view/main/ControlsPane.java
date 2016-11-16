@@ -103,6 +103,8 @@ final class ControlsPane extends BasePanel {
 	private final ImagePane logoPane;
 
 	ControlsPane(MediaPlayerActions mediaPlayerActions) {
+		
+		this.setMinimumSize(new Dimension(1200, 100));
 
 		playPauseButton = new BigButton();
 		playPauseButton.setAction(mediaPlayerActions.playbackPlayAction());
@@ -156,31 +158,30 @@ final class ControlsPane extends BasePanel {
 		setLayout(layout);
 		
 		logoPane = new ImagePane(ImagePane.Mode.FIT, getClass().getResource("/MultTecnologia-logo-name.png"), 1.0f);
-		logoPane.setBackground(Color.WHITE);
+		logoPane.setBackground(new Color(Color.TRANSLUCENT));
 		logoPane.setPreferredSize(new Dimension(50, 50));
-		logoPane.setMinimumSize(new Dimension(50, 50));
-		logoPane.setMaximumSize(new Dimension(50, 50));
-		logoPane.setSize(new Dimension(50, 50));
+		logoPane.setIgnoreRepaint(true);
 		add(logoPane, "wmax 120, hmax 80");
 		
-		add(playPauseButton);
-		add(previousButton, "sg 1");
-		add(stopButton, "sg 1");
-		add(nextButton, "sg 1");
+		add(playPauseButton, "sg 2, al left, gap 5");
+		add(previousButton, "sg 2, al left, gap 5");
+		add(stopButton, "sg 2, al left, gap 5");
+		add(nextButton, "sg 2, al left, gap 5");
 
-		add(fullscreenButton, "sg 1");
-		add(extendedButton, "sg 1");
+		add(fullscreenButton, "sg 2, al left, gap 5");
 
-		add(snapshotButton, "sg 1");
+		add(snapshotButton, "sg 2, al left, gap 5");
+		add(extendedButton, "sg 2, al left, gap 5");
 
-		add(speedLabel, "sg 2");
+
+		add(speedLabel, "wmax 100");
 		add(speedSlider, "wmax 150, hmax 80, al center center");
 		speedSlider.addChangeListener(new ChangeListener() {
 
 			@Override
 			public void stateChanged(ChangeEvent e) {
-				//application().mediaPlayerComponent().getMediaPlayer().setVolume(volumeSlider.getValue());
-				System.out.println("speedSlider=" + speedSlider.getValue());
+				application().getMediaPlayerComponent().getMediaPlayer().setRate( (float) Math.pow((double)2, (double)speedSlider.getValue())/8);
+				System.out.println("speedSlider value=" + speedSlider.getValue() + " Speed adjust=" +  Math.pow((double)2, (double)speedSlider.getValue())/8);
 			}
 		});
 
@@ -190,7 +191,7 @@ final class ControlsPane extends BasePanel {
 		volumeSlider.addChangeListener(new ChangeListener() {
 			@Override
 			public void stateChanged(ChangeEvent e) {
-				application().mediaPlayerComponent().getMediaPlayer().setVolume(volumeSlider.getValue());
+				application().getMediaPlayerComponent().getMediaPlayer().setVolume(volumeSlider.getValue());
 			}
 		});
 
@@ -198,16 +199,17 @@ final class ControlsPane extends BasePanel {
 		muteButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				application().mediaPlayerComponent().forceMute();
-				if(application().mediaPlayerComponent().getMediaPlayer().isMute()) muteButton.setIcon(volumeMutedIcon);
+				application().getMediaPlayerComponent().forceMute();
+				if(application().getMediaPlayerComponent().isMuteForced()) muteButton.setIcon(volumeMutedIcon);
 				else muteButton.setIcon(volumeHighIcon);
+				setEnabledComponents(application().getMediaPlayerComponent().isPlayerReady());
 			}
 		});
 
 		fullscreenButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				application().mediaPlayerComponent().getMediaPlayer().toggleFullScreen();
+				application().getMediaPlayerComponent().getMediaPlayer().toggleFullScreen();
 			}
 		});
 
@@ -266,6 +268,6 @@ final class ControlsPane extends BasePanel {
 		extendedButton.setEnabled(newState);
 		snapshotButton.setEnabled(newState);
 		speedSlider.setEnabled(newState);
-
+		volumeSlider.setEnabled(!application().getMediaPlayerComponent().isMuteForced());
 	}
 }
