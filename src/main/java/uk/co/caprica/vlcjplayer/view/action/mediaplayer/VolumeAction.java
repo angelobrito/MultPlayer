@@ -28,7 +28,11 @@ import uk.co.caprica.vlcjplayer.view.main.MainFrame;
 
 final class VolumeAction extends MediaPlayerAction {
 
-    private final int delta;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -6017283512774003373L;
+	private final int delta;
 
     VolumeAction(Resource resource, MediaPlayer mediaPlayer, int delta) {
         super(resource, mediaPlayer);
@@ -42,6 +46,5 @@ final class VolumeAction extends MediaPlayerAction {
         else if(newVolume > 200) newVolume = 200;
 
         ((MainFrame) application().getMainFrame()).setVolumeSlider(newVolume);
-//    	System.out.println("Menu newVolume=" + newVolume + ", delta=" + delta + ", action e=" + e);
     }
 }

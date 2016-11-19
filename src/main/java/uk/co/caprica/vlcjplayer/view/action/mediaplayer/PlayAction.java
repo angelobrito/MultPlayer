@@ -30,6 +30,11 @@ import uk.co.caprica.vlcjplayer.view.main.MainFrame;
 
 final class PlayAction extends MediaPlayerAction {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -2720851085587740008L;
+
 	PlayAction(Resource resource, MediaPlayer mediaPlayer) {
 		super(resource, mediaPlayer);
 	}
@@ -39,8 +44,6 @@ final class PlayAction extends MediaPlayerAction {
 		System.out.println("Play Action:" + e.toString());
 		MultiScreensHandler mediaPlayerComponent = application().getMediaPlayerComponent();
 		mediaPlayerComponent.resume();
-//		FIXME UPDATE buttons and menuItems
-//		mediaPlayerComponent.getSelectedScreen().start();
 		((MainFrame) application().getMainFrame()).updateEnabledComponents();
 	}
 }

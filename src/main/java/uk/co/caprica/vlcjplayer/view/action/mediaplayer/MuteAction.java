@@ -29,14 +29,18 @@ import uk.co.caprica.vlcjplayer.view.main.MainFrame;
 
 final class MuteAction extends MediaPlayerAction {
 
-    MuteAction(Resource resource, MediaPlayer mediaPlayer) {
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1276111891207424800L;
+
+	MuteAction(Resource resource, MediaPlayer mediaPlayer) {
         super(resource, mediaPlayer);
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-//        mediaPlayer.mute();
-		application().getMediaPlayerComponent().forceMute();
+    	application().getMediaPlayerComponent().forceMute();
 		((MainFrame) application().getMainFrame()).updateEnabledComponents();
     }
 }

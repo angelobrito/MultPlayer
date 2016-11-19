@@ -3,20 +3,14 @@ package multiplayer;
 import static uk.co.caprica.vlcjplayer.Application.application;
 
 import java.awt.BorderLayout;
-import java.awt.Canvas;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.Frame;
 import java.awt.GridLayout;
-import java.awt.Window;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
-import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -30,7 +24,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
-import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
@@ -46,9 +39,7 @@ import uk.co.caprica.vlcj.player.MediaPlayerFactory;
 import uk.co.caprica.vlcj.player.embedded.DefaultFullScreenStrategy;
 import uk.co.caprica.vlcj.player.embedded.EmbeddedMediaPlayer;
 import uk.co.caprica.vlcj.player.embedded.FullScreenStrategy;
-import uk.co.caprica.vlcj.test.basic.PlayerControlsPanel;
 import uk.co.caprica.vlcj.test.multi.PlayerInstance;
-import uk.co.caprica.vlcjplayer.Application;
 import uk.co.caprica.vlcjplayer.event.SnapshotImageEvent;
 
 
@@ -119,8 +110,7 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 		for(int i = 0; i < application().getScreenQtt(); i ++ ) {
 			EmbeddedMediaPlayer player = factory.newEmbeddedMediaPlayer(fullScreenStrategy);
 			PlayerInstance playerInstance = new PlayerInstance(player);
-			// FIXME for debug reason all screens have sound enabled as default but shouldn't
-			//playerInstance.mediaPlayer().mute(true);
+			if(i != 0) playerInstance.mediaPlayer().mute(true);
 			players.add(playerInstance);
 
 			JPanel playerPanel = new JPanel();
@@ -464,7 +454,7 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 	private EmbeddedMediaPlayer getLongestPlayer() {
 		int longestVideo = 0;
 		for(int i = 0; i < this.players.size(); i++) {
-			// FIXME not all videos have the same position, must check on this to avoid errors
+			// FIXME not all videos have the same Length, must check on this to avoid errors
 			if(this.players.get(i).mediaPlayer().isSeekable() &&
 					this.players.get(i).mediaPlayer().getLength() > 
 					this.players.get(longestVideo).mediaPlayer().getLength())
@@ -492,7 +482,6 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 	public void setSelectedFile(String selectedFile) {
 		this.selectedFile = selectedFile;
 
-		// FIXME maybe an improvement on how to handle these files is needed
 		Vector<String> foundFiles = this.getRelatedFiles(this.mediaDirectory, selectedFile);
 		this.mediaFilePath.clear();
 		for(int i = 0; i < this.players.size(); i++) {
@@ -532,8 +521,8 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 				System.out.println("Resume for Player[" + i + "]");
 				this.players.get(i).mediaPlayer().play();
 			}
-			else System.out.println("Player[" + i + "] is not playing");
-			System.out.println("Player screen running?" + (this.players.get(i).mediaPlayer().isPlaying()));
+			else System.out.println("Screen[" + (i+1) + "] is already playing");
+			System.out.println("Player[" + i + "].Screen[" + (i+1) + "] running? " + (this.players.get(i).mediaPlayer().isPlaying()));
 		}
 	}
 
@@ -588,6 +577,11 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 
 	@Override
 	public void snapshotTaken(MediaPlayer mediaPlayer, String outputFileDirectoryPath) {
+		BufferedImage image = mediaPlayer.getSnapshot();
+		if (image != null) application().post(new SnapshotImageEvent(image));
+	}
+
+	public void selectScreenshotFileName(String outputFileDirectoryPath) {
 		String fileName;
 		int incremental = 0;
 
@@ -597,12 +591,5 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 			incremental++;
 			fileName = outputFileDirectoryPath + "\\screenshot" + incremental + ".png"; 
 		}
-		BufferedImage image = mediaPlayer.getSnapshot();
-		if (image != null) {
-
-			// FIXME This method as is doesn't uses the filename generated above it should be upgraded in near future.
-			application().post(new SnapshotImageEvent(image));
-		}
-
 	}
 }

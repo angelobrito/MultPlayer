@@ -40,13 +40,11 @@ import com.google.common.eventbus.Subscribe;
 
 import net.miginfocom.swing.MigLayout;
 import uk.co.caprica.vlcj.binding.LibVlcConst;
-import uk.co.caprica.vlcj.player.MediaPlayer;
 import uk.co.caprica.vlcjplayer.event.PausedEvent;
 import uk.co.caprica.vlcjplayer.event.PlayingEvent;
 import uk.co.caprica.vlcjplayer.event.ShowEffectsEvent;
 import uk.co.caprica.vlcjplayer.event.StoppedEvent;
 import uk.co.caprica.vlcjplayer.view.BasePanel;
-import uk.co.caprica.vlcjplayer.view.action.Resource;
 import uk.co.caprica.vlcjplayer.view.action.mediaplayer.MediaPlayerActions;
 import uk.co.caprica.vlcjplayer.view.image.ImagePane;
 
@@ -179,7 +177,6 @@ final class ControlsPane extends BasePanel {
 			@Override
 			public void stateChanged(ChangeEvent e) {
 				application().getMediaPlayerComponent().setRate( (float) Math.pow((double)2, (double)speedSlider.getValue())/8);
-				System.out.println("speedSlider value=" + speedSlider.getValue() + " Speed adjust=" +  Math.pow((double)2, (double)speedSlider.getValue())/8);
 			}
 		});
 

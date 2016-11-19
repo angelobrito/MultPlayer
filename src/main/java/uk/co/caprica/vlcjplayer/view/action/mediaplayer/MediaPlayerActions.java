@@ -26,12 +26,10 @@ import java.util.List;
 
 import javax.swing.Action;
 
-import uk.co.caprica.vlcj.player.MediaPlayer;
-import uk.co.caprica.vlcj.player.embedded.EmbeddedMediaPlayer;
-
 import com.google.common.collect.ImmutableList;
 
 import multiplayer.MultiScreensHandler;
+import uk.co.caprica.vlcj.player.MediaPlayer;
 
 // FIXME i think none of these actions need be public now?
 //       the dynamic ones currently are unfortunately... for now... (e.g. videotrack)

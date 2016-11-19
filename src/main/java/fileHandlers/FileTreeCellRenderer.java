@@ -12,7 +12,12 @@ import javax.swing.tree.DefaultTreeCellRenderer;
 /** A TreeCellRenderer for a File. */
 class FileTreeCellRenderer extends DefaultTreeCellRenderer {
 
-    private FileSystemView fileSystemView;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 3515015242890008712L;
+
+	private FileSystemView fileSystemView;
 
     private JLabel label;
 

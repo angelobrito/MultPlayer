@@ -31,7 +31,6 @@ import fileHandlers.FileBrowser;
 
 final class PlaylistPane extends FileBrowser {
 
-	private File          workingDir;
 	private JTree 		  tree;
 
 	public PlaylistPane() {
@@ -41,8 +40,6 @@ final class PlaylistPane extends FileBrowser {
 
 	public void updateDirectoryTree(File workingDirectoryPath) {
 
-		// FIXME this is not showing on guy
-		this.workingDir = workingDirectoryPath;
 		this.navitageToDirectory(workingDirectoryPath);
 		System.out.println("After Navigate");
 		
@@ -52,7 +49,6 @@ final class PlaylistPane extends FileBrowser {
 
 	public void jTree1ValueChanged(TreeSelectionEvent tse ) {
 		DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
-		File toTest = new File(this.workingDir + node.toString());
 		System.out.println("Node path=" + node.getPath());
 		System.out.println("Node pathStr=" + node.getPath().toString());
 		System.out.println("Node ObjPath=" + node.getUserObjectPath());

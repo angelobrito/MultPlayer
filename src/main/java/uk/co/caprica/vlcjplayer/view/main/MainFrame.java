@@ -24,7 +24,6 @@ import static uk.co.caprica.vlcjplayer.Application.resources;
 import static uk.co.caprica.vlcjplayer.view.action.Resource.resource;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -75,7 +74,6 @@ import uk.co.caprica.vlcjplayer.view.BaseFrame;
 import uk.co.caprica.vlcjplayer.view.MouseMovementDetector;
 import uk.co.caprica.vlcjplayer.view.action.StandardAction;
 import uk.co.caprica.vlcjplayer.view.action.mediaplayer.MediaPlayerActions;
-import uk.co.caprica.vlcjplayer.view.image.ImagePane;
 import uk.co.caprica.vlcjplayer.view.snapshot.SnapshotView;
 
 @SuppressWarnings("serial")
@@ -411,6 +409,8 @@ public final class MainFrame extends BaseFrame {
 		while(newDirectory.isFile() || newDirectory.toString().contains("cam") || newDirectory.toString().contains("channel")) {
 			newDirectory = newDirectory.getParentFile();
 		}
+		
+		// FIXME the JTree is not updating its self when a recent file or a new open file is used
 		updateDirectoryTree(newDirectory);
 		if(selectedFile.isFile()) { 
 			multiMediaPlayerComponent.setSelectedFile(selectedFile.getName());

@@ -2,51 +2,27 @@ package fileHandlers;
 
 import java.awt.BorderLayout;
 import java.awt.Container;
-import java.awt.Desktop;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.GridLayout;
 import java.awt.Image;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
-import java.io.IOException;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Vector;
 
 import javax.imageio.ImageIO;
-import javax.swing.Icon;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
-import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
-import javax.swing.JTable;
-import javax.swing.JTextField;
-import javax.swing.JToolBar;
 import javax.swing.JTree;
-import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.filechooser.FileSystemView;
-import javax.swing.table.TableColumn;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
@@ -87,9 +63,6 @@ public class FileBrowser {
 	/** Provides nice icons and names for files. */
 	private FileSystemView fileSystemView;
 
-	/** currently selected File. */
-	private File currentFile;
-
 	/** Main GUI container */
 	private JPanel gui;
 
@@ -117,7 +90,6 @@ public class FileBrowser {
 					DefaultMutableTreeNode node =
 							(DefaultMutableTreeNode)tse.getPath().getLastPathComponent();
 					showChildren(node);
-					System.out.println("TreeSelectionListener from FileBrowser");
 				}
 			};
 
@@ -169,7 +141,7 @@ public class FileBrowser {
 		tree.setSelectionInterval(0,0);
 	}
 
-	private void showThrowable(Throwable t) {
+	public void showThrowable(Throwable t) {
 		t.printStackTrace();
 		JOptionPane.showMessageDialog(
 				gui,
@@ -239,7 +211,6 @@ public class FileBrowser {
 		progressBar.setVisible(true);
 		progressBar.setIndeterminate(true);
 
-		DefaultMutableTreeNode node = buildNodeFromString(newDirectoryPath);
 		DefaultMutableTreeNode lastLeaf = new DefaultMutableTreeNode(newDirectoryPath);
 		TreePath path = new TreePath(lastLeaf.getPath());
 //		System.out.println("navigateToDirectory path=" + path);
