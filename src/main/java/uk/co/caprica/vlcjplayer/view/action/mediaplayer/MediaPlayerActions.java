@@ -75,11 +75,11 @@ public final class MediaPlayerActions {
 
     private List<Action> newPlaybackSpeedActions(MediaPlayer mediaPlayer) {
         List<Action> actions = new ArrayList<>();
-        actions.add(new RateAction(resource("menu.playback.item.speed.item.x4"    ), mediaPlayer, 4f));
-        actions.add(new RateAction(resource("menu.playback.item.speed.item.x2"    ), mediaPlayer, 2f));
-        actions.add(new RateAction(resource("menu.playback.item.speed.item.normal"), mediaPlayer, 1f));
-        actions.add(new RateAction(resource("menu.playback.item.speed.item./2"    ), mediaPlayer, 0.5f));
-        actions.add(new RateAction(resource("menu.playback.item.speed.item./4"    ), mediaPlayer, 0.25f));
+        actions.add(new RateAction(resource("menu.playback.item.speed.item.x4"    ), mediaPlayer, 5));
+        actions.add(new RateAction(resource("menu.playback.item.speed.item.x2"    ), mediaPlayer, 4));
+        actions.add(new RateAction(resource("menu.playback.item.speed.item.normal"), mediaPlayer, 3));
+        actions.add(new RateAction(resource("menu.playback.item.speed.item./2"    ), mediaPlayer, 2));
+        actions.add(new RateAction(resource("menu.playback.item.speed.item./4"    ), mediaPlayer, 1));
         return ImmutableList.copyOf(actions);
     }
 

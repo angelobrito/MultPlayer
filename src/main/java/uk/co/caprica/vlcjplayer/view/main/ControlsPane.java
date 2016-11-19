@@ -25,36 +25,37 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.image.BufferedImage;
-import java.io.File;
 import java.util.Hashtable;
 
-import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JSlider;
-import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import net.miginfocom.layout.AC;
-import net.miginfocom.layout.LC;
+import com.google.common.eventbus.Subscribe;
+
 import net.miginfocom.swing.MigLayout;
 import uk.co.caprica.vlcj.binding.LibVlcConst;
+import uk.co.caprica.vlcj.player.MediaPlayer;
 import uk.co.caprica.vlcjplayer.event.PausedEvent;
 import uk.co.caprica.vlcjplayer.event.PlayingEvent;
 import uk.co.caprica.vlcjplayer.event.ShowEffectsEvent;
 import uk.co.caprica.vlcjplayer.event.StoppedEvent;
 import uk.co.caprica.vlcjplayer.view.BasePanel;
+import uk.co.caprica.vlcjplayer.view.action.Resource;
 import uk.co.caprica.vlcjplayer.view.action.mediaplayer.MediaPlayerActions;
 import uk.co.caprica.vlcjplayer.view.image.ImagePane;
 
-import com.google.common.eventbus.Subscribe;
-
 final class ControlsPane extends BasePanel {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -2868260151135033903L;
 
 	private final Icon playIcon = newIcon("play");
 
@@ -63,8 +64,6 @@ final class ControlsPane extends BasePanel {
 	private final Icon fullscreenIcon = newIcon("fullscreen");
 
 	private final Icon extendedIcon = newIcon("extended");
-
-	private final Icon snapshotIcon = newIcon("snapshot");
 
 	private final Icon volumeHighIcon = newIcon("volume-high");
 
@@ -94,9 +93,14 @@ final class ControlsPane extends BasePanel {
 
 	private final ImagePane logoPane;
 
+	private final PositionPane positionPane;
+
 	ControlsPane(MediaPlayerActions mediaPlayerActions) {
-		
+
 		this.setMinimumSize(new Dimension(1200, 100));
+		//this.setMaximumSize(new Dimension(1200, 100));
+
+		positionPane = new PositionPane(application().getMediaPlayerComponent());
 
 		playPauseButton = new BigButton();
 		playPauseButton.setAction(mediaPlayerActions.playbackPlayAction());
@@ -119,17 +123,17 @@ final class ControlsPane extends BasePanel {
 		volumeSlider = new JSlider();
 		volumeSlider.setMinimum(LibVlcConst.MIN_VOLUME);
 		volumeSlider.setMaximum(LibVlcConst.MAX_VOLUME);
-		volumeSlider.setValue(LibVlcConst.MAX_VOLUME-100);
+		volumeSlider.setValue(LibVlcConst.MAX_VOLUME/2);
 
 
 		speedLabel = new JLabel("Velocidade: ");
 
 		speedSlider = new JSlider(JSlider.HORIZONTAL, FPS_MIN, FPS_MAX, 3);
-		speedSlider.setMajorTickSpacing(10);
+		speedSlider.setMajorTickSpacing(1);
 		speedSlider.setMinorTickSpacing(1);
 		speedSlider.setPaintTicks(true);
 		speedSlider.setPaintLabels(true);
-		speedSlider.setName("Velocidade");
+		speedSlider.setName("speedRate");
 
 		// FIXME Fix the layout of the Controll pane its ugly
 		Hashtable<Integer, JLabel> labelTable = new Hashtable<Integer, JLabel>();
@@ -142,40 +146,48 @@ final class ControlsPane extends BasePanel {
 
 		MigLayout layout = new MigLayout("fill, insets 0 0 0 0", "[]12[]10[]10[]12[]10[]12[]push[]10[]", "[]"); 
 		setLayout(layout);
-		
+
 		logoPane = new ImagePane(ImagePane.Mode.FIT, getClass().getResource("/MultTecnologia-logo-name.png"), 1.0f);
 		logoPane.setBackground(new Color(Color.TRANSLUCENT));
 		logoPane.setPreferredSize(new Dimension(50, 50));
 		logoPane.setIgnoreRepaint(true);
-		add(logoPane, "wmax 120, hmax 80");
-		
-		add(playPauseButton, "sg 2, al left, gap 5");
-		add(stopButton, "sg 2, al left, gap 5");
+		add(logoPane, "West, wmax 120, hmax 80, gap 20 0");
 
-		add(fullscreenButton, "sg 2, al left, gap 5");
+		add(positionPane, "North, gap 30");
 
-		add(snapshotButton, "sg 2, al left, gap 5");
-		add(extendedButton, "sg 2, al left, gap 5");
+		add(playPauseButton, "Center, sg 2, al left, gap 30");
+		add(stopButton, "Center, sg 2, al left, gap 5");
+
+		add(fullscreenButton, "Center, sg 2, al left, gap 5");
+
+		add(snapshotButton, "Center, sg 2, al left, gap 5");
+		add(extendedButton, "Center, sg 2, al left, gap 5");
 
 
 		add(speedLabel, "sg 2, al left, gap 5");
-		add(speedSlider, "sg 1, wmax 150, hmax 80, al left, gap 5");
+		add(speedSlider, "Center, sg 1, wmax 150, hmax 80, al left, gap 5");
+		add(muteButton, "Center, sg 2, al left, gap 5");
+		add(volumeSlider, "Center, sg 1, wmax 150, hmax 80, al center center");
+
+		registerListeners();
+		setEnabledComponents();
+	}
+
+	private void registerListeners() {
 		speedSlider.addChangeListener(new ChangeListener() {
 
 			@Override
 			public void stateChanged(ChangeEvent e) {
-				application().getMediaPlayerComponent().getMediaPlayer().setRate( (float) Math.pow((double)2, (double)speedSlider.getValue())/8);
+				application().getMediaPlayerComponent().setRate( (float) Math.pow((double)2, (double)speedSlider.getValue())/8);
 				System.out.println("speedSlider value=" + speedSlider.getValue() + " Speed adjust=" +  Math.pow((double)2, (double)speedSlider.getValue())/8);
 			}
 		});
-
-		add(muteButton, "sg 2, al left, gap 5");
-		add(volumeSlider, "sg 1, wmax 150, hmax 80, al center center");
 
 		volumeSlider.addChangeListener(new ChangeListener() {
 			@Override
 			public void stateChanged(ChangeEvent e) {
 				application().getMediaPlayerComponent().setVolume(volumeSlider.getValue());
+				((MainFrame) application().getMainFrame()).updateEnabledComponents();
 			}
 		});
 
@@ -183,10 +195,7 @@ final class ControlsPane extends BasePanel {
 		muteButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				application().getMediaPlayerComponent().forceMute();
-				if(application().getMediaPlayerComponent().isMuteForced()) muteButton.setIcon(volumeMutedIcon);
-				else muteButton.setIcon(volumeHighIcon);
-				setEnabledComponents(application().getMediaPlayerComponent().isPlayerReady());
+				MuteAction();
 			}
 		});
 
@@ -205,8 +214,12 @@ final class ControlsPane extends BasePanel {
 		});
 	}
 
-	public void setSpeedValue(int newSpeed){
+	public void setSpeedRate(int newSpeed){
 		this.speedSlider.setValue(newSpeed);
+	}
+
+	public void setVolumeSlider(int newVolume) {
+		this.volumeSlider.setValue(newVolume);
 	}
 
 	@Subscribe
@@ -226,6 +239,11 @@ final class ControlsPane extends BasePanel {
 
 	private class BigButton extends JButton {
 
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 8144036361040943211L;
+
 		private BigButton() {
 			setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 			setHideActionText(true);
@@ -234,6 +252,11 @@ final class ControlsPane extends BasePanel {
 
 	private class StandardButton extends JButton {
 
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -2407454848235839869L;
+
 		private StandardButton() {
 			setBorder(BorderFactory.createEmptyBorder(6, 6, 6, 6));
 			setHideActionText(true);
@@ -241,15 +264,29 @@ final class ControlsPane extends BasePanel {
 	}
 
 	private Icon newIcon(String name) {
-		return new ImageIcon(getClass().getResource("/icons/buttons/" + name + ".png"));
+		return new ImageIcon(getClass().getResource("/icons/buttons/" + name + ".png"), name);
 	}
 
-	public void setEnabledComponents(boolean newState) {
+	private void MuteAction() {
+		application().getMediaPlayerComponent().forceMute();
+		((MainFrame) application().getMainFrame()).updateEnabledComponents();
+	}
+
+	public void setEnabledComponents() {
+		boolean newState = application().getMediaPlayerComponent().isPlayerReady();
+		if(newState){
+			if(application().getMediaPlayerComponent().isPaused()) onPaused(new PausedEvent());
+			else onPlaying(new PlayingEvent());
+		}
+		else onStopped(new StoppedEvent());
+		positionPane.setEnabled(newState);
 		stopButton.setEnabled(newState);
 		fullscreenButton.setEnabled(newState);
 		extendedButton.setEnabled(newState);
 		snapshotButton.setEnabled(newState);
 		speedSlider.setEnabled(newState);
 		volumeSlider.setEnabled(!application().getMediaPlayerComponent().isMuteForced());
+		if(application().getMediaPlayerComponent().isMuteForced()) muteButton.setIcon(volumeMutedIcon);
+		else muteButton.setIcon(volumeHighIcon);
 	}
 }

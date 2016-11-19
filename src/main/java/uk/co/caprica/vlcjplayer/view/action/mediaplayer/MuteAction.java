@@ -19,10 +19,13 @@
 
 package uk.co.caprica.vlcjplayer.view.action.mediaplayer;
 
+import static uk.co.caprica.vlcjplayer.Application.application;
+
 import java.awt.event.ActionEvent;
 
 import uk.co.caprica.vlcj.player.MediaPlayer;
 import uk.co.caprica.vlcjplayer.view.action.Resource;
+import uk.co.caprica.vlcjplayer.view.main.MainFrame;
 
 final class MuteAction extends MediaPlayerAction {
 
@@ -32,6 +35,8 @@ final class MuteAction extends MediaPlayerAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        mediaPlayer.mute();
+//        mediaPlayer.mute();
+		application().getMediaPlayerComponent().forceMute();
+		((MainFrame) application().getMainFrame()).updateEnabledComponents();
     }
 }

@@ -242,7 +242,7 @@ public class FileBrowser {
 		DefaultMutableTreeNode node = buildNodeFromString(newDirectoryPath);
 		DefaultMutableTreeNode lastLeaf = new DefaultMutableTreeNode(newDirectoryPath);
 		TreePath path = new TreePath(lastLeaf.getPath());
-		System.out.println("navigateToDirectory path=" + path);
+//		System.out.println("navigateToDirectory path=" + path);
 		tree.setSelectionPath(path);
 
 		progressBar.setIndeterminate(false);
@@ -299,14 +299,14 @@ public class FileBrowser {
 	}
 
     public TreePath findTreePath(File find) {
-    	System.out.println("findTreePath find=" + find.toString());
+//    	System.out.println("findTreePath find=" + find.toString());
         for (int ii=0; ii < tree.getRowCount(); ii++) {
             TreePath treePath = tree.getPathForRow(ii);
             Object object = treePath.getLastPathComponent();
             DefaultMutableTreeNode node = (DefaultMutableTreeNode) object;
             File nodeFile = (File) node.getUserObject();
 
-            System.out.println("findTreePath nodeFile[" + ii + "/" + tree.getRowCount() + "]=" + nodeFile.toString());
+//            System.out.println("findTreePath nodeFile[" + ii + "/" + tree.getRowCount() + "]=" + nodeFile.toString());
             if (nodeFile==find) {
                 return treePath;
             }

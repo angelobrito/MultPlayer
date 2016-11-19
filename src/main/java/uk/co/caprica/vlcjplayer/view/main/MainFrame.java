@@ -123,8 +123,6 @@ public final class MainFrame extends BaseFrame {
 
 	private final JFileChooser fileChooser;
 
-	private final PositionPane positionPane;
-
 	private final PlaylistPane playlistPane;
 
 	private final ControlsPane controlsPane;
@@ -134,14 +132,16 @@ public final class MainFrame extends BaseFrame {
 	private final JPanel bottomPane;
 
 	private final MouseMovementDetector mouseMovementDetector;
-	
+
 	private final MediaPlayerActions mediaPlayerActions;
 
 
 	public MainFrame() {
 		super(resource("main.aplication.name").name());
 
-		this.setMinimumSize(new Dimension(1100, 600));
+		super.setMinimumSize(new Dimension(1600, 1300));
+		this.setMinimumSize(new Dimension(1600, 600));
+		this.setPreferredSize(new Dimension(1600, 600));
 
 		this.multiMediaPlayerComponent = application().getNewMediaPlayerComponent(this);
 		this.multiMediaPlayerComponent.setMinimumSize(new Dimension(1100, 600));
@@ -155,17 +155,7 @@ public final class MainFrame extends BaseFrame {
 			public void actionPerformed(ActionEvent e) {
 
 				// Fetch the Video folder (it depends on user interaction after the click Open Folder)
-				if (JFileChooser.APPROVE_OPTION == fileChooser.showOpenDialog(MainFrame.this)) {
-					System.out.println("Update open folder");
-					File newDirectory = fileChooser.getSelectedFile();
-					if(newDirectory.isFile()) newDirectory = newDirectory.getParentFile();
-					updateDirectoryTree(newDirectory);
-					if(fileChooser.getSelectedFile().isFile()) { 
-						multiMediaPlayerComponent.setSelectedFile(fileChooser.getSelectedFile().getName());
-						mediaPlayerActions.playbackPlayAction().actionPerformed(e);
-						updateEnabledComponents();
-					}
-				}
+				fetchWorkingVideoFolder(e);
 			}
 		};
 
@@ -247,7 +237,7 @@ public final class MainFrame extends BaseFrame {
 
 		playbackSpeedMenu = new JMenu(resource("menu.playback.item.speed").name());
 		playbackSpeedMenu.setMnemonic(resource("menu.playback.item.speed").mnemonic());
-		
+
 		//FIXME Update the speedSlideBar whenever the buttons are pressed
 		for (Action action : mediaPlayerActions.playbackSpeedActions()) {
 			playbackSpeedMenu.add(new JMenuItem(action));
@@ -340,9 +330,6 @@ public final class MainFrame extends BaseFrame {
 		JPanel bottomControlsPane = new JPanel();
 		bottomControlsPane.setLayout(new MigLayout("fill, insets 0 n n n", "[grow]", "[]0[]"));
 
-		positionPane = new PositionPane(multiMediaPlayerComponent.getMediaPlayer());
-		bottomControlsPane.add(positionPane, "grow, wrap");
-
 		controlsPane = new ControlsPane(mediaPlayerActions);
 		bottomPane.add(bottomControlsPane, BorderLayout.CENTER);
 		bottomControlsPane.add(controlsPane, "grow");
@@ -408,6 +395,28 @@ public final class MainFrame extends BaseFrame {
 
 		setMinimumSize(new Dimension(900, 580));
 		updateEnabledComponents();
+	}
+
+	private void fetchWorkingVideoFolder(ActionEvent e) {
+		if (JFileChooser.APPROVE_OPTION == fileChooser.showOpenDialog(MainFrame.this)) {
+			System.out.println("Update open folder");
+			File newDirectory = fileChooser.getSelectedFile();
+			actOpenNewMedia(e, newDirectory);
+			application().addRecentMedia(newDirectory.getAbsolutePath());
+		}
+	}
+
+	public void actOpenNewMedia(ActionEvent e, File selectedFile) {
+		File newDirectory = selectedFile;
+		while(newDirectory.isFile() || newDirectory.toString().contains("cam") || newDirectory.toString().contains("channel")) {
+			newDirectory = newDirectory.getParentFile();
+		}
+		updateDirectoryTree(newDirectory);
+		if(selectedFile.isFile()) { 
+			multiMediaPlayerComponent.setSelectedFile(selectedFile.getName());
+			mediaPlayerActions.playbackPlayAction().actionPerformed(e);
+			updateEnabledComponents();
+		}
 	}
 
 	private ButtonGroup addActions(List<Action> actions, JMenu menu, boolean selectFirst) {
@@ -487,8 +496,9 @@ public final class MainFrame extends BaseFrame {
 
 	public void updateDirectoryTree(File newDirectory){
 		this.playlistPane.updateDirectoryTree(newDirectory);
+		System.out.println("NewWorkingDir=" + newDirectory);
 	}
-	
+
 	@Subscribe
 	public void onBeforeEnterFullScreen(BeforeEnterFullScreenEvent event) {
 		menuBar.setVisible(false);
@@ -539,13 +549,16 @@ public final class MainFrame extends BaseFrame {
 		System.out.println("Player running:" + playerRunning);
 
 		playbackMenu.setEnabled(playerRunning);
-		// TODO include disability of Volume Up and Volume Down for forcedMute on audioMenu
-		
+		setEnabledMenuItemVolumeDecrease(0 < multiMediaPlayerComponent.getVolume() && 
+				!application().getMediaPlayerComponent().isMuteForced());
+		setEnabledMenuItemVolumeIncrease(multiMediaPlayerComponent.getVolume() < 200 && 
+				!application().getMediaPlayerComponent().isMuteForced());
+
 		videoFullscreenAction.setEnabled(playerRunning);
 		videoZoomMenu.setEnabled(playerRunning);
 		videoCropMenu.setEnabled(playerRunning);
 		videoSnapshot.setEnabled(playerRunning);
-		controlsPane.setEnabledComponents(playerRunning);
+		controlsPane.setEnabledComponents();
 		multiMediaPlayerComponent.setVisible(playerRunning);
 	}
 
@@ -559,5 +572,23 @@ public final class MainFrame extends BaseFrame {
 
 	public ActionListener playbackPlayAction() {
 		return this.mediaPlayerActions.playbackPlayAction();
+	}
+
+	public void setSpeedRate(int rate) {
+		this.controlsPane.setSpeedRate(rate);
+	}
+
+	public void setVolumeSlider(int newVolume) {
+		this.controlsPane.setVolumeSlider(newVolume);
+	}
+
+	public void setEnabledMenuItemVolumeDecrease(boolean b) {
+		System.out.println("menuItem=" +this.audioMenu.getItem(3));
+		this.audioMenu.getItem(3).setEnabled(b);
+	}
+
+	public void setEnabledMenuItemVolumeIncrease(boolean b) {
+		System.out.println("menuItem=" +this.audioMenu.getItem(2));
+		this.audioMenu.getItem(2).setEnabled(b);
 	}
 }

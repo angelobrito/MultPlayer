@@ -22,6 +22,10 @@ package uk.co.caprica.vlcjplayer.view.main;
 import static uk.co.caprica.vlcjplayer.Application.application;
 import static uk.co.caprica.vlcjplayer.time.Time.formatTime;
 
+import java.awt.Color;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.swing.JLabel;
@@ -31,16 +35,21 @@ import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import com.google.common.eventbus.Subscribe;
+
+import multiplayer.MultiScreensHandler;
 import net.miginfocom.swing.MigLayout;
-import uk.co.caprica.vlcj.player.MediaPlayer;
 import uk.co.caprica.vlcjplayer.event.TickEvent;
 import uk.co.caprica.vlcjplayer.view.StandardLabel;
 
-import com.google.common.eventbus.Subscribe;
-
 final class PositionPane extends JPanel {
 
-    private final JLabel timeLabel;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 8157822719326602228L;
+
+	private final JLabel timeLabel;
 
     private final JSlider positionSlider;
 
@@ -48,22 +57,30 @@ final class PositionPane extends JPanel {
 
     private long time;
 
-    private final MediaPlayer mediaPlayer;
+    private final MultiScreensHandler player;
 
     private final AtomicBoolean sliderChanging = new AtomicBoolean();
 
     private final AtomicBoolean positionChanging = new AtomicBoolean();
+    
+    private boolean mousePressedPlaying = false;
 
-    PositionPane(MediaPlayer mediaPlayer) {
-        this.mediaPlayer = mediaPlayer;
+    PositionPane(MultiScreensHandler mediaPlayer) {
+        this.player = mediaPlayer;
 
-        timeLabel = new StandardLabel("9:99:99");
+        timeLabel = new StandardLabel("hh:mm:ss");
+        timeLabel.setText("-:--:--");
 
         UIManager.put("Slider.paintValue", false); // FIXME how to do this for a single component?
+
         positionSlider = new JSlider();
         positionSlider.setMinimum(0);
         positionSlider.setMaximum(1000);
         positionSlider.setValue(0);
+        positionSlider.setToolTipText("Position");
+        
+        durationLabel = new StandardLabel("hh:mm:ss");
+        durationLabel.setText("-:--:--");
 
         positionSlider.addChangeListener(new ChangeListener() {
             @Override
@@ -81,36 +98,38 @@ final class PositionPane extends JPanel {
             }
         });
 
-        durationLabel = new StandardLabel("9:99:99");
-
         setLayout(new MigLayout("fill, insets 0 0 0 0", "[][grow][]", "[]"));
 
         add(timeLabel, "shrink");
         add(positionSlider, "grow");
         add(durationLabel, "shrink");
 
-        timeLabel.setText("-:--:--");
-        durationLabel.setText("-:--:--");
-
         application().subscribe(this);
     }
 
     private void refresh() {
-        timeLabel.setText(formatTime(time));
+
+    	this.updateTime();
 
         if (!sliderChanging.get()) {
-            int value = (int) (mediaPlayer.getPosition() * 1000.0f);
+            int value = (int) (player.getPosition() * 1000.0f);
             positionChanging.set(true);
             positionSlider.setValue(value);
             positionChanging.set(false);
         }
     }
 
-    void setTime(long time) {
-        this.time = time;
+    private void updateTime() {
+        this.setTime(this.player.getTime());
+        this.setDuration(this.player.getLength());
     }
 
-    void setDuration(long duration) {
+    public void setTime(long time) {
+        this.time = time;
+        this.timeLabel.setText(formatTime(time));
+    }
+
+    public void setDuration(long duration) {
         durationLabel.setText(formatTime(duration));
     }
 
@@ -118,4 +137,10 @@ final class PositionPane extends JPanel {
     public void onTick(TickEvent tick) {
         refresh();
     }
+    
+    @Override
+    public void setEnabled(boolean enabled){
+    	super.setEnabled(enabled);
+    	positionSlider.setEnabled(enabled);
+    }    
 }

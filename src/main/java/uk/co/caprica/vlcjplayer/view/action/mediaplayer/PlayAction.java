@@ -39,8 +39,8 @@ final class PlayAction extends MediaPlayerAction {
 		System.out.println("Play Action:" + e.toString());
 		MultiScreensHandler mediaPlayerComponent = application().getMediaPlayerComponent();
 		mediaPlayerComponent.resume();
-		mediaPlayerComponent.getSelectedScreen().start();
 //		FIXME UPDATE buttons and menuItems
+//		mediaPlayerComponent.getSelectedScreen().start();
 		((MainFrame) application().getMainFrame()).updateEnabledComponents();
 	}
 }

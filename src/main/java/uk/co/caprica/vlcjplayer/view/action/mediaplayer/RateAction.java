@@ -24,19 +24,20 @@ import java.awt.event.ActionEvent;
 
 import uk.co.caprica.vlcj.player.MediaPlayer;
 import uk.co.caprica.vlcjplayer.view.action.Resource;
+import uk.co.caprica.vlcjplayer.view.main.MainFrame;
 
 final class RateAction extends MediaPlayerAction {
 
-    private final float rate;
+    private final int rate;
 
-    RateAction(Resource resource, MediaPlayer mediaPlayer, float rate) {
+    RateAction(Resource resource, MediaPlayer mediaPlayer, int rate) {
         super(resource, mediaPlayer);
         this.rate = rate;
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        //mediaPlayer.setRate(rate);
-    	application().getMediaPlayerComponent().setRate(rate);
+    	((MainFrame) application().getMainFrame()).setSpeedRate((int) rate);
+    	System.out.println("Menu setRate=" + rate);
     }
 }

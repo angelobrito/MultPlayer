@@ -161,7 +161,7 @@ public final class Application {
 	}
 
 	public MultiScreensHandler getNewMediaPlayerComponent(Window container) {
-		multiMediaPlayerComponent = new MultiScreensHandler(container) {
+		multiMediaPlayerComponent = new MultiScreensHandler((JFrame) container) {
             /**
 			 * 
 			 */

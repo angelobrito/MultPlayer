@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Vector;
 
 import javax.swing.ImageIcon;
+import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
@@ -45,6 +46,7 @@ import uk.co.caprica.vlcj.player.MediaPlayerFactory;
 import uk.co.caprica.vlcj.player.embedded.DefaultFullScreenStrategy;
 import uk.co.caprica.vlcj.player.embedded.EmbeddedMediaPlayer;
 import uk.co.caprica.vlcj.player.embedded.FullScreenStrategy;
+import uk.co.caprica.vlcj.test.basic.PlayerControlsPanel;
 import uk.co.caprica.vlcj.test.multi.PlayerInstance;
 import uk.co.caprica.vlcjplayer.Application;
 import uk.co.caprica.vlcjplayer.event.SnapshotImageEvent;
@@ -71,8 +73,9 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 
 	private int selectedScreen;
 	private boolean forcedMute;
+	private boolean paused;
 
-	public MultiScreensHandler(Window container) {
+	public MultiScreensHandler(JFrame container) {
 		JPanel contentPane = new JPanel();
 		contentPane.setBackground(Color.black);
 		contentPane.setLayout(new GridLayout(rowsNumber, collumsNumber, 16, 16));
@@ -81,11 +84,12 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 		players = new ArrayList<PlayerInstance>();
 		mediaFilePath = new ArrayList<String>();
 
-		container = new Frame("Screens");
+		container = new JFrame("Screens");
+		container.setVisible(false);
 		container.setLayout(new BorderLayout());
 		container.setBackground(Color.black);
 		container.add(contentPane, BorderLayout.CENTER);
-		container.setBounds(100, 100, 1600, 300);
+		container.setMinimumSize(new Dimension(1600, 600));
 		container.addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent evt) {
@@ -102,7 +106,8 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 			@Override
 			public void keyPressed(KeyEvent e) {
 				for(int i = 0; i < players.size(); i ++ ) {
-					players.get(i).mediaPlayer().pause();
+//					players.get(i).mediaPlayer().pause();
+					pauseScreens();
 				}
 			}
 		});
@@ -127,7 +132,7 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 		}
 		container.setVisible(true);
 	}
-
+	
 	public MediaPlayerFactory getFactory() {
 		return this.factory;
 	}
@@ -335,6 +340,13 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 		for(int i = 0; i < this.players.size(); i++) 
 			this.players.get(i).mediaPlayer().mute();
 	}
+	
+	public void pauseScreens() {
+		if(!this.paused) this.paused = true;
+		else this.paused = false;
+		for(int i = 0; i < this.players.size(); i++) 
+			this.players.get(i).mediaPlayer().pause();
+	}
 
 	@Override
 	public void volumeChanged(MediaPlayer mediaPlayer, float volume) {
@@ -439,6 +451,36 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 		return this.players.get(this.selectedScreen).mediaPlayer().isPlayable();
 	}
 
+	public void setPosition(float position) {
+		for(int i = 0; i < this.players.size(); i++) 
+			// FIXME not all videos have the same position, must check on this to avoid errors
+			this.players.get(i).mediaPlayer().setPosition(position);
+	}
+
+	public float getPosition() {
+		return getLongestPlayer().getPosition();
+	}
+
+	private EmbeddedMediaPlayer getLongestPlayer() {
+		int longestVideo = 0;
+		for(int i = 0; i < this.players.size(); i++) {
+			// FIXME not all videos have the same position, must check on this to avoid errors
+			if(this.players.get(i).mediaPlayer().isSeekable() &&
+					this.players.get(i).mediaPlayer().getLength() > 
+					this.players.get(longestVideo).mediaPlayer().getLength())
+				longestVideo = i;
+		}
+		return this.players.get(longestVideo).mediaPlayer();
+	}
+	
+	public long getTime() {
+		return getLongestPlayer().getTime();
+		}
+	
+	public long getLength(){
+		return getLongestPlayer().getLength();
+	}
+
 	public EmbeddedMediaPlayer getSelectedScreen() {
 		return this.players.get(this.selectedScreen).mediaPlayer();
 	}
@@ -487,13 +529,10 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 		for(int i = 0; i < this.players.size(); i++){
 
 			if(!this.players.get(i).mediaPlayer().isPlaying()){
-				System.out.println("Resume for=" + i);
+				System.out.println("Resume for Player[" + i + "]");
 				this.players.get(i).mediaPlayer().play();
 			}
-			else {
-				System.out.println("Paused for=" + i);
-				this.players.get(i).mediaPlayer().pause();
-			}
+			else System.out.println("Player[" + i + "] is not playing");
 			System.out.println("Player screen running?" + (this.players.get(i).mediaPlayer().isPlaying()));
 		}
 	}
@@ -517,20 +556,27 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 
 	public void setRate(float rate) {
 		for(int i = 0; i < this.players.size(); i++){
-
-			System.out.println("setRate for=" + i);
 			this.players.get(i).mediaPlayer().setRate(rate);
-			System.out.println("Player running?" + (this.players.get(i).mediaPlayer().isPlaying()) + " with new rate " + this.players.get(i).mediaPlayer().getRate());
 		}
+	}
+	
+	public boolean isPaused() {
+		return this.paused;
 	}
 
 	public void setVolume(int value) {
 		for(int i = 0; i < this.players.size(); i++){
-
-			System.out.println("setVolume for=" + i);
 			this.players.get(i).mediaPlayer().setVolume(value);
-			System.out.println("Player running?" + (this.players.get(i).mediaPlayer().isPlaying()) + " with new volume " + this.players.get(i).mediaPlayer().getVolume());
 		}
+	}
+	
+	public int getVolume() {
+		int result = 0;
+		for(int i = 0; i < this.players.size(); i++){
+			int t = this.players.get(i).mediaPlayer().getVolume();
+			if(t > result) result = t;
+		}
+		return result;
 	}
 
 	public void getSnapshots() {
@@ -553,11 +599,10 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 		}
 		BufferedImage image = mediaPlayer.getSnapshot();
 		if (image != null) {
-			
+
 			// FIXME This method as is doesn't uses the filename generated above it should be upgraded in near future.
 			application().post(new SnapshotImageEvent(image));
 		}
 
 	}
-
 }
