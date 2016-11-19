@@ -382,6 +382,7 @@ public final class MainFrame extends BaseFrame {
 			public void actionPerformed(ActionEvent e) {
 				multiMediaPlayerComponent.getMediaPlayer().toggleFullScreen();
 				videoFullscreenAction.select(false);
+				updateEnabledComponents();
 			}
 		});
 
@@ -496,7 +497,6 @@ public final class MainFrame extends BaseFrame {
 
 	public void updateDirectoryTree(File newDirectory){
 		this.playlistPane.updateDirectoryTree(newDirectory);
-		System.out.println("NewWorkingDir=" + newDirectory);
 	}
 
 	@Subscribe
@@ -583,12 +583,10 @@ public final class MainFrame extends BaseFrame {
 	}
 
 	public void setEnabledMenuItemVolumeDecrease(boolean b) {
-		System.out.println("menuItem=" +this.audioMenu.getItem(3));
 		this.audioMenu.getItem(3).setEnabled(b);
 	}
 
 	public void setEnabledMenuItemVolumeIncrease(boolean b) {
-		System.out.println("menuItem=" +this.audioMenu.getItem(2));
 		this.audioMenu.getItem(2).setEnabled(b);
 	}
 }

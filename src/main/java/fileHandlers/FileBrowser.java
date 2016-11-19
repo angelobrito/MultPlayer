@@ -213,7 +213,6 @@ public class FileBrowser {
 
 		DefaultMutableTreeNode lastLeaf = new DefaultMutableTreeNode(newDirectoryPath);
 		TreePath path = new TreePath(lastLeaf.getPath());
-//		System.out.println("navigateToDirectory path=" + path);
 		tree.setSelectionPath(path);
 
 		progressBar.setIndeterminate(false);

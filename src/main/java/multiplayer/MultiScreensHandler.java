@@ -31,6 +31,7 @@ import javax.swing.border.LineBorder;
 
 import fileHandlers.PathFinder;
 import uk.co.caprica.vlcj.binding.internal.libvlc_media_t;
+import uk.co.caprica.vlcj.binding.internal.libvlc_state_t;
 import uk.co.caprica.vlcj.component.EmbeddedMediaPlayerComponent;
 import uk.co.caprica.vlcj.discovery.NativeDiscovery;
 import uk.co.caprica.vlcj.player.MediaPlayer;
@@ -75,6 +76,7 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 		players = new ArrayList<PlayerInstance>();
 		mediaFilePath = new ArrayList<String>();
 
+		// TODO this window should be removed
 		container = new JFrame("Screens");
 		container.setVisible(false);
 		container.setLayout(new BorderLayout());
@@ -110,6 +112,8 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 		for(int i = 0; i < application().getScreenQtt(); i ++ ) {
 			EmbeddedMediaPlayer player = factory.newEmbeddedMediaPlayer(fullScreenStrategy);
 			PlayerInstance playerInstance = new PlayerInstance(player);
+			
+			
 			if(i != 0) playerInstance.mediaPlayer().mute(true);
 			players.add(playerInstance);
 
@@ -513,16 +517,35 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 				this.isPlayable();
 	}
 
-	public void resume() {
-		this.setVisible(true);
+	public void resume() {		this.setVisible(true);
 		for(int i = 0; i < this.players.size(); i++){
-
-			if(!this.players.get(i).mediaPlayer().isPlaying()){
-				System.out.println("Resume for Player[" + i + "]");
+			MediaPlayer mediaPlayer = this.players.get(i).mediaPlayer();
+			
+			// FIXME cut the cases where there is no media and the player is not ready
+			System.out.print("Resume for Player[" + i + "].State= {" + mediaPlayer.getMediaPlayerState().toString() + "} - ");
+			if(!mediaPlayer.isPlaying() && !mediaPlayer.getMediaPlayerState().toString().equalsIgnoreCase("libvlc_Ended")){
+				System.out.println("Player Started...");
 				this.players.get(i).mediaPlayer().play();
 			}
-			else System.out.println("Screen[" + (i+1) + "] is already playing");
-			System.out.println("Player[" + i + "].Screen[" + (i+1) + "] running? " + (this.players.get(i).mediaPlayer().isPlaying()));
+			else if(mediaPlayer.isPlaying()) {
+				System.out.print("Screen[" + (i+1) + "] is already playing ");
+				if(!mediaPlayer.getMediaPlayerState().toString().equalsIgnoreCase("libvlc_Paused")){
+					System.out.println("but not Paused then Pause!");
+					this.players.get(i).mediaPlayer().pause();
+				}
+				else {
+					System.out.println("and Paused then Play!");
+					this.players.get(i).mediaPlayer().play();
+				}
+			}
+			else System.out.println("Screen[" + (i+1) + "] is not ready");
+			try {
+				Thread.sleep(40);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			System.out.print("Player[" + i + "].Screen[" + (i+1) + "] running? " + (this.players.get(i).mediaPlayer().isPlaying()));
+			System.out.println(" State= {" + mediaPlayer.getMediaPlayerState().toString() + "}");
 		}
 	}
 
@@ -551,6 +574,16 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 	
 	public boolean isPaused() {
 		return this.paused;
+	}
+	
+	public libvlc_state_t getMediaPlayerState() {
+		libvlc_state_t result = null;
+		for(int i = 0; i < this.players.size(); i++){
+			result = this.players.get(i).mediaPlayer().getMediaState();
+			if(result != null && 
+					result.toString().equalsIgnoreCase("libvlc_Playing")) break;
+		}
+		return result;
 	}
 
 	public void setVolume(int value) {

@@ -41,13 +41,12 @@ final class PlaylistPane extends FileBrowser {
 	public void updateDirectoryTree(File workingDirectoryPath) {
 
 		this.navitageToDirectory(workingDirectoryPath);
-		System.out.println("After Navigate");
-		
 		DefaultMutableTreeNode node = new DefaultMutableTreeNode(workingDirectoryPath);
 		this.showChildren(node);
 	}
 
 	public void jTree1ValueChanged(TreeSelectionEvent tse ) {
+		
 		DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
 		System.out.println("Node path=" + node.getPath());
 		System.out.println("Node pathStr=" + node.getPath().toString());

@@ -40,6 +40,7 @@ import com.google.common.eventbus.Subscribe;
 
 import net.miginfocom.swing.MigLayout;
 import uk.co.caprica.vlcj.binding.LibVlcConst;
+import uk.co.caprica.vlcj.binding.internal.libvlc_state_t;
 import uk.co.caprica.vlcjplayer.event.PausedEvent;
 import uk.co.caprica.vlcjplayer.event.PlayingEvent;
 import uk.co.caprica.vlcjplayer.event.ShowEffectsEvent;
@@ -271,11 +272,14 @@ final class ControlsPane extends BasePanel {
 
 	public void setEnabledComponents() {
 		boolean newState = application().getMediaPlayerComponent().isPlayerReady();
-		if(newState){
-			if(application().getMediaPlayerComponent().isPaused()) onPaused(new PausedEvent());
-			else onPlaying(new PlayingEvent());
+		libvlc_state_t state = application().getMediaPlayerComponent().getMediaPlayerState();
+		if(state != null && state.toString().equalsIgnoreCase("libvlc_Playing")) {
+			
+			System.out.println("enable componentes player state = " + state.toString());
+			playPauseButton.setIcon(pauseIcon); 
 		}
-		else onStopped(new StoppedEvent());
+		else 
+			playPauseButton.setIcon(playIcon);
 		positionPane.setEnabled(newState);
 		stopButton.setEnabled(newState);
 		fullscreenButton.setEnabled(newState);
@@ -283,7 +287,9 @@ final class ControlsPane extends BasePanel {
 		snapshotButton.setEnabled(newState);
 		speedSlider.setEnabled(newState);
 		volumeSlider.setEnabled(!application().getMediaPlayerComponent().isMuteForced());
-		if(application().getMediaPlayerComponent().isMuteForced()) muteButton.setIcon(volumeMutedIcon);
-		else muteButton.setIcon(volumeHighIcon);
+		if(application().getMediaPlayerComponent().isMuteForced()) 
+			muteButton.setIcon(volumeMutedIcon);
+		else 
+			muteButton.setIcon(volumeHighIcon);
 	}
 }
