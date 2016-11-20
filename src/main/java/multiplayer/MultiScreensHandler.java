@@ -479,12 +479,20 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 
 	public Vector<String> getRelatedFiles(File workingDirectory, String fileName) {
 
+		System.out.println("getRelatedFiles started at " + workingDirectory.getAbsolutePath() + " with fileName=" + fileName);
 		Vector<String> result = new Vector<String>();
-
+		
+	    // file name example: fileName=CH01-20161120-103622.avi
+		String fileRegex = fileName;
+		String nameSeparator = "-";  // FIXME could be -, /, ' ',?
+		//String dateSeparator = ""; // FIXME could be -, /, ' ',?
+		String[] nameProcess = fileName.split("-");
+		
+		//  Regex = Prefix +      date      + sufix (timestamp.fileType)
+		fileRegex = "CH*" + nameSeparator + nameProcess[1] + nameSeparator + nameProcess[2];
 		try {
-
 			Path startingDir = Paths.get(workingDirectory.getAbsolutePath());
-			PathFinder finder = new PathFinder(fileName);
+			PathFinder finder = new PathFinder(fileRegex);
 			Files.walkFileTree(startingDir, finder);
 			result = finder.getPathsAsArray();
 			finder.done(fileName);

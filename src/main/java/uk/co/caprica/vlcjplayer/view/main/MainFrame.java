@@ -405,6 +405,12 @@ public final class MainFrame extends BaseFrame {
 		updateEnabledComponents();
 	}
 
+	public void updateDirectoryTree(File newDirectory){
+		this.multiMediaPlayerComponent.setMediaDirectory(newDirectory.getAbsolutePath());
+		// FIXME the JTree is not updating its self when a recent file or a new open file is used
+		//this.playlistPane.updateDirectoryTree(newDirectory);
+	}
+	
 	private void fetchWorkingVideoFolder(ActionEvent e) {
 		if (JFileChooser.APPROVE_OPTION == fileChooser.showOpenDialog(MainFrame.this)) {
 			System.out.println("Update open folder");
@@ -419,11 +425,11 @@ public final class MainFrame extends BaseFrame {
 			newDirectory = newDirectory.getParentFile();
 		}
 		
-		// FIXME the JTree is not updating its self when a recent file or a new open file is used
-		//updateDirectoryTree(newDirectory);
+		// Update working Media Directory to match the last selection (both from JTree or FileChooser)
+		updateDirectoryTree(newDirectory);
 		
 		// FIXME to show the screens before starting playback, is here the best place for this?
-		showScreens();
+		showScreens(selectedFile);
 		if(selectedFile.isFile()) { 
 			multiMediaPlayerComponent.setSelectedFile(selectedFile.getName());
 			if(e != null) mediaPlayerActions.playbackPlayAction().actionPerformed(e);
@@ -507,10 +513,6 @@ public final class MainFrame extends BaseFrame {
 		}
 	}
 
-	public void updateDirectoryTree(File newDirectory){
-		this.playlistPane.updateDirectoryTree(newDirectory);
-	}
-
 	@Subscribe
 	public void onBeforeEnterFullScreen(BeforeEnterFullScreenEvent event) {
 		menuBar.setVisible(false);
@@ -580,10 +582,10 @@ public final class MainFrame extends BaseFrame {
 		controlsPane.setEnabledComponents();
 		multiMediaPlayerComponent.setVisible(playerRunning);
 		
-		showScreens();
+		showScreens(null);
 	}
 
-	public void showScreens() {
+	public void showScreens(File selectedFile) {
 		libvlc_state_t state = multiMediaPlayerComponent.getMediaPlayerState();
 		if(state != null) {
 			System.out.println("showScreens state=" + state.toString());
@@ -618,7 +620,8 @@ public final class MainFrame extends BaseFrame {
 				videoContentPane.showDefault();
 				mouseMovementDetector.stop();
 				application().post(StoppedEvent.INSTANCE);
-				JOptionPane.showMessageDialog(MainFrame.this, MessageFormat.format(resources().getString("error.errorEncountered"), fileChooser.getSelectedFile().toString()), resources().getString("dialog.errorEncountered"), JOptionPane.ERROR_MESSAGE);
+				if (selectedFile != null) 
+					JOptionPane.showMessageDialog(MainFrame.this, MessageFormat.format(resources().getString("error.errorEncountered"), selectedFile.toString()), resources().getString("dialog.errorEncountered"), JOptionPane.ERROR_MESSAGE);
 				break;
 			}
 		}

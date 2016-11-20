@@ -97,10 +97,9 @@ public class FileBrowser {
 							(DefaultMutableTreeNode)tse.getPath().getLastPathComponent();
 					showChildren(node);
 
-					// TODO this node.toString serves as the absolut path to a then could be used in the exat same way as filechooser
+					// This node.toString serves as the Absolut path to a then could be used in the exact same way as filechooser
 					File newSelectedFile = new File(node.toString());
 					if(newSelectedFile != null) {
-						System.out.println("Wololo node.tostring=" + node.toString());
 						((MainFrame) application().getMainFrame()).actOpenNewMedia(
 								new ActionEvent(
 										tse,
