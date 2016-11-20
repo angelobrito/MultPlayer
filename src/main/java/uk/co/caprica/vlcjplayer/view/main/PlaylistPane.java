@@ -48,10 +48,6 @@ final class PlaylistPane extends FileBrowser {
 	public void jTree1ValueChanged(TreeSelectionEvent tse ) {
 		
 		DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
-		System.out.println("Node path=" + node.getPath());
-		System.out.println("Node pathStr=" + node.getPath().toString());
-		System.out.println("Node ObjPath=" + node.getUserObjectPath());
-		System.out.println("Node ObjPathstr=" + node.getUserObjectPath());
 		if (node.isLeaf()) application().getMediaPlayerComponent().setSelectedFile(node.toString());;
 	}
 }

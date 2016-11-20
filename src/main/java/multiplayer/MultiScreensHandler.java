@@ -479,7 +479,6 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 
 	public Vector<String> getRelatedFiles(File workingDirectory, String fileName) {
 
-		System.out.println("getRelatedFiles started at " + workingDirectory.getAbsolutePath() + " with fileName=" + fileName);
 		Vector<String> result = new Vector<String>();
 		
 	    // file name example: fileName=CH01-20161120-103622.avi
@@ -512,30 +511,36 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 			MediaPlayer mediaPlayer = this.players.get(i).mediaPlayer();
 			
 			// FIXME cut the cases where there is no media and the player is not ready
-			System.out.print("Resume for Player[" + i + "].State= {" + mediaPlayer.getMediaPlayerState().toString() + "} - ");
+			//System.out.print("Resume for Player[" + i + "].State= {" + mediaPlayer.getMediaPlayerState().toString() + "} - ");
 			if(!mediaPlayer.isPlaying() && !mediaPlayer.getMediaPlayerState().toString().equalsIgnoreCase("libvlc_Ended")){
-				System.out.println("Player Started...");
+				//System.out.println("Player Started...");
 				this.players.get(i).mediaPlayer().play();
 			}
 			else if(mediaPlayer.isPlaying()) {
-				System.out.print("Screen[" + (i+1) + "] is already playing ");
+				//System.out.print("Screen[" + (i+1) + "] is already playing ");
 				if(!mediaPlayer.getMediaPlayerState().toString().equalsIgnoreCase("libvlc_Paused")){
-					System.out.println("but not Paused then Pause!");
+					//System.out.println("but not Paused then Pause!");
 					this.players.get(i).mediaPlayer().pause();
 				}
 				else {
-					System.out.println("and Paused then Play!");
+					//System.out.println("and Paused then Play!");
 					this.players.get(i).mediaPlayer().play();
 				}
 			}
-			else System.out.println("Screen[" + (i+1) + "] is not ready");
-			try {
+			else {
+				//System.out.println("Screen[" + (i+1) + "] is not ready");
+			}
+			
+			/*
+			// Set a small delay to let the other threads to run and update the state
+		    try {
 				Thread.sleep(40);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 			System.out.print("Player[" + i + "].Screen[" + (i+1) + "] running? " + (this.players.get(i).mediaPlayer().isPlaying()));
 			System.out.println(" State= {" + mediaPlayer.getMediaPlayerState().toString() + "}");
+			 */
 		}
 	}
 
@@ -550,9 +555,9 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 	public void stop() {
 		for(int i = 0; i < this.players.size(); i++){
 
-			System.out.println("Stop for=" + i);
+			//System.out.println("Stop for=" + i);
 			this.players.get(i).mediaPlayer().stop();
-			System.out.println("Player screen running?" + (this.players.get(i).mediaPlayer().isPlaying()));
+			//System.out.println("Player screen running?" + (this.players.get(i).mediaPlayer().isPlaying()));
 		}
 	}
 

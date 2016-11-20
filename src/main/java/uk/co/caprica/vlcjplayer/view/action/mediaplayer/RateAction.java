@@ -38,6 +38,5 @@ final class RateAction extends MediaPlayerAction {
     @Override
     public void actionPerformed(ActionEvent e) {
     	((MainFrame) application().getMainFrame()).setSpeedRate((int) rate);
-    	System.out.println("Menu setRate=" + rate);
     }
 }

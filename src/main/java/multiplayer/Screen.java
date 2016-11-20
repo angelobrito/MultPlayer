@@ -58,7 +58,7 @@ public class Screen extends EmbeddedMediaPlayerComponent {
 		this.titled.setTitleColor(Color.YELLOW);
 
 		super.getMediaPlayer().mute();
-		System.out.println("Activated?");
+		//System.out.println("Activated?");
 	}
 	
 	public void deactivateScreen() {
@@ -66,7 +66,7 @@ public class Screen extends EmbeddedMediaPlayerComponent {
 		this.titled.setTitleColor(Color.WHITE);
 
 		super.getMediaPlayer().mute();
-		System.out.println("Deactivated?");
+		///System.out.println("Deactivated?");
 	}
 
 	/** Returns an ImageIcon, or null if the path was invalid. */
@@ -83,7 +83,7 @@ public class Screen extends EmbeddedMediaPlayerComponent {
 	
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		System.out.println("MouseEvent=" + "Clicked #" + e.getClickCount());
+		//System.out.println("MouseEvent=" + "Clicked #" + e.getClickCount());
 		if(e.getClickCount() > 1) { 
 			// TODO Functionality for future maximize this screen
 			if(e.getButton() == MouseEvent.BUTTON1) this.activateScreen();
@@ -93,13 +93,13 @@ public class Screen extends EmbeddedMediaPlayerComponent {
 
 	@Override
 	public void mouseEntered(MouseEvent e) {
-		System.out.println("MouseEvent=" + "Entered Screen" + this.screenTitle);
+		//System.out.println("MouseEvent=" + "Entered Screen" + this.screenTitle);
 		this.getMediaPlayer().mute();
 	}
 
 	@Override
 	public void mouseExited(MouseEvent e) {
-		System.out.println("MouseEvent=" + "Leave Screen" + this.screenTitle);
+		//System.out.println("MouseEvent=" + "Leave Screen" + this.screenTitle);
 		this.getMediaPlayer().mute();
 	}
 

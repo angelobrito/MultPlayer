@@ -274,12 +274,11 @@ final class ControlsPane extends BasePanel {
 		boolean newState = application().getMediaPlayerComponent().isPlayerReady();
 		libvlc_state_t state = application().getMediaPlayerComponent().getMediaPlayerState();
 		if(state != null && state.toString().equalsIgnoreCase("libvlc_Playing")) {
-			
-			System.out.println("enable componentes player state = " + state.toString());
 			playPauseButton.setIcon(pauseIcon); 
 		}
-		else 
+		else {
 			playPauseButton.setIcon(playIcon);
+		}
 		positionPane.setEnabled(newState);
 		stopButton.setEnabled(newState);
 		fullscreenButton.setEnabled(newState);

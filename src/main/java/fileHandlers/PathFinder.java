@@ -39,17 +39,15 @@ public class PathFinder extends SimpleFileVisitor<Path> {
 	// the file or directory name.
 	public void find(Path fileName) {
 		Path name = fileName.getFileName();
-		System.out.println("find tested=" + name);
 		if (name != null && matcher.matches(name)) {
 			numMatches++;
 			foundPaths.add(fileName.toString());
-			System.out.println("*** find matched=" + name.toString());
 		}
 	}
 
 	// Prints the total number of matches to standard out.
 	public void done(String fileName) {
-		System.out.println("PathFinder Matched " + numMatches + " with " + fileName);
+		//System.out.println("PathFinder Matched " + numMatches + " with " + fileName);
 	}
 
 	public Vector<String> getPathsAsArray() {

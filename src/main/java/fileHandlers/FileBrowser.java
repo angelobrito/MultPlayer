@@ -250,51 +250,49 @@ public class FileBrowser {
 		return root;        
 	}
 
-	//	public static void main(String[] args) {
-	//		SwingUtilities.invokeLater(new Runnable() {
-	//			public void run() {
-	//				try {
-	//					// Significantly improves the look of the output in
-	//					// terms of the file names returned by FileSystemView!
-	//					UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-	//				} catch(Exception weTried) {
-	//				}
-	//				JFrame f = new JFrame(APP_TITLE);
-	//				f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-	//
-	//				FileBrowser FileBrowser = new FileBrowser();
-	//				f.setContentPane(FileBrowser.getGui());
-	//
-	//				try {
-	//					URL urlBig = FileBrowser.getClass().getResource("fb-icon-32x32.png");
-	//					URL urlSmall = FileBrowser.getClass().getResource("fb-icon-16x16.png");
-	//					ArrayList<Image> images = new ArrayList<Image>();
-	//					images.add( ImageIO.read(urlBig) );
-	//					images.add( ImageIO.read(urlSmall) );
-	//					f.setIconImages(images);
-	//				} catch(Exception weTried) {
-	//					System.err.println(weTried.toString());
-	//				}
-	//
-	//				f.pack();
-	//				f.setLocationByPlatform(true);
-	//				f.setMinimumSize(f.getSize());
-	//				f.setVisible(true);
-	//
-	//				FileBrowser.showRootFile();
-	//			}
-	//		});
-	//	}
+	public static void main(String[] args) {
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					// Significantly improves the look of the output in
+					// terms of the file names returned by FileSystemView!
+					UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+				} catch(Exception weTried) {
+				}
+				JFrame f = new JFrame(APP_TITLE);
+				f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+				FileBrowser FileBrowser = new FileBrowser();
+				f.setContentPane(FileBrowser.getGui());
+
+				try {
+					URL urlBig = FileBrowser.getClass().getResource("fb-icon-32x32.png");
+					URL urlSmall = FileBrowser.getClass().getResource("fb-icon-16x16.png");
+					ArrayList<Image> images = new ArrayList<Image>();
+					images.add( ImageIO.read(urlBig) );
+					images.add( ImageIO.read(urlSmall) );
+					f.setIconImages(images);
+				} catch(Exception weTried) {
+					System.err.println(weTried.toString());
+				}
+
+				f.pack();
+				f.setLocationByPlatform(true);
+				f.setMinimumSize(f.getSize());
+				f.setVisible(true);
+
+				FileBrowser.showRootFile();
+			}
+		});
+	}
 
 	public TreePath findTreePath(File find) {
-		//    	System.out.println("findTreePath find=" + find.toString());
 		for (int ii=0; ii < tree.getRowCount(); ii++) {
 			TreePath treePath = tree.getPathForRow(ii);
 			Object object = treePath.getLastPathComponent();
 			DefaultMutableTreeNode node = (DefaultMutableTreeNode) object;
 			File nodeFile = (File) node.getUserObject();
 
-			//            System.out.println("findTreePath nodeFile[" + ii + "/" + tree.getRowCount() + "]=" + nodeFile.toString());
 			if (nodeFile==find) {
 				return treePath;
 			}

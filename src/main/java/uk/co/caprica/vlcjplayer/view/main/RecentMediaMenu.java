@@ -69,10 +69,9 @@ final class RecentMediaMenu extends OnDemandMenu {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			System.out.println("Recent action e=" + e.toString() + ", mrl=" + this.mrl);
 
 			if (this.mrl != null && !this.mrl.equals("")) {
-				System.out.println("Update open folder to " + mrl);
+
 				File newDirectory = new File(this.mrl);
 				((MainFrame) application().getMainFrame()).actOpenNewMedia(e, newDirectory);
 			}

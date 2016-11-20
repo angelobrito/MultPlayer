@@ -361,7 +361,6 @@ public final class MainFrame extends BaseFrame {
 				mouseMovementDetector.start();
 				updateEnabledComponents();
 				application().post(PlayingEvent.INSTANCE);
-				System.out.println("MainFrame playing detected");
 			}
 
 			@Override
@@ -369,7 +368,6 @@ public final class MainFrame extends BaseFrame {
 				mouseMovementDetector.stop();
 				updateEnabledComponents();
 				application().post(PausedEvent.INSTANCE);
-				System.out.println("MainFrame paused detected");
 			}
 
 			@Override
@@ -378,7 +376,6 @@ public final class MainFrame extends BaseFrame {
 				videoContentPane.showDefault();
 				updateEnabledComponents();
 				application().post(StoppedEvent.INSTANCE);
-				System.out.println("MainFrame stoped detected");
 			}
 
 			@Override
@@ -387,7 +384,6 @@ public final class MainFrame extends BaseFrame {
 				mouseMovementDetector.stop();
 				updateEnabledComponents();
 				application().post(StoppedEvent.INSTANCE);
-				System.out.println("MainFrame finished detected");
 			}
 
 			@Override
@@ -397,7 +393,6 @@ public final class MainFrame extends BaseFrame {
 				updateEnabledComponents();
 				application().post(StoppedEvent.INSTANCE);
 				JOptionPane.showMessageDialog(MainFrame.this, MessageFormat.format(resources().getString("error.errorEncountered"), fileChooser.getSelectedFile().toString()), resources().getString("dialog.errorEncountered"), JOptionPane.ERROR_MESSAGE);
-				System.out.println("MainFrame error detected");
 			}
 		});
 		
@@ -413,7 +408,6 @@ public final class MainFrame extends BaseFrame {
 	
 	private void fetchWorkingVideoFolder(ActionEvent e) {
 		if (JFileChooser.APPROVE_OPTION == fileChooser.showOpenDialog(MainFrame.this)) {
-			System.out.println("Update open folder");
 			File newDirectory = fileChooser.getSelectedFile();
 			actOpenNewMedia(e, newDirectory);
 		}
@@ -567,7 +561,6 @@ public final class MainFrame extends BaseFrame {
 		}
 		
 		boolean playerRunning = multiMediaPlayerComponent.isPlayerReady();
-		System.out.println("Player running:" + playerRunning);
 
 		playbackMenu.setEnabled(playerRunning);
 		setEnabledMenuItemVolumeDecrease(0 < multiMediaPlayerComponent.getVolume() && 
@@ -588,7 +581,6 @@ public final class MainFrame extends BaseFrame {
 	public void showScreens(File selectedFile) {
 		libvlc_state_t state = multiMediaPlayerComponent.getMediaPlayerState();
 		if(state != null) {
-			System.out.println("showScreens state=" + state.toString());
 			switch(multiMediaPlayerComponent.getMediaPlayerState()){
 			case libvlc_Playing:
 				videoContentPane.showVideo();
@@ -626,7 +618,6 @@ public final class MainFrame extends BaseFrame {
 			}
 		}
 		else {
-			System.out.println("showScreens state=null");
 			videoContentPane.showDefault();
 			mouseMovementDetector.stop();
 			application().post(StoppedEvent.INSTANCE);
