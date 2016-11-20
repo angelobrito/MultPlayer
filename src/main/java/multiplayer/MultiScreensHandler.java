@@ -43,6 +43,7 @@ import uk.co.caprica.vlcj.player.embedded.EmbeddedMediaPlayer;
 import uk.co.caprica.vlcj.player.embedded.FullScreenStrategy;
 import uk.co.caprica.vlcj.test.multi.PlayerInstance;
 import uk.co.caprica.vlcjplayer.event.SnapshotImageEvent;
+import uk.co.caprica.vlcjplayer.view.image.ImagePane;
 
 
 public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements MediaPlayerEventListener, MouseListener, MouseMotionListener, MouseWheelListener, KeyListener{
@@ -82,9 +83,15 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 
 		FullScreenStrategy fullScreenStrategy = new DefaultFullScreenStrategy(containerFrame);
 
+		ImagePane screenLogo = new ImagePane(
+        		ImagePane.Mode.CENTER, 
+				getClass().getResource("/MultTecnologia-logo.png"), 
+				0.3f);
 		for(int i = 0; i < application().getScreenQtt(); i ++ ) {
 			EmbeddedMediaPlayer player = factory.newEmbeddedMediaPlayer(fullScreenStrategy);
 			PlayerInstance playerInstance = new PlayerInstance(player);
+			playerInstance.mediaPlayer().setLogoImage(screenLogo.getImage());
+			playerInstance.mediaPlayer().enableLogo(true);
 			players.add(playerInstance);
 
 			JPanel playerPanel = new JPanel();
@@ -128,6 +135,13 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 		for(int i = 0; i < mediaFilePath.size(); i ++ ) {
 			players.get(i).mediaPlayer().prepareMedia(mediaFilePath.get(i));
 			players.get(i).mediaPlayer().setVideoSurface(factory.newVideoSurface(players.get(i).videoSurface()));
+			
+			if(mediaFilePath.get(i) != null && !mediaFilePath.get(i).equals("")) {
+				players.get(i).mediaPlayer().enableLogo(true);
+			}
+			else {
+				players.get(i).mediaPlayer().enableLogo(false);
+			}
 		}
 	}
 

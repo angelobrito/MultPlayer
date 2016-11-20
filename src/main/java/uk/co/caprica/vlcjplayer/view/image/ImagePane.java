@@ -64,6 +64,10 @@ public final class ImagePane extends JComponent {
         prepareImage();
     }
 
+    public BufferedImage getImage() {
+    	return this.sourceImage;
+    }
+    
     public ImagePane(Mode mode, BufferedImage image, float opacity) {
         this.mode = mode;
         this.opacity = opacity;
