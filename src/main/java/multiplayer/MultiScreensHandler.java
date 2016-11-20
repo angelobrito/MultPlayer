@@ -3,6 +3,7 @@ package multiplayer;
 import static uk.co.caprica.vlcjplayer.Application.application;
 
 import java.awt.BorderLayout;
+import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridLayout;
@@ -67,54 +68,29 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 	private boolean forcedMute;
 	private boolean paused;
 
-	public MultiScreensHandler(JFrame container) {
+	public MultiScreensHandler(JFrame containerFrame) {
 		JPanel contentPane = new JPanel();
 		contentPane.setBackground(Color.black);
 		contentPane.setLayout(new GridLayout(rowsNumber, collumsNumber, 16, 16));
 		contentPane.setBorder(new EmptyBorder(16, 16, 16, 16));
+		contentPane.setVisible(false);
 
 		players = new ArrayList<PlayerInstance>();
 		mediaFilePath = new ArrayList<String>();
 
 		// TODO this window should be removed
-		container = new JFrame("Screens");
-		container.setVisible(false);
-		container.setLayout(new BorderLayout());
-		container.setBackground(Color.black);
-		container.add(contentPane, BorderLayout.CENTER);
-		container.setMinimumSize(new Dimension(1600, 600));
-		container.addWindowListener(new WindowAdapter() {
-			@Override
-			public void windowClosing(WindowEvent evt) {
-				for(PlayerInstance pi : players) {
-					pi.mediaPlayer().release();
-				}
-				factory.release();
-				System.exit(0);
-			}
-		});
-
-		container.addKeyListener(new KeyAdapter() {
-
-			@Override
-			public void keyPressed(KeyEvent e) {
-				for(int i = 0; i < players.size(); i ++ ) {
-//					players.get(i).mediaPlayer().pause();
-					pauseScreens();
-				}
-			}
-		});
+		JPanel videoContainer = new JPanel();
+		videoContainer.setVisible(true);
+		videoContainer.setBackground(Color.black);
+		videoContainer.setPreferredSize(new Dimension(1600, 600));
 
 		factory = new MediaPlayerFactory();
 
-		FullScreenStrategy fullScreenStrategy = new DefaultFullScreenStrategy(container);
+		FullScreenStrategy fullScreenStrategy = new DefaultFullScreenStrategy(containerFrame);
 
 		for(int i = 0; i < application().getScreenQtt(); i ++ ) {
 			EmbeddedMediaPlayer player = factory.newEmbeddedMediaPlayer(fullScreenStrategy);
 			PlayerInstance playerInstance = new PlayerInstance(player);
-			
-			
-			if(i != 0) playerInstance.mediaPlayer().mute(true);
 			players.add(playerInstance);
 
 			JPanel playerPanel = new JPanel();
@@ -124,7 +100,19 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 
 			contentPane.add(playerPanel);
 		}
-		container.setVisible(true);
+		contentPane.setVisible(true);
+//		videoContainer.add(contentPane);
+//
+//		contentPane.addKeyListener(new KeyAdapter() {
+//
+//			@Override
+//			public void keyPressed(KeyEvent e) {
+//				pauseScreens();
+//			}
+//		});
+		
+		this.add(contentPane, BorderLayout.CENTER);
+		this.setVisible(true);
 	}
 	
 	public MediaPlayerFactory getFactory() {

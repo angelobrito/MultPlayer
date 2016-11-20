@@ -1,9 +1,11 @@
 package fileHandlers;
 
+import static uk.co.caprica.vlcjplayer.Application.application;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Image;
+import java.awt.event.ActionEvent;
 import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
@@ -27,6 +29,8 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
+
+import uk.co.caprica.vlcjplayer.view.main.MainFrame;
 
 /**
 A basic File Browser.  Requires 1.6+ for the Desktop & SwingWorker
@@ -90,6 +94,15 @@ public class FileBrowser {
 					DefaultMutableTreeNode node =
 							(DefaultMutableTreeNode)tse.getPath().getLastPathComponent();
 					showChildren(node);
+
+					// FIXME this node.toString serves as the absolut path to a then could be used in the exat same way as filechooser
+					File newSelectedFile = new File(node.toString());
+					if(newSelectedFile != null) {
+						System.out.println("Wololo node.tostring=" + node.toString());
+//						((MainFrame) application().getMainFrame()).actOpenNewMedia(
+//								new ActionEvent(this, 0, "treeSelectionEvent"),
+//								newSelectedFile);
+					}
 				}
 			};
 
@@ -179,7 +192,7 @@ public class FileBrowser {
 								videoFiles.add(child);
 							}
 						}
-						
+
 						// Then run twice to include just video files
 						for (File child : videoFiles) publish(child);
 					}
@@ -232,59 +245,59 @@ public class FileBrowser {
 		return root;        
 	}
 
-	public static void main(String[] args) {
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					// Significantly improves the look of the output in
-					// terms of the file names returned by FileSystemView!
-					UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-				} catch(Exception weTried) {
-				}
-				JFrame f = new JFrame(APP_TITLE);
-				f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	//	public static void main(String[] args) {
+	//		SwingUtilities.invokeLater(new Runnable() {
+	//			public void run() {
+	//				try {
+	//					// Significantly improves the look of the output in
+	//					// terms of the file names returned by FileSystemView!
+	//					UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+	//				} catch(Exception weTried) {
+	//				}
+	//				JFrame f = new JFrame(APP_TITLE);
+	//				f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	//
+	//				FileBrowser FileBrowser = new FileBrowser();
+	//				f.setContentPane(FileBrowser.getGui());
+	//
+	//				try {
+	//					URL urlBig = FileBrowser.getClass().getResource("fb-icon-32x32.png");
+	//					URL urlSmall = FileBrowser.getClass().getResource("fb-icon-16x16.png");
+	//					ArrayList<Image> images = new ArrayList<Image>();
+	//					images.add( ImageIO.read(urlBig) );
+	//					images.add( ImageIO.read(urlSmall) );
+	//					f.setIconImages(images);
+	//				} catch(Exception weTried) {
+	//					System.err.println(weTried.toString());
+	//				}
+	//
+	//				f.pack();
+	//				f.setLocationByPlatform(true);
+	//				f.setMinimumSize(f.getSize());
+	//				f.setVisible(true);
+	//
+	//				FileBrowser.showRootFile();
+	//			}
+	//		});
+	//	}
 
-				FileBrowser FileBrowser = new FileBrowser();
-				f.setContentPane(FileBrowser.getGui());
+	public TreePath findTreePath(File find) {
+		//    	System.out.println("findTreePath find=" + find.toString());
+		for (int ii=0; ii < tree.getRowCount(); ii++) {
+			TreePath treePath = tree.getPathForRow(ii);
+			Object object = treePath.getLastPathComponent();
+			DefaultMutableTreeNode node = (DefaultMutableTreeNode) object;
+			File nodeFile = (File) node.getUserObject();
 
-				try {
-					URL urlBig = FileBrowser.getClass().getResource("fb-icon-32x32.png");
-					URL urlSmall = FileBrowser.getClass().getResource("fb-icon-16x16.png");
-					ArrayList<Image> images = new ArrayList<Image>();
-					images.add( ImageIO.read(urlBig) );
-					images.add( ImageIO.read(urlSmall) );
-					f.setIconImages(images);
-				} catch(Exception weTried) {
-					System.err.println(weTried.toString());
-				}
-
-				f.pack();
-				f.setLocationByPlatform(true);
-				f.setMinimumSize(f.getSize());
-				f.setVisible(true);
-
-				FileBrowser.showRootFile();
+			//            System.out.println("findTreePath nodeFile[" + ii + "/" + tree.getRowCount() + "]=" + nodeFile.toString());
+			if (nodeFile==find) {
+				return treePath;
 			}
-		});
+		}
+		// not found!
+		return null;
 	}
 
-    public TreePath findTreePath(File find) {
-//    	System.out.println("findTreePath find=" + find.toString());
-        for (int ii=0; ii < tree.getRowCount(); ii++) {
-            TreePath treePath = tree.getPathForRow(ii);
-            Object object = treePath.getLastPathComponent();
-            DefaultMutableTreeNode node = (DefaultMutableTreeNode) object;
-            File nodeFile = (File) node.getUserObject();
-
-//            System.out.println("findTreePath nodeFile[" + ii + "/" + tree.getRowCount() + "]=" + nodeFile.toString());
-            if (nodeFile==find) {
-                return treePath;
-            }
-        }
-        // not found!
-        return null;
-    }
-	
 	private boolean isValidVideoFile(File file){
 
 		String fileName;      

@@ -59,6 +59,7 @@ import com.google.common.eventbus.Subscribe;
 
 import multiplayer.MultiScreensHandler;
 import net.miginfocom.swing.MigLayout;
+import uk.co.caprica.vlcj.binding.internal.libvlc_state_t;
 import uk.co.caprica.vlcj.player.MediaPlayer;
 import uk.co.caprica.vlcj.player.MediaPlayerEventAdapter;
 import uk.co.caprica.vlcjplayer.event.AfterExitFullScreenEvent;
@@ -307,7 +308,10 @@ public final class MainFrame extends BaseFrame {
 
 		JPanel contentPane = new JPanel();
 		contentPane.setLayout(new BorderLayout());
-		contentPane.add(videoContentPane, BorderLayout.CENTER);
+		
+		// FIXME the videoContentPane is not working properly then I set permanently the video screen on
+        //contentPane.add(videoContentPane, BorderLayout.CENTER);
+		contentPane.add(application().getMediaPlayerComponent(), BorderLayout.CENTER);
 		contentPane.setTransferHandler(new MediaTransferHandler() {
 			@Override
 			protected void onMediaDropped(String[] uris) {
@@ -334,49 +338,6 @@ public final class MainFrame extends BaseFrame {
 
 		contentPane.add(bottomPane, BorderLayout.SOUTH);
 
-		multiMediaPlayerComponent.getMediaPlayer().addMediaPlayerEventListener(new MediaPlayerEventAdapter() {
-
-			@Override
-			public void playing(MediaPlayer mediaPlayer) {
-				videoContentPane.showVideo();
-				mouseMovementDetector.start();
-				updateEnabledComponents();
-				application().post(PlayingEvent.INSTANCE);
-			}
-
-			@Override
-			public void paused(MediaPlayer mediaPlayer) {
-				mouseMovementDetector.stop();
-				updateEnabledComponents();
-				application().post(PausedEvent.INSTANCE);
-			}
-
-			@Override
-			public void stopped(MediaPlayer mediaPlayer) {
-				mouseMovementDetector.stop();
-				videoContentPane.showDefault();
-				updateEnabledComponents();
-				application().post(StoppedEvent.INSTANCE);
-			}
-
-			@Override
-			public void finished(MediaPlayer mediaPlayer) {
-				videoContentPane.showDefault();
-				mouseMovementDetector.stop();
-				updateEnabledComponents();
-				application().post(StoppedEvent.INSTANCE);
-			}
-
-			@Override
-			public void error(MediaPlayer mediaPlayer) {
-				videoContentPane.showDefault();
-				mouseMovementDetector.stop();
-				updateEnabledComponents();
-				application().post(StoppedEvent.INSTANCE);
-				JOptionPane.showMessageDialog(MainFrame.this, MessageFormat.format(resources().getString("error.errorEncountered"), fileChooser.getSelectedFile().toString()), resources().getString("dialog.errorEncountered"), JOptionPane.ERROR_MESSAGE);
-			}
-		});
-
 		getActionMap().put(ACTION_EXIT_FULLSCREEN, new AbstractAction() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -392,6 +353,54 @@ public final class MainFrame extends BaseFrame {
 
 		mouseMovementDetector = new VideoMouseMovementDetector(multiMediaPlayerComponent.getVideoSurface(), 500, multiMediaPlayerComponent);
 
+		multiMediaPlayerComponent.getMediaPlayer().addMediaPlayerEventListener(new MediaPlayerEventAdapter() {
+
+			@Override
+			public void playing(MediaPlayer mediaPlayer) {
+				videoContentPane.showVideo();
+				mouseMovementDetector.start();
+				updateEnabledComponents();
+				application().post(PlayingEvent.INSTANCE);
+				System.out.println("MainFrame playing detected");
+			}
+
+			@Override
+			public void paused(MediaPlayer mediaPlayer) {
+				mouseMovementDetector.stop();
+				updateEnabledComponents();
+				application().post(PausedEvent.INSTANCE);
+				System.out.println("MainFrame paused detected");
+			}
+
+			@Override
+			public void stopped(MediaPlayer mediaPlayer) {
+				mouseMovementDetector.stop();
+				videoContentPane.showDefault();
+				updateEnabledComponents();
+				application().post(StoppedEvent.INSTANCE);
+				System.out.println("MainFrame stoped detected");
+			}
+
+			@Override
+			public void finished(MediaPlayer mediaPlayer) {
+				videoContentPane.showDefault();
+				mouseMovementDetector.stop();
+				updateEnabledComponents();
+				application().post(StoppedEvent.INSTANCE);
+				System.out.println("MainFrame finished detected");
+			}
+
+			@Override
+			public void error(MediaPlayer mediaPlayer) {
+				videoContentPane.showDefault();
+				mouseMovementDetector.stop();
+				updateEnabledComponents();
+				application().post(StoppedEvent.INSTANCE);
+				JOptionPane.showMessageDialog(MainFrame.this, MessageFormat.format(resources().getString("error.errorEncountered"), fileChooser.getSelectedFile().toString()), resources().getString("dialog.errorEncountered"), JOptionPane.ERROR_MESSAGE);
+				System.out.println("MainFrame error detected");
+			}
+		});
+		
 		setMinimumSize(new Dimension(900, 580));
 		updateEnabledComponents();
 	}
@@ -401,7 +410,6 @@ public final class MainFrame extends BaseFrame {
 			System.out.println("Update open folder");
 			File newDirectory = fileChooser.getSelectedFile();
 			actOpenNewMedia(e, newDirectory);
-			application().addRecentMedia(newDirectory.getAbsolutePath());
 		}
 	}
 
@@ -413,11 +421,15 @@ public final class MainFrame extends BaseFrame {
 		
 		// FIXME the JTree is not updating its self when a recent file or a new open file is used
 		updateDirectoryTree(newDirectory);
+		
+		// FIXME to show the screens before starting playback, is here the best place for this?
+		showScreens();
 		if(selectedFile.isFile()) { 
 			multiMediaPlayerComponent.setSelectedFile(selectedFile.getName());
 			mediaPlayerActions.playbackPlayAction().actionPerformed(e);
 			updateEnabledComponents();
 		}
+		application().addRecentMedia(newDirectory.getAbsolutePath());
 	}
 
 	private ButtonGroup addActions(List<Action> actions, JMenu menu, boolean selectFirst) {
@@ -454,7 +466,7 @@ public final class MainFrame extends BaseFrame {
 		setAlwaysOnTop(alwaysOnTop);
 		videoAlwaysOnTopAction.select(alwaysOnTop);
 		fileChooser.setCurrentDirectory(new File(prefs.get("chooserDirectory", ".")));
-		this.updateDirectoryTree(fileChooser.getCurrentDirectory());
+		
 		String recentMedia = prefs.get("recentMedia", "");
 		if (recentMedia.length() > 0) {
 			List<String> mrls = Arrays.asList(prefs.get("recentMedia", "").split("\\|"));
@@ -545,6 +557,13 @@ public final class MainFrame extends BaseFrame {
 
 	public void updateEnabledComponents() {
 
+		// FIXME to avoid thread problems sleep a little to give time to other threads to run
+		try {
+			Thread.sleep(40);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		
 		boolean playerRunning = multiMediaPlayerComponent.isPlayerReady();
 		System.out.println("Player running:" + playerRunning);
 
@@ -560,6 +579,55 @@ public final class MainFrame extends BaseFrame {
 		videoSnapshot.setEnabled(playerRunning);
 		controlsPane.setEnabledComponents();
 		multiMediaPlayerComponent.setVisible(playerRunning);
+		
+		showScreens();
+	}
+
+	public void showScreens() {
+		libvlc_state_t state = multiMediaPlayerComponent.getMediaPlayerState();
+		if(state != null) {
+			System.out.println("showScreens state=" + state.toString());
+			switch(multiMediaPlayerComponent.getMediaPlayerState()){
+			case libvlc_Playing:
+				videoContentPane.showVideo();
+				//mouseMovementDetector.start();
+				application().post(PlayingEvent.INSTANCE);
+				break;
+
+			case libvlc_Paused:
+				mouseMovementDetector.stop();
+				application().post(PausedEvent.INSTANCE);
+				break;
+
+			case libvlc_Stopped:
+				mouseMovementDetector.stop();
+				videoContentPane.showDefault();
+				application().post(StoppedEvent.INSTANCE);
+				break;
+
+			case libvlc_Ended:
+				videoContentPane.showDefault();
+				mouseMovementDetector.stop();
+				application().post(StoppedEvent.INSTANCE);
+
+			default:
+				// libvlc_Buffering
+				// libvlc_Error 
+				// libvlc_NothingSpecial 
+				// libvlc_Opening 
+				videoContentPane.showDefault();
+				mouseMovementDetector.stop();
+				application().post(StoppedEvent.INSTANCE);
+				JOptionPane.showMessageDialog(MainFrame.this, MessageFormat.format(resources().getString("error.errorEncountered"), fileChooser.getSelectedFile().toString()), resources().getString("dialog.errorEncountered"), JOptionPane.ERROR_MESSAGE);
+				break;
+			}
+		}
+		else {
+			System.out.println("showScreens state=null");
+			videoContentPane.showDefault();
+			mouseMovementDetector.stop();
+			application().post(StoppedEvent.INSTANCE);
+		}
 	}
 
 	public Component getPlayerHandler(){
