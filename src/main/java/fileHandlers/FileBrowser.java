@@ -1,6 +1,7 @@
 package fileHandlers;
 
 import static uk.co.caprica.vlcjplayer.Application.application;
+
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;

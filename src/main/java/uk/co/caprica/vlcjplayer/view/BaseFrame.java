@@ -26,9 +26,9 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 
-import uk.co.caprica.vlcjplayer.event.ShutdownEvent;
-
 import com.google.common.eventbus.Subscribe;
+
+import uk.co.caprica.vlcjplayer.event.ShutdownEvent;
 
 @SuppressWarnings("serial")
 public abstract class BaseFrame extends JFrame {

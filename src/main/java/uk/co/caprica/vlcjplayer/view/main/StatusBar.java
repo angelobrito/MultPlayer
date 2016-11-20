@@ -25,11 +25,11 @@ import static uk.co.caprica.vlcjplayer.time.Time.formatTime;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import com.google.common.eventbus.Subscribe;
+
 import net.miginfocom.swing.MigLayout;
 import uk.co.caprica.vlcjplayer.event.TickEvent;
 import uk.co.caprica.vlcjplayer.view.BorderedStandardLabel;
-
-import com.google.common.eventbus.Subscribe;
 
 final class StatusBar extends JPanel {
 
