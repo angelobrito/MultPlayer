@@ -420,18 +420,18 @@ public final class MainFrame extends BaseFrame {
 		}
 		
 		// FIXME the JTree is not updating its self when a recent file or a new open file is used
-		updateDirectoryTree(newDirectory);
+		//updateDirectoryTree(newDirectory);
 		
 		// FIXME to show the screens before starting playback, is here the best place for this?
 		showScreens();
 		if(selectedFile.isFile()) { 
 			multiMediaPlayerComponent.setSelectedFile(selectedFile.getName());
-			mediaPlayerActions.playbackPlayAction().actionPerformed(e);
+			if(e != null) mediaPlayerActions.playbackPlayAction().actionPerformed(e);
 			updateEnabledComponents();
+			application().addRecentMedia(selectedFile.getAbsolutePath());
 		}
-		application().addRecentMedia(newDirectory.getAbsolutePath());
 	}
-
+	
 	private ButtonGroup addActions(List<Action> actions, JMenu menu, boolean selectFirst) {
 		ButtonGroup buttonGroup = addActions(actions, menu);
 		if (selectFirst) {

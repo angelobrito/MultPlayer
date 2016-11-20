@@ -33,7 +33,9 @@ import javax.swing.tree.TreeSelectionModel;
 import uk.co.caprica.vlcjplayer.view.main.MainFrame;
 
 /**
-A basic File Browser.  Requires 1.6+ for the Desktop & SwingWorker
+A basic File Browser upgraded from Andrew's project on 
+http://codereview.stackexchange.com/q/4446/7784 .  
+Requires 1.6+ for the Desktop & SwingWorker
 classes, amongst other minor things.
 
 Includes support classes FileTableModel & FileTreeCellRenderer.
@@ -95,13 +97,17 @@ public class FileBrowser {
 							(DefaultMutableTreeNode)tse.getPath().getLastPathComponent();
 					showChildren(node);
 
-					// FIXME this node.toString serves as the absolut path to a then could be used in the exat same way as filechooser
+					// TODO this node.toString serves as the absolut path to a then could be used in the exat same way as filechooser
 					File newSelectedFile = new File(node.toString());
 					if(newSelectedFile != null) {
 						System.out.println("Wololo node.tostring=" + node.toString());
-//						((MainFrame) application().getMainFrame()).actOpenNewMedia(
-//								new ActionEvent(this, 0, "treeSelectionEvent"),
-//								newSelectedFile);
+						((MainFrame) application().getMainFrame()).actOpenNewMedia(
+								new ActionEvent(
+										tse,
+										0,
+										"TreeSelectionEvent"
+										)
+								, newSelectedFile);
 					}
 				}
 			};

@@ -78,12 +78,6 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 		players = new ArrayList<PlayerInstance>();
 		mediaFilePath = new ArrayList<String>();
 
-		// TODO this window should be removed
-		JPanel videoContainer = new JPanel();
-		videoContainer.setVisible(true);
-		videoContainer.setBackground(Color.black);
-		videoContainer.setPreferredSize(new Dimension(1600, 600));
-
 		factory = new MediaPlayerFactory();
 
 		FullScreenStrategy fullScreenStrategy = new DefaultFullScreenStrategy(containerFrame);
@@ -165,7 +159,7 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 	}
 
 	public void activateScreen(int screenNumber) {
-		//TODO Change screen color and unmute
+		//TODO New feature for future implementations: Change screen color and unmute
 	}
 
 

@@ -85,7 +85,7 @@ public class Screen extends EmbeddedMediaPlayerComponent {
 	public void mouseClicked(MouseEvent e) {
 		System.out.println("MouseEvent=" + "Clicked #" + e.getClickCount());
 		if(e.getClickCount() > 1) { 
-			// TODO maximize this screen
+			// TODO Functionality for future maximize this screen
 			if(e.getButton() == MouseEvent.BUTTON1) this.activateScreen();
 			else this.deactivateScreen();
 		}
