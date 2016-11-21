@@ -35,7 +35,6 @@ import uk.co.caprica.vlcj.player.MediaPlayerFactory;
 import uk.co.caprica.vlcj.player.embedded.DefaultFullScreenStrategy;
 import uk.co.caprica.vlcj.player.embedded.EmbeddedMediaPlayer;
 import uk.co.caprica.vlcj.player.embedded.FullScreenStrategy;
-import uk.co.caprica.vlcj.test.multi.PlayerInstance;
 import uk.co.caprica.vlcjplayer.event.SnapshotImageEvent;
 import uk.co.caprica.vlcjplayer.view.image.ImagePane;
 
