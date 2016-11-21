@@ -25,6 +25,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
@@ -74,10 +75,19 @@ public class MultTecnologiaPlayer {
 
     public static void main(String[] args) throws InterruptedException, ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException {
         
+    	setLookAndFeel();
+
     	// This will locate LibVLC for the vast majority of cases
-        new NativeDiscovery().discover();
-        
-        setLookAndFeel();
+    	try {
+    		NativeDiscovery env = new NativeDiscovery(); 
+    		if(!env.discover()) throw new Exception("Native Library não foi encontrada. Contact o administrador de sistemas.");
+    	}
+    	catch(Exception e){
+    		JOptionPane.showMessageDialog(null, e.toString(), "Error",
+    				JOptionPane.ERROR_MESSAGE);
+    		System.exit(0);
+    	}
+
         
         SwingUtilities.invokeLater(new Runnable() {
             @Override
