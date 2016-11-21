@@ -28,13 +28,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>uk.co.caprica.vlcj</groupId>
-    <artifactId>vlcj-player</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <artifactId>mult-Tecnologia-player</artifactId>
+    <version>1.1.2</version>
 
     <name>Mult Tecnologia Player</name>
-    <description>Media Player for DVR from Mult Tecnologia</description>
-    <url>http://www.capricasoftware.co.uk/vlcj</url>
-    <inceptionYear>2015</inceptionYear>
+    <description>Media Player for DVR Video Files from Mult Tecnologia</description>
+    <inceptionYear>2016</inceptionYear>
 
     <packaging>jar</packaging>
 
@@ -47,8 +46,7 @@
     </licenses>
 
     <organization>
-        <name>Caprica Software Limited</name>
-        <url>http://www.capricasoftware.co.uk</url>
+        <name>Mult Tecnologia</name>
     </organization>
 
     <developers>
