@@ -19,10 +19,8 @@
 
 package uk.co.caprica.vlcjplayer.view.action.mediaplayer;
 
-import static uk.co.caprica.vlcjplayer.Application.application;
-
 import java.awt.event.ActionEvent;
-
+import static uk.co.caprica.vlcjplayer.Application.application;
 import uk.co.caprica.vlcj.player.MediaPlayer;
 import uk.co.caprica.vlcjplayer.view.action.Resource;
 import uk.co.caprica.vlcjplayer.view.main.MainFrame;

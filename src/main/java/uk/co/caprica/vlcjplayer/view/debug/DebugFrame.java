@@ -42,15 +42,15 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ScrollPaneConstants;
 
-import com.google.common.eventbus.Subscribe;
-
+import uk.co.caprica.vlcj.component.EmbeddedMediaPlayerComponent;
+import uk.co.caprica.vlcjplayer.event.ShowDebugEvent;
+import uk.co.caprica.vlcjplayer.view.BaseFrame;
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.swing.AdvancedTableModel;
 import ca.odell.glazedlists.swing.GlazedListsSwing;
-import uk.co.caprica.vlcj.component.EmbeddedMediaPlayerComponent;
-import uk.co.caprica.vlcjplayer.event.ShowDebugEvent;
-import uk.co.caprica.vlcjplayer.view.BaseFrame;
+
+import com.google.common.eventbus.Subscribe;
 
 @SuppressWarnings("serial")
 public final class DebugFrame extends BaseFrame {

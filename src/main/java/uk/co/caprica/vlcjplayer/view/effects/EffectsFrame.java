@@ -19,6 +19,7 @@
 
 package uk.co.caprica.vlcjplayer.view.effects;
 
+import static uk.co.caprica.vlcjplayer.Application.resources;
 import static uk.co.caprica.vlcjplayer.view.action.Resource.resource;
 
 import java.awt.Color;
@@ -29,13 +30,13 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
-import com.google.common.eventbus.Subscribe;
-
 import net.miginfocom.swing.MigLayout;
 import uk.co.caprica.vlcjplayer.event.ShowEffectsEvent;
 import uk.co.caprica.vlcjplayer.view.BaseFrame;
 import uk.co.caprica.vlcjplayer.view.effects.audio.AudioEffectsPanel;
 import uk.co.caprica.vlcjplayer.view.effects.video.VideoEffectsPanel;
+
+import com.google.common.eventbus.Subscribe;
 
 @SuppressWarnings("serial")
 public class EffectsFrame extends BaseFrame {

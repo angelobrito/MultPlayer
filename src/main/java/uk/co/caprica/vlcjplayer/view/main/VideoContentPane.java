@@ -3,6 +3,7 @@ package uk.co.caprica.vlcjplayer.view.main;
 import static uk.co.caprica.vlcjplayer.Application.application;
 
 import java.awt.CardLayout;
+import java.awt.Color;
 
 import javax.swing.JPanel;
 

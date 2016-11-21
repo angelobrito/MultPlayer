@@ -36,11 +36,11 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-import com.google.common.io.Files;
-
 import net.miginfocom.swing.MigLayout;
 import uk.co.caprica.vlcjplayer.view.image.ImagePane;
 import uk.co.caprica.vlcjplayer.view.image.ImagePane.Mode;
+
+import com.google.common.io.Files;
 
 /**
  * Simple frame implementation that shows a buffered image.

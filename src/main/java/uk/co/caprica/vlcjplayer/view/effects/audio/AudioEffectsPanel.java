@@ -19,7 +19,10 @@
 
 package uk.co.caprica.vlcjplayer.view.effects.audio;
 
+import static uk.co.caprica.vlcjplayer.Application.resources;
 import static uk.co.caprica.vlcjplayer.view.action.Resource.resource;
+
+import java.awt.Color;
 
 import javax.swing.JTabbedPane;
 

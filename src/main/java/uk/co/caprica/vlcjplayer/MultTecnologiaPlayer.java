@@ -30,8 +30,10 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
 import multiplayer.MultiScreensHandler;
+import uk.co.caprica.vlcj.component.EmbeddedMediaPlayerComponent;
 import uk.co.caprica.vlcj.discovery.NativeDiscovery;
 import uk.co.caprica.vlcj.log.NativeLog;
+import uk.co.caprica.vlcj.player.MediaPlayer;
 import uk.co.caprica.vlcj.player.embedded.EmbeddedMediaPlayer;
 import uk.co.caprica.vlcj.runtime.RuntimeUtil;
 import uk.co.caprica.vlcj.runtime.streams.NativeStreams;
@@ -39,6 +41,7 @@ import uk.co.caprica.vlcj.test.multi.PlayerInstance;
 import uk.co.caprica.vlcjplayer.event.ShutdownEvent;
 import uk.co.caprica.vlcjplayer.view.debug.DebugFrame;
 import uk.co.caprica.vlcjplayer.view.effects.EffectsFrame;
+import uk.co.caprica.vlcjplayer.view.main.MainFrame;
 import uk.co.caprica.vlcjplayer.view.messages.NativeLogFrame;
 
 /**
