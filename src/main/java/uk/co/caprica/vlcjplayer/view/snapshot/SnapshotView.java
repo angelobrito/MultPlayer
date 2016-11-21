@@ -35,12 +35,13 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.WindowConstants;
+
+import com.google.common.io.Files;
 
 import net.miginfocom.swing.MigLayout;
 import uk.co.caprica.vlcjplayer.view.image.ImagePane;
 import uk.co.caprica.vlcjplayer.view.image.ImagePane.Mode;
-
-import com.google.common.io.Files;
 
 /**
  * Simple frame implementation that shows a buffered image.
@@ -61,7 +62,7 @@ public class SnapshotView extends JFrame {
         contentPane.add(new ImagePane(Mode.DEFAULT, image, 1.0f), BorderLayout.CENTER);
         contentPane.add(new ActionPane(), BorderLayout.SOUTH);
         setContentPane(contentPane);
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         pack();
         setLocationByPlatform(true);
         setVisible(true);

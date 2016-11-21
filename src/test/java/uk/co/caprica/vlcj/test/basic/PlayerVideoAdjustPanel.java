@@ -29,6 +29,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
+import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -76,7 +77,7 @@ public class PlayerVideoAdjustPanel extends JPanel {
 
         contrastLabel = new JLabel("Contrast");
         contrastSlider = new JSlider();
-        contrastSlider.setOrientation(JSlider.HORIZONTAL);
+        contrastSlider.setOrientation(SwingConstants.HORIZONTAL);
         contrastSlider.setMinimum(Math.round(LibVlcConst.MIN_CONTRAST * 100.0f));
         contrastSlider.setMaximum(Math.round(LibVlcConst.MAX_CONTRAST * 100.0f));
         contrastSlider.setPreferredSize(new Dimension(100, 40));
@@ -87,7 +88,7 @@ public class PlayerVideoAdjustPanel extends JPanel {
 
         brightnessLabel = new JLabel("Brightness");
         brightnessSlider = new JSlider();
-        brightnessSlider.setOrientation(JSlider.HORIZONTAL);
+        brightnessSlider.setOrientation(SwingConstants.HORIZONTAL);
         brightnessSlider.setMinimum(Math.round(LibVlcConst.MIN_BRIGHTNESS * 100.0f));
         brightnessSlider.setMaximum(Math.round(LibVlcConst.MAX_BRIGHTNESS * 100.0f));
         brightnessSlider.setPreferredSize(new Dimension(100, 40));
@@ -96,7 +97,7 @@ public class PlayerVideoAdjustPanel extends JPanel {
 
         hueLabel = new JLabel("Hue");
         hueSlider = new JSlider();
-        hueSlider.setOrientation(JSlider.HORIZONTAL);
+        hueSlider.setOrientation(SwingConstants.HORIZONTAL);
         hueSlider.setMinimum(LibVlcConst.MIN_HUE);
         hueSlider.setMaximum(LibVlcConst.MAX_HUE);
         hueSlider.setPreferredSize(new Dimension(100, 40));
@@ -105,7 +106,7 @@ public class PlayerVideoAdjustPanel extends JPanel {
 
         saturationLabel = new JLabel("Saturation");
         saturationSlider = new JSlider();
-        saturationSlider.setOrientation(JSlider.HORIZONTAL);
+        saturationSlider.setOrientation(SwingConstants.HORIZONTAL);
         saturationSlider.setMinimum(Math.round(LibVlcConst.MIN_SATURATION * 100.0f));
         saturationSlider.setMaximum(Math.round(LibVlcConst.MAX_SATURATION * 100.0f));
         saturationSlider.setPreferredSize(new Dimension(100, 40));
@@ -114,7 +115,7 @@ public class PlayerVideoAdjustPanel extends JPanel {
 
         gammaLabel = new JLabel("Gamma");
         gammaSlider = new JSlider();
-        gammaSlider.setOrientation(JSlider.HORIZONTAL);
+        gammaSlider.setOrientation(SwingConstants.HORIZONTAL);
         gammaSlider.setMinimum(Math.round(LibVlcConst.MIN_GAMMA * 100.0f));
         gammaSlider.setMaximum(Math.round(LibVlcConst.MAX_GAMMA * 100.0f));
         gammaSlider.setPreferredSize(new Dimension(100, 40));

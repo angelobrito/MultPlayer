@@ -19,10 +19,13 @@
 
 package uk.co.caprica.vlcjplayer.view;
 
+import java.awt.Component;
+
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
+import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -41,7 +44,7 @@ public class SliderControl extends JPanel implements ChangeListener {
 
         label = new SmallStandardLabel();
         label.setText(text);
-        label.setHorizontalAlignment(JLabel.CENTER);
+        label.setHorizontalAlignment(SwingConstants.CENTER);
 
         int modelMin = (int)(min * factor);
         int modelMax = (int)(max * factor);
@@ -50,14 +53,14 @@ public class SliderControl extends JPanel implements ChangeListener {
         modelValue = Math.min(modelValue, modelMax);
         modelValue = Math.max(modelValue, modelMin);
 
-        slider = new JSlider(JSlider.VERTICAL, modelMin, modelMax, modelValue);
+        slider = new JSlider(SwingConstants.VERTICAL, modelMin, modelMax, modelValue);
         valueLabel = new SmallStandardLabel();
 
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
-        label.setAlignmentX(JLabel.CENTER_ALIGNMENT);
-        slider.setAlignmentX(JSlider.CENTER_ALIGNMENT);
-        valueLabel.setAlignmentX(JLabel.CENTER_ALIGNMENT);
+        label.setAlignmentX(Component.CENTER_ALIGNMENT);
+        slider.setAlignmentX(Component.CENTER_ALIGNMENT);
+        valueLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         add(slider);
         add(label);

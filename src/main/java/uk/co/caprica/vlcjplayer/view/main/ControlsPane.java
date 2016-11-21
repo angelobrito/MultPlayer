@@ -23,6 +23,7 @@ import static uk.co.caprica.vlcjplayer.Application.application;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Transparency;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Hashtable;
@@ -33,6 +34,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JSlider;
+import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -127,7 +129,7 @@ final class ControlsPane extends BasePanel {
 
 		speedLabel = new JLabel("Velocidade: ");
 
-		speedSlider = new JSlider(JSlider.HORIZONTAL, FPS_MIN, FPS_MAX, 3);
+		speedSlider = new JSlider(SwingConstants.HORIZONTAL, FPS_MIN, FPS_MAX, 3);
 		speedSlider.setMajorTickSpacing(1);
 		speedSlider.setMinorTickSpacing(1);
 		speedSlider.setPaintTicks(true);
@@ -147,7 +149,7 @@ final class ControlsPane extends BasePanel {
 		setLayout(layout);
 
 		logoPane = new ImagePane(ImagePane.Mode.FIT, getClass().getResource("/MultTecnologia-logo-name.png"), 1.0f);
-		logoPane.setBackground(new Color(Color.TRANSLUCENT));
+		logoPane.setBackground(new Color(Transparency.TRANSLUCENT));
 		logoPane.setPreferredSize(new Dimension(50, 50));
 		logoPane.setIgnoreRepaint(true);
 		add(logoPane, "West, wmax 120, hmax 80, gap 20 0");
@@ -177,7 +179,7 @@ final class ControlsPane extends BasePanel {
 
 			@Override
 			public void stateChanged(ChangeEvent e) {
-				application().getMediaPlayerComponent().setRate( (float) Math.pow((double)2, (double)speedSlider.getValue())/8);
+				application().getMediaPlayerComponent().setRate( (float) Math.pow(2, speedSlider.getValue())/8);
 			}
 		});
 

@@ -20,6 +20,7 @@
 package uk.co.caprica.vlcjplayer.view.action.mediaplayer;
 
 import static uk.co.caprica.vlcjplayer.Application.application;
+
 import java.awt.event.ActionEvent;
 
 import uk.co.caprica.vlcj.player.MediaPlayer;
@@ -37,6 +38,6 @@ final class RateAction extends MediaPlayerAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-    	((MainFrame) application().getMainFrame()).setSpeedRate((int) rate);
+    	((MainFrame) application().getMainFrame()).setSpeedRate(rate);
     }
 }

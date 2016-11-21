@@ -1,6 +1,7 @@
 package fileHandlers;
 
 import static uk.co.caprica.vlcjplayer.Application.application;
+
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -92,6 +93,7 @@ public class FileBrowser {
 			treeModel = new DefaultTreeModel(root);
 
 			TreeSelectionListener treeSelectionListener = new TreeSelectionListener() {
+				@Override
 				public void valueChanged(TreeSelectionEvent tse){
 					DefaultMutableTreeNode node =
 							(DefaultMutableTreeNode)tse.getPath().getLastPathComponent();
@@ -252,6 +254,7 @@ public class FileBrowser {
 
 	public static void main(String[] args) {
 		SwingUtilities.invokeLater(new Runnable() {
+			@Override
 			public void run() {
 				try {
 					// Significantly improves the look of the output in

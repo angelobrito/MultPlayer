@@ -39,13 +39,13 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
+import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileFilter;
 
-import ca.odell.glazedlists.impl.Main;
 import uk.co.caprica.vlcj.binding.LibVlcConst;
 import uk.co.caprica.vlcj.filter.swing.SwingFileFilterFactory;
 import uk.co.caprica.vlcj.player.MediaPlayer;
@@ -142,7 +142,7 @@ public class PlayerControlsPanel extends JPanel {
         toggleMuteButton.setBackground(Color.BLACK);
 
         volumeSlider = new JSlider();
-        volumeSlider.setOrientation(JSlider.HORIZONTAL);
+        volumeSlider.setOrientation(SwingConstants.HORIZONTAL);
         volumeSlider.setMinimum(LibVlcConst.MIN_VOLUME);
         volumeSlider.setMaximum(LibVlcConst.MAX_VOLUME);
         volumeSlider.setPreferredSize(new Dimension(100, 40));

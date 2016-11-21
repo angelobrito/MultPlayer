@@ -23,9 +23,9 @@ import static uk.co.caprica.vlcjplayer.Application.application;
 
 import javax.swing.JPanel;
 
-import uk.co.caprica.vlcjplayer.event.ShutdownEvent;
-
 import com.google.common.eventbus.Subscribe;
+
+import uk.co.caprica.vlcjplayer.event.ShutdownEvent;
 
 public abstract class BasePanel extends JPanel {
 

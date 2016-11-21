@@ -19,7 +19,6 @@
 
 package uk.co.caprica.vlcjplayer.view.effects;
 
-import static uk.co.caprica.vlcjplayer.Application.resources;
 import static uk.co.caprica.vlcjplayer.view.action.Resource.resource;
 
 import java.awt.Color;
@@ -29,14 +28,15 @@ import javax.swing.BorderFactory;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
+import javax.swing.WindowConstants;
+
+import com.google.common.eventbus.Subscribe;
 
 import net.miginfocom.swing.MigLayout;
 import uk.co.caprica.vlcjplayer.event.ShowEffectsEvent;
 import uk.co.caprica.vlcjplayer.view.BaseFrame;
 import uk.co.caprica.vlcjplayer.view.effects.audio.AudioEffectsPanel;
 import uk.co.caprica.vlcjplayer.view.effects.video.VideoEffectsPanel;
-
-import com.google.common.eventbus.Subscribe;
 
 @SuppressWarnings("serial")
 public class EffectsFrame extends BaseFrame {
@@ -58,7 +58,7 @@ public class EffectsFrame extends BaseFrame {
         videoEffectsPanel = new VideoEffectsPanel();
         tabbedPane.addTab(resource("dialog.effects.tabs.video").name(), videoEffectsPanel);
 
-        setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
 
         JPanel contentPane = new JPanel();
         contentPane.setBorder(BorderFactory.createEmptyBorder(4,  4,  4,  4));

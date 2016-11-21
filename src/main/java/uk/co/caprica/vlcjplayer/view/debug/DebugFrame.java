@@ -41,16 +41,17 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.WindowConstants;
 
-import uk.co.caprica.vlcj.component.EmbeddedMediaPlayerComponent;
-import uk.co.caprica.vlcjplayer.event.ShowDebugEvent;
-import uk.co.caprica.vlcjplayer.view.BaseFrame;
+import com.google.common.eventbus.Subscribe;
+
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.swing.AdvancedTableModel;
 import ca.odell.glazedlists.swing.GlazedListsSwing;
-
-import com.google.common.eventbus.Subscribe;
+import uk.co.caprica.vlcj.component.EmbeddedMediaPlayerComponent;
+import uk.co.caprica.vlcjplayer.event.ShowDebugEvent;
+import uk.co.caprica.vlcjplayer.view.BaseFrame;
 
 @SuppressWarnings("serial")
 public final class DebugFrame extends BaseFrame {
@@ -114,7 +115,7 @@ public final class DebugFrame extends BaseFrame {
         contentPane.add(scrollPane, BorderLayout.CENTER);
 
         setContentPane(contentPane);
-        setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
 
         applyPreferences();
     }

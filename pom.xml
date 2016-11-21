@@ -132,7 +132,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>uk.co.caprica.vlcjplayer.VlcjPlayer</mainClass>
+                            <mainClass>uk.co.caprica.vlcjplayer.MultTecnologiaPlayer</mainClass>
                             <addClasspath>true</addClasspath>
                         </manifest>
                     </archive>
