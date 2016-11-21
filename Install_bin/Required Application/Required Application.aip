@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<FRAGMENT Type="ReadOnly" CreateVersion="13.4" RootPath="." Language="en">
+  <COMPONENT cid="caphyon.advinst.msicomp.PreReqComponent">
+    <ROW PrereqKey="RequiredApplication" DisplayName="Required Application" SetupFileUrl="vlc-2.2.4-win64.exe" Location="0" ExactSize="0" Operator="1" Options="yiz" TargetName="vlc-2.2.4-win64.exe"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.PreReqSearchComponent">
+    <ROW SearchKey="SystemFolderfile.dll" Prereq="RequiredApplication" SearchType="0" SearchString="[SystemFolder]file.dll" VerMin="1.0" Order="1" MsiKey="SystemFolderfile.dll" Property="PreReqSearch"/>
+  </COMPONENT>
+</FRAGMENT>

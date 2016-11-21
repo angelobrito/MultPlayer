@@ -31,8 +31,8 @@
     <artifactId>vlcj-player</artifactId>
     <version>1.0.0-SNAPSHOT</version>
 
-    <name>vlcj-player</name>
-    <description>vlcj Media Player</description>
+    <name>Mult Tecnologia Player</name>
+    <description>Media Player for DVR from Mult Tecnologia</description>
     <url>http://www.capricasoftware.co.uk/vlcj</url>
     <inceptionYear>2015</inceptionYear>
 
