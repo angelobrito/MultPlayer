@@ -10,7 +10,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
 /** A TreeCellRenderer for a File. */
-class FileTreeCellRenderer extends DefaultTreeCellRenderer {
+public class FileTreeCellRenderer extends DefaultTreeCellRenderer {
 
     /**
 	 * 
@@ -21,7 +21,7 @@ class FileTreeCellRenderer extends DefaultTreeCellRenderer {
 
     private JLabel label;
 
-    FileTreeCellRenderer() {
+    public FileTreeCellRenderer() {
         label = new JLabel();
         label.setOpaque(true);
         fileSystemView = FileSystemView.getFileSystemView();
