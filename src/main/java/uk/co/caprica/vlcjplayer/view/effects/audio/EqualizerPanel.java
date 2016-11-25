@@ -39,6 +39,7 @@ import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import multiplayer.MultiScreensHandler;
 import net.miginfocom.swing.MigLayout;
 import uk.co.caprica.vlcj.binding.LibVlcConst;
 import uk.co.caprica.vlcj.component.EmbeddedMediaPlayerComponent;
@@ -53,7 +54,7 @@ public class EqualizerPanel extends BasePanel implements ChangeListener, ItemLis
 
     private final String dbFormat = "%.1f dB";
 
-    private final EmbeddedMediaPlayerComponent mediaPlayerComponent;
+    private final MultiScreensHandler mediaPlayerHandler;
     private final Equalizer equalizer;
 
     private final SliderControl preampControl;
@@ -65,12 +66,12 @@ public class EqualizerPanel extends BasePanel implements ChangeListener, ItemLis
     private boolean applyingPreset;
 
     public EqualizerPanel() {
-        this.mediaPlayerComponent = application().getMediaPlayerComponent();
-        this.equalizer = mediaPlayerComponent.getMediaPlayerFactory().newEqualizer();
+        this.mediaPlayerHandler = application().getMediaPlayerComponent();
+        this.equalizer = mediaPlayerHandler.getMediaPlayerFactory().newEqualizer();
         this.setBackground(Color.WHITE);
 
-        List<Float> list = mediaPlayerComponent.getMediaPlayerFactory().getEqualizerBandFrequencies();
-        List<String> presets = mediaPlayerComponent.getMediaPlayerFactory().getEqualizerPresetNames();
+        List<Float> list = mediaPlayerHandler.getMediaPlayerFactory().getEqualizerBandFrequencies();
+        List<String> presets = mediaPlayerHandler.getMediaPlayerFactory().getEqualizerPresetNames();
 
         JPanel bandsPane = new JPanel();
         bandsPane.setLayout(new GridLayout(1, 1 + list.size(), 2, 0));
@@ -141,7 +142,7 @@ public class EqualizerPanel extends BasePanel implements ChangeListener, ItemLis
     @Override
     public final void actionPerformed(ActionEvent e) {
         boolean enable = enableCheckBox.isSelected();
-        mediaPlayerComponent.getMediaPlayer().setEqualizer(enable ? equalizer : null);
+        mediaPlayerHandler.setEqualizer(enable ? equalizer : null);
         enableControls(enable);
     }
 
@@ -170,7 +171,7 @@ public class EqualizerPanel extends BasePanel implements ChangeListener, ItemLis
         String presetName = (String) presetComboBox.getSelectedItem();
         if (e.getStateChange() == ItemEvent.SELECTED) {
             if (presetName != null) {
-                Equalizer presetEqualizer = mediaPlayerComponent.getMediaPlayerFactory().newEqualizer(presetName);
+                Equalizer presetEqualizer = mediaPlayerHandler.getMediaPlayerFactory().newEqualizer(presetName);
                 if (presetEqualizer != null) {
                     applyingPreset = true;
                     preampControl.getSlider().setValue((int) (presetEqualizer.getPreamp() * 100f));

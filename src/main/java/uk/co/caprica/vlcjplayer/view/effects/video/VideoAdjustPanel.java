@@ -31,6 +31,7 @@ import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import multiplayer.MultiScreensHandler;
 import net.miginfocom.swing.MigLayout;
 import uk.co.caprica.vlcj.binding.LibVlcConst;
 import uk.co.caprica.vlcj.component.EmbeddedMediaPlayerComponent;
@@ -41,7 +42,7 @@ import uk.co.caprica.vlcjplayer.view.BasePanel;
 
 public class VideoAdjustPanel extends BasePanel {
 
-    private final EmbeddedMediaPlayerComponent mediaPlayerComponent;
+    private final MultiScreensHandler mediaPlayerHandler;
 
     private final JCheckBox enableCheckBox;
     private final JLabel hueLabel;
@@ -56,7 +57,7 @@ public class VideoAdjustPanel extends BasePanel {
     private final JSlider gammaSlider;
 
     public VideoAdjustPanel() {
-        this.mediaPlayerComponent = application().getMediaPlayerComponent();
+        this.mediaPlayerHandler = application().getMediaPlayerComponent();
 
         enableCheckBox = new JCheckBox(resource("dialog.effects.tabs.video.adjust.enable").name());
 
@@ -101,14 +102,12 @@ public class VideoAdjustPanel extends BasePanel {
         gammaSlider.setMinimum(Math.round(LibVlcConst.MIN_GAMMA * 100.0f));
         gammaSlider.setMaximum(Math.round(LibVlcConst.MAX_GAMMA * 100.0f));
 
-        MediaPlayer mediaPlayer = mediaPlayerComponent.getMediaPlayer();
-
         enableCheckBox.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 boolean enable = enableCheckBox.isSelected();
                 enableControls(enable);
-                mediaPlayer.setAdjustVideo(enable);
+                mediaPlayerHandler.setAdjustVideo(enable);
             }
         });
 
@@ -116,7 +115,7 @@ public class VideoAdjustPanel extends BasePanel {
             @Override
             public void stateChanged(ChangeEvent e) {
                 JSlider source = (JSlider) e.getSource();
-                mediaPlayer.setHue(source.getValue());
+                mediaPlayerHandler.setHue(source.getValue());
             }
         });
 
@@ -124,7 +123,7 @@ public class VideoAdjustPanel extends BasePanel {
             @Override
             public void stateChanged(ChangeEvent e) {
                 JSlider source = (JSlider) e.getSource();
-                mediaPlayer.setBrightness(source.getValue() / 100.0f);
+                mediaPlayerHandler.setBrightness(source.getValue() / 100.0f);
             }
         });
 
@@ -132,7 +131,7 @@ public class VideoAdjustPanel extends BasePanel {
             @Override
             public void stateChanged(ChangeEvent e) {
                 JSlider source = (JSlider) e.getSource();
-                mediaPlayer.setContrast(source.getValue() / 100.0f);
+                mediaPlayerHandler.setContrast(source.getValue() / 100.0f);
             }
         });
 
@@ -140,7 +139,7 @@ public class VideoAdjustPanel extends BasePanel {
             @Override
             public void stateChanged(ChangeEvent e) {
                 JSlider source = (JSlider) e.getSource();
-                mediaPlayer.setSaturation(source.getValue() / 100.0f);
+                mediaPlayerHandler.setSaturation(source.getValue() / 100.0f);
             }
         });
 
@@ -148,15 +147,15 @@ public class VideoAdjustPanel extends BasePanel {
             @Override
             public void stateChanged(ChangeEvent e) {
                 JSlider source = (JSlider) e.getSource();
-                mediaPlayer.setGamma(source.getValue() / 100.0f);
+                mediaPlayerHandler.setGamma(source.getValue() / 100.0f);
             }
         });
 
-        contrastSlider.setValue(Math.round(mediaPlayer.getBrightness() * 100.0f));
-        brightnessSlider.setValue(Math.round(mediaPlayer.getContrast() * 100.0f));
-        hueSlider.setValue(mediaPlayer.getHue());
-        saturationSlider.setValue(Math.round(mediaPlayer.getSaturation() * 100.0f));
-        gammaSlider.setValue(Math.round(mediaPlayer.getGamma() * 100.0f));
+        contrastSlider.setValue(Math.round(mediaPlayerHandler.getBrightness() * 100.0f));
+        brightnessSlider.setValue(Math.round(mediaPlayerHandler.getContrast() * 100.0f));
+        hueSlider.setValue(mediaPlayerHandler.getHue());
+        saturationSlider.setValue(Math.round(mediaPlayerHandler.getSaturation() * 100.0f));
+        gammaSlider.setValue(Math.round(mediaPlayerHandler.getGamma() * 100.0f));
 
         setLayout(new MigLayout("fill", "[shrink]rel[grow]", ""));
         add(enableCheckBox, "span 2, wrap");

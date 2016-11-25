@@ -18,6 +18,7 @@
  */
 package multiplayer;
 
+import static uk.co.caprica.vlcjplayer.Application.application;
 import java.awt.Canvas;
 import java.awt.Color;
 
@@ -74,6 +75,7 @@ public class PlayerInstance extends MediaPlayerEventAdapter {
     @Override
     public void finished(MediaPlayer mediaPlayer) {
         System.out.println("finished");
+//        (MainFrame) application().getMainFrame();
     }
 
     @Override

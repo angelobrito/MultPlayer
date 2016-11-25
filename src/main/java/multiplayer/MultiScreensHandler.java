@@ -29,6 +29,7 @@ import uk.co.caprica.vlcj.binding.internal.libvlc_media_t;
 import uk.co.caprica.vlcj.binding.internal.libvlc_state_t;
 import uk.co.caprica.vlcj.component.EmbeddedMediaPlayerComponent;
 import uk.co.caprica.vlcj.discovery.NativeDiscovery;
+import uk.co.caprica.vlcj.player.Equalizer;
 import uk.co.caprica.vlcj.player.MediaPlayer;
 import uk.co.caprica.vlcj.player.MediaPlayerEventListener;
 import uk.co.caprica.vlcj.player.MediaPlayerFactory;
@@ -587,11 +588,98 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 		}
 		return result;
 	}
+	
+	public void setContrast(float contrast) {
+		for(int i = 0; i < this.players.size(); i++){
+			this.players.get(i).mediaPlayer().setContrast(contrast);
+		}
+	}
 
 	public void setVolume(int value) {
 		for(int i = 0; i < this.players.size(); i++){
 			this.players.get(i).mediaPlayer().setVolume(value);
 		}
+	}
+	
+	public void setBrightness(float brightness) {
+		for(int i = 0; i < this.players.size(); i++){
+			this.players.get(i).mediaPlayer().setBrightness(brightness);
+		}
+	}
+	
+	public void setSaturation(float saturation) {
+		for(int i = 0; i < this.players.size(); i++){
+			this.players.get(i).mediaPlayer().setSaturation(saturation);
+		}
+	}
+	
+	public void setAdjustVideo(boolean enable) {
+		for(int i = 0; i < this.players.size(); i++){
+			this.players.get(i).mediaPlayer().setAdjustVideo(enable);
+		}
+	}
+	
+	public void setGamma(float gamma) {
+		for(int i = 0; i < this.players.size(); i++){
+			this.players.get(i).mediaPlayer().setGamma(gamma);
+		}
+	}
+	
+	public void setHue(int hue) {
+		for(int i = 0; i < this.players.size(); i++){
+			this.players.get(i).mediaPlayer().setHue(hue);
+		}
+	}
+	
+	public void setEqualizer(Equalizer equalizer) {
+		for(int i = 0; i < this.players.size(); i++){
+			this.players.get(i).mediaPlayer().setEqualizer(equalizer);
+		}
+	}
+	
+	public float getBrightness() {
+		float result = 0;
+		for(int i = 0; i < this.players.size(); i++){
+			float t = this.players.get(i).mediaPlayer().getBrightness();
+			if(t > result) result = t;
+		}
+		return result;
+	}
+	
+	public float getContrast() {
+		float result = 0;
+		for(int i = 0; i < this.players.size(); i++){
+			float t = this.players.get(i).mediaPlayer().getContrast();
+			if(t > result) result = t;
+		}
+		return result;
+	}
+	
+	public int getHue() {
+		int result = 0;
+		for(int i = 0; i < this.players.size(); i++){
+			int t = this.players.get(i).mediaPlayer().getHue();
+			if(t > result) result = t;
+		}
+		return result;
+	}
+	
+	public float getSaturation() {
+		float result = 0;
+		for(int i = 0; i < this.players.size(); i++){
+			float t = this.players.get(i).mediaPlayer().getSaturation();
+			if(t > result) result = t;
+		}
+		return result;
+	}
+	
+	public float getGamma() {
+		float result = 0;
+		for(int i = 0; i < this.players.size(); i++){
+			float t = this.players.get(i).mediaPlayer().getGamma();
+			if(t > result) result = t;
+		}
+		return result;
 	}
 	
 	public int getVolume() {

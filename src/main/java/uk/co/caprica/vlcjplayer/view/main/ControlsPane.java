@@ -76,7 +76,7 @@ final class ControlsPane extends BasePanel {
 
 	private final JButton fullscreenButton;
 
-	private final JButton extendedButton;
+	private final JButton effectsButton;
 
 	private final JButton snapshotButton;
 
@@ -112,8 +112,8 @@ final class ControlsPane extends BasePanel {
 		fullscreenButton = new StandardButton();
 		fullscreenButton.setIcon(fullscreenIcon);
 
-		extendedButton = new StandardButton();
-		extendedButton.setIcon(extendedIcon);
+		effectsButton = new StandardButton();
+		effectsButton.setIcon(extendedIcon);
 
 		snapshotButton = new StandardButton();
 		snapshotButton.setAction(mediaPlayerActions.videoSnapshotAction());
@@ -162,7 +162,7 @@ final class ControlsPane extends BasePanel {
 		add(fullscreenButton, "Center, sg 2, al left, gap 5");
 
 		add(snapshotButton, "Center, sg 2, al left, gap 5");
-		add(extendedButton, "Center, sg 2, al left, gap 5");
+		add(effectsButton, "Center, sg 2, al left, gap 5");
 
 
 		add(speedLabel, "sg 2, al left, gap 5");
@@ -206,9 +206,10 @@ final class ControlsPane extends BasePanel {
 			}
 		});
 
-		extendedButton.addActionListener(new ActionListener() {
+		effectsButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				System.out.println("Effects Button");
 				application().post(ShowEffectsEvent.INSTANCE);
 			}
 		});
@@ -284,7 +285,7 @@ final class ControlsPane extends BasePanel {
 		positionPane.setEnabled(newState);
 		stopButton.setEnabled(newState);
 		fullscreenButton.setEnabled(newState);
-		extendedButton.setEnabled(newState);
+		effectsButton.setEnabled(newState);
 		snapshotButton.setEnabled(newState);
 		speedSlider.setEnabled(newState);
 		volumeSlider.setEnabled(!application().getMediaPlayerComponent().isMuteForced());

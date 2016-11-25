@@ -93,29 +93,31 @@ final class AboutDialog extends JDialog {
         vlcjVersionLabel.setText(resource("dialog.about.vlcjVersion").name());
 
         JLabel vlcjVersionValueLabel = new ValueLabel();
+        Font boldFont = new Font(vlcjVersionValueLabel.getFont().getFontName(), Font.ITALIC, vlcjVersionValueLabel.getFont().getSize());
         vlcjVersionValueLabel.setText(Info.getInstance().version().toString());
-
+        vlcjVersionValueLabel.setFont(boldFont);
+        
         JLabel vlcVersionLabel = new JLabel();
         vlcVersionLabel.setText(resource("dialog.about.vlcVersion").name());
 
         JLabel vlcVersionValueLabel = new ValueLabel();
         vlcVersionValueLabel.setText(LibVlcVersion.getVersion().toString());
+        vlcVersionValueLabel.setFont(boldFont);
 
-        JLabel vlcChangesetValueLabel = new ValueLabel();
-        vlcChangesetValueLabel.setText(LibVlcVersion.getChangeset());
-
-        add(logoLabel, "shrink, top, spany 7");
+        add(logoLabel, "shrink, West, spany 7");
         add(applicationLabel, "grow, spanx 2, wrap");
         add(blurb1Label, "grow, spanx 2, wrap");
         add(blurb2Label, "grow, spanx 2, wrap");
         add(attribution1Label, "grow, spanx 2, wrap");
-        add(applicationVersionLabel, "");
+        
+        add(applicationVersionLabel );
         add(applicationVersionValueLabel, "wrap");
+
         add(vlcjVersionLabel);
         add(vlcjVersionValueLabel, "wrap");
+        
         add(vlcVersionLabel);
         add(vlcVersionValueLabel, "wrap");
-        add(vlcChangesetValueLabel, "skip 2");
 
         getRootPane().registerKeyboardAction(new ActionListener() {
             @Override
@@ -126,6 +128,7 @@ final class AboutDialog extends JDialog {
 
         pack();
         setResizable(false);
+        setVisible(true);
     }
 
     private class ValueLabel extends JLabel {
