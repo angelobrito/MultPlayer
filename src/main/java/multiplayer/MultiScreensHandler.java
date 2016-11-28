@@ -11,10 +11,6 @@ import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
@@ -24,7 +20,9 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 
-import fileHandlers.PathFinder;
+import fileHandlers.FileAdditionalInfo;
+import fileHandlers.FileBrowser;
+import fileHandlers.FileTimeTracker;
 import uk.co.caprica.vlcj.binding.internal.libvlc_media_t;
 import uk.co.caprica.vlcj.binding.internal.libvlc_state_t;
 import uk.co.caprica.vlcj.component.EmbeddedMediaPlayerComponent;
@@ -48,11 +46,12 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 	private static final long serialVersionUID = -6723807719374506428L;
 
 	private File mediaDirectory;
-	private List<String> mediaFilePath;
+	private ArrayList<ArrayList<FileAdditionalInfo>> mediaFilePath;
 	private String selectedFile;
+	private FileTimeTracker timeTracker;
 
 	private int rowsNumber = 2;
-	private int collumsNumber = 2;
+	private int columnsNumber = 2;
 	private List<PlayerInstance> players;
 
 	private MediaPlayerFactory factory;
@@ -62,16 +61,22 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 	private int selectedScreen;
 	private boolean forcedMute;
 	private boolean paused;
+	
+	private JPanel contentPane;
 
 	public MultiScreensHandler(JFrame containerFrame) {
-		JPanel contentPane = new JPanel();
+		contentPane = new JPanel();
 		contentPane.setBackground(Color.black);
-		contentPane.setLayout(new GridLayout(rowsNumber, collumsNumber, 16, 16));
+		setNewScreensLayout(application().getScreenQtt());
 		contentPane.setBorder(new EmptyBorder(16, 16, 16, 16));
 		contentPane.setVisible(false);
 
+		timeTracker = new FileTimeTracker();
 		players = new ArrayList<PlayerInstance>();
-		mediaFilePath = new ArrayList<String>();
+		mediaFilePath = new ArrayList<ArrayList<FileAdditionalInfo>>();
+		for(int i = 0; i < application().getScreenQtt(); i++) {
+			mediaFilePath.add(new ArrayList<FileAdditionalInfo>());
+		}
 
 		factory = new MediaPlayerFactory();
 
@@ -83,9 +88,9 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 				0.3f);
 		for(int i = 0; i < application().getScreenQtt(); i ++ ) {
 			EmbeddedMediaPlayer player = factory.newEmbeddedMediaPlayer(fullScreenStrategy);
-			PlayerInstance playerInstance = new PlayerInstance(player);
-			playerInstance.mediaPlayer().setLogoImage(screenLogo.getImage());
-			playerInstance.mediaPlayer().enableLogo(true);
+			PlayerInstance playerInstance = new PlayerInstance(player, ("#" + (i + 1)));
+			playerInstance.setLogoImage(screenLogo.getImage());
+			playerInstance.enableLogo(true);
 			players.add(playerInstance);
 
 			JPanel playerPanel = new JPanel();
@@ -96,18 +101,32 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 			contentPane.add(playerPanel);
 		}
 		contentPane.setVisible(true);
-//		videoContainer.add(contentPane);
-//
-//		contentPane.addKeyListener(new KeyAdapter() {
-//
-//			@Override
-//			public void keyPressed(KeyEvent e) {
-//				pauseScreens();
-//			}
-//		});
 		
 		this.add(contentPane, BorderLayout.CENTER);
 		this.setVisible(true);
+	}
+	
+	public void setNewScreensLayout(int qttScreens) {
+		
+		// Calculate the number of Rows and Columns that
+		this.rowsNumber = 0;
+		this.columnsNumber = 0;
+		boolean rows = false;
+		
+		do{
+			if(!rows) {
+				this.rowsNumber++;
+				rows = true;
+			}
+			else {
+				this.columnsNumber++;
+				rows = false;
+			}
+			System.out.println("qttScreen[" + qttScreens + "] Debug={rows=" + this.rowsNumber + ", collums=" + this.columnsNumber + "}");
+		}
+		while((this.rowsNumber * this.columnsNumber) < qttScreens);
+		
+		contentPane.setLayout(new GridLayout(this.rowsNumber, this.columnsNumber, 16, 16));
 	}
 	
 	public MediaPlayerFactory getFactory() {
@@ -120,21 +139,29 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 
 	public void screensRelease() {
 		for(PlayerInstance pi : this.players) {
-			pi.mediaPlayer().release();
+			pi.release();
 		}
 		this.factory.release();
 	}
 
 	private void updateScreensMedia() {
-		for(int i = 0; i < mediaFilePath.size(); i ++ ) {
-			players.get(i).mediaPlayer().prepareMedia(mediaFilePath.get(i));
-			players.get(i).mediaPlayer().setVideoSurface(factory.newVideoSurface(players.get(i).videoSurface()));
-			
-			if(mediaFilePath.get(i) != null && !mediaFilePath.get(i).equals("")) {
-				players.get(i).mediaPlayer().enableLogo(true);
-			}
-			else {
-				players.get(i).mediaPlayer().enableLogo(false);
+		int queued = 0;
+		for (ArrayList<FileAdditionalInfo> channel : this.mediaFilePath) {
+			if(channel.size() > 0) {
+				FileAdditionalInfo info = channel.get(0);
+				String filePath = info.getFilePath();
+				int channelNumber = info.getChannel();
+				if(channelNumber > 0 && channelNumber <= this.players.size()) {
+					queued = channelNumber;
+				}
+				else {
+					// TODO how to treat files that has no channels, or has a channel greater than players.size()
+					// TODO queued file access mode
+					queued = (queued%this.players.size() + 1);
+				}
+				
+				this.players.get(queued-1).prepareMedia(filePath);
+				this.players.get(queued-1).setVideoSurface(this.factory.newVideoSurface(this.players.get(queued-1).videoSurface()));
 			}
 		}
 	}
@@ -302,15 +329,15 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 
 			if(this.forcedMute) {
 
-				if(!this.players.get(i).mediaPlayer().isMute()) {
-					this.players.get(i).mediaPlayer().mute();
+				if(!this.players.get(i).isMute()) {
+					this.players.get(i).mute();
 				}
 				// Else do nothing
 			}
 			else {
 
 				// Otherwise don't care and toggle mute state 
-				this.players.get(i).mediaPlayer().mute();
+				this.players.get(i).mute();
 			}
 	}
 
@@ -322,14 +349,14 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 		if(!this.forcedMute) this.forcedMute = true;
 		else this.forcedMute = false;
 		for(int i = 0; i < this.players.size(); i++) 
-			this.players.get(i).mediaPlayer().mute();
+			this.players.get(i).mute();
 	}
 	
 	public void pauseScreens() {
 		if(!this.paused) this.paused = true;
 		else this.paused = false;
 		for(int i = 0; i < this.players.size(); i++) 
-			this.players.get(i).mediaPlayer().pause();
+			this.players.get(i).pause();
 	}
 
 	@Override
@@ -424,21 +451,31 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 
 	public void start() {
 		for(int i = 0; i < this.players.size(); i++) 
-			this.players.get(i).mediaPlayer().start();
+			this.players.get(i).start();
 	}
 
 	public boolean isPlaying() {
-		return this.players.get(this.selectedScreen).mediaPlayer().isPlaying();
+		boolean result = false;
+		for(PlayerInstance player : this.players) {
+			if(!result) result = player.isPlaying();
+			else break;
+		}
+		return result;
 	}
 
 	public boolean isPlayable() {
-		return this.players.get(this.selectedScreen).mediaPlayer().isPlayable();
+		boolean result = false;
+		for(PlayerInstance player : this.players) {
+			if(!result) result = player.isPlayable();
+			else break;
+		}
+		return result;
 	}
 
 	public void setPosition(float position) {
 		for(int i = 0; i < this.players.size(); i++) 
 			// FIXME not all videos have the same position, must check on this to avoid errors
-			this.players.get(i).mediaPlayer().setPosition(position);
+			this.players.get(i).setPosition(position);
 	}
 
 	public float getPosition() {
@@ -449,9 +486,9 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 		int longestVideo = 0;
 		for(int i = 0; i < this.players.size(); i++) {
 			// FIXME not all videos have the same Length, must check on this to avoid errors
-			if(this.players.get(i).mediaPlayer().isSeekable() &&
-					this.players.get(i).mediaPlayer().getLength() > 
-					this.players.get(longestVideo).mediaPlayer().getLength())
+			if(this.players.get(i).isSeekable() &&
+					this.players.get(i).getLength() > 
+					this.players.get(longestVideo).getLength())
 				longestVideo = i;
 		}
 		return this.players.get(longestVideo).mediaPlayer();
@@ -474,39 +511,29 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 	}
 
 	public void setSelectedFile(String selectedFile) {
-		this.selectedFile = selectedFile;
 
-		Vector<String> foundFiles = this.getRelatedFiles(this.mediaDirectory, selectedFile);
-		this.mediaFilePath.clear();
+		// file name example: fileName=CH01-20161120-103622.avi
+		this.selectedFile = selectedFile;
+		
+		ArrayList<String> foundFiles = FileBrowser.getRelatedFiles(this.mediaDirectory, selectedFile);
+		for(int i = 0; i < application().getScreenQtt(); i++) this.mediaFilePath.get(i).clear();
+		
+		
 		for(int i = 0; i < this.players.size(); i++) {
-			if(i < foundFiles.size()) this.mediaFilePath.add(foundFiles.get(i));
-			else this.mediaFilePath.add("");
+			String filePath = "";
+			if(i < foundFiles.size()) filePath = foundFiles.get(i);
+			
+			FileAdditionalInfo info = new FileAdditionalInfo(filePath);
+			int channel = info.getChannel();
+			
+			if(channel > 0 && channel <= this.mediaFilePath.size()) {
+				this.mediaFilePath.get(channel-1).add(info);
+			}
+			else {
+				this.mediaFilePath.get(0).add(info);;
+			}
 		}
 		this.updateScreensMedia();
-	}
-
-	public Vector<String> getRelatedFiles(File workingDirectory, String fileName) {
-
-		Vector<String> result = new Vector<String>();
-		
-	    // file name example: fileName=CH01-20161120-103622.avi
-		String fileRegex = fileName;
-		String nameSeparator = "-";  // FIXME could be -, /, ' ',?
-		//String dateSeparator = ""; // FIXME could be -, /, ' ',?
-		String[] nameProcess = fileName.split("-");
-		
-		//  Regex = Prefix +      date      + sufix (timestamp.fileType)
-		fileRegex = "CH*" + nameSeparator + nameProcess[1] + nameSeparator + nameProcess[2];
-		try {
-			Path startingDir = Paths.get(workingDirectory.getAbsolutePath());
-			PathFinder finder = new PathFinder(fileRegex);
-			Files.walkFileTree(startingDir, finder);
-			result = finder.getPathsAsArray();
-			finder.done(fileName);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return result;
 	}
 
 	public boolean isPlayerReady() {
@@ -514,7 +541,8 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 				this.isPlayable();
 	}
 
-	public void resume() {		this.setVisible(true);
+	public void resume() {
+		this.setVisible(true);
 		for(int i = 0; i < this.players.size(); i++){
 			MediaPlayer mediaPlayer = this.players.get(i).mediaPlayer();
 			
@@ -522,17 +550,17 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 			//System.out.print("Resume for Player[" + i + "].State= {" + mediaPlayer.getMediaPlayerState().toString() + "} - ");
 			if(!mediaPlayer.isPlaying() && !mediaPlayer.getMediaPlayerState().toString().equalsIgnoreCase("libvlc_Ended")){
 				//System.out.println("Player Started...");
-				this.players.get(i).mediaPlayer().play();
+				this.players.get(i).start();
 			}
 			else if(mediaPlayer.isPlaying()) {
 				//System.out.print("Screen[" + (i+1) + "] is already playing ");
 				if(!mediaPlayer.getMediaPlayerState().toString().equalsIgnoreCase("libvlc_Paused")){
 					//System.out.println("but not Paused then Pause!");
-					this.players.get(i).mediaPlayer().pause();
+					this.players.get(i).pause();
 				}
 				else {
 					//System.out.println("and Paused then Play!");
-					this.players.get(i).mediaPlayer().play();
+					this.players.get(i).play();
 				}
 			}
 			else {
@@ -557,21 +585,21 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 	}
 
 	public int getCollumsNumber() {
-		return collumsNumber;
+		return columnsNumber;
 	}
 
 	public void stop() {
 		for(int i = 0; i < this.players.size(); i++){
 
 			//System.out.println("Stop for=" + i);
-			this.players.get(i).mediaPlayer().stop();
+			this.players.get(i).stop();
 			//System.out.println("Player screen running?" + (this.players.get(i).mediaPlayer().isPlaying()));
 		}
 	}
 
 	public void setRate(float rate) {
 		for(int i = 0; i < this.players.size(); i++){
-			this.players.get(i).mediaPlayer().setRate(rate);
+			this.players.get(i).setRate(rate);
 		}
 	}
 	
@@ -581,8 +609,8 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 	
 	public libvlc_state_t getMediaPlayerState() {
 		libvlc_state_t result = null;
-		for(int i = 0; i < this.players.size(); i++){
-			result = this.players.get(i).mediaPlayer().getMediaState();
+		for(PlayerInstance player : this.players){
+			result = player.getMediaState();
 			if(result != null && 
 					result.toString().equalsIgnoreCase("libvlc_Playing")) break;
 		}
@@ -591,56 +619,56 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 	
 	public void setContrast(float contrast) {
 		for(int i = 0; i < this.players.size(); i++){
-			this.players.get(i).mediaPlayer().setContrast(contrast);
+			this.players.get(i).setContrast(contrast);
 		}
 	}
 
 	public void setVolume(int value) {
 		for(int i = 0; i < this.players.size(); i++){
-			this.players.get(i).mediaPlayer().setVolume(value);
+			this.players.get(i).setVolume(value);
 		}
 	}
 	
 	public void setBrightness(float brightness) {
 		for(int i = 0; i < this.players.size(); i++){
-			this.players.get(i).mediaPlayer().setBrightness(brightness);
+			this.players.get(i).setBrightness(brightness);
 		}
 	}
 	
 	public void setSaturation(float saturation) {
 		for(int i = 0; i < this.players.size(); i++){
-			this.players.get(i).mediaPlayer().setSaturation(saturation);
+			this.players.get(i).setSaturation(saturation);
 		}
 	}
 	
 	public void setAdjustVideo(boolean enable) {
 		for(int i = 0; i < this.players.size(); i++){
-			this.players.get(i).mediaPlayer().setAdjustVideo(enable);
+			this.players.get(i).setAdjustVideo(enable);
 		}
 	}
 	
 	public void setGamma(float gamma) {
 		for(int i = 0; i < this.players.size(); i++){
-			this.players.get(i).mediaPlayer().setGamma(gamma);
+			this.players.get(i).setGamma(gamma);
 		}
 	}
 	
 	public void setHue(int hue) {
 		for(int i = 0; i < this.players.size(); i++){
-			this.players.get(i).mediaPlayer().setHue(hue);
+			this.players.get(i).setHue(hue);
 		}
 	}
 	
 	public void setEqualizer(Equalizer equalizer) {
 		for(int i = 0; i < this.players.size(); i++){
-			this.players.get(i).mediaPlayer().setEqualizer(equalizer);
+			this.players.get(i).setEqualizer(equalizer);
 		}
 	}
 	
 	public float getBrightness() {
 		float result = 0;
 		for(int i = 0; i < this.players.size(); i++){
-			float t = this.players.get(i).mediaPlayer().getBrightness();
+			float t = this.players.get(i).getBrightness();
 			if(t > result) result = t;
 		}
 		return result;
@@ -649,7 +677,7 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 	public float getContrast() {
 		float result = 0;
 		for(int i = 0; i < this.players.size(); i++){
-			float t = this.players.get(i).mediaPlayer().getContrast();
+			float t = this.players.get(i).getContrast();
 			if(t > result) result = t;
 		}
 		return result;
@@ -658,7 +686,7 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 	public int getHue() {
 		int result = 0;
 		for(int i = 0; i < this.players.size(); i++){
-			int t = this.players.get(i).mediaPlayer().getHue();
+			int t = this.players.get(i).getHue();
 			if(t > result) result = t;
 		}
 		return result;
@@ -667,7 +695,7 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 	public float getSaturation() {
 		float result = 0;
 		for(int i = 0; i < this.players.size(); i++){
-			float t = this.players.get(i).mediaPlayer().getSaturation();
+			float t = this.players.get(i).getSaturation();
 			if(t > result) result = t;
 		}
 		return result;
@@ -676,7 +704,7 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 	public float getGamma() {
 		float result = 0;
 		for(int i = 0; i < this.players.size(); i++){
-			float t = this.players.get(i).mediaPlayer().getGamma();
+			float t = this.players.get(i).getGamma();
 			if(t > result) result = t;
 		}
 		return result;
@@ -685,16 +713,16 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 	public int getVolume() {
 		int result = 0;
 		for(int i = 0; i < this.players.size(); i++){
-			int t = this.players.get(i).mediaPlayer().getVolume();
+			int t = this.players.get(i).getVolume();
 			if(t > result) result = t;
 		}
 		return result;
 	}
 
 	public void getSnapshots() {
-		for(int i = 0; i < this.players.size(); i++){
-			if(this.players.get(i).mediaPlayer().isPlaying())
-				this.snapshotTaken(this.players.get(i).mediaPlayer(), this.mediaFilePath.get(i));
+		for( PlayerInstance player : this.players){
+			if(player.isPlaying())
+				this.snapshotTaken(player.mediaPlayer(), player.getMediaPath());
 		}
 	}
 

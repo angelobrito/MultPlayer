@@ -21,6 +21,7 @@ import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.ArrayList;
 import java.util.Vector;
 
 
@@ -28,11 +29,11 @@ public class PathFinder extends SimpleFileVisitor<Path> {
 
 	private final PathMatcher matcher;
 	private int numMatches = 0;
-	private Vector<String> foundPaths;
+	private ArrayList<String> foundPaths;
 
 	public PathFinder(String pattern) {
 		matcher = FileSystems.getDefault().getPathMatcher("glob:" + pattern);
-		foundPaths = new Vector<String>();
+		foundPaths = new ArrayList<String>();
 	}
 
 	// Compares the glob pattern against
@@ -50,7 +51,7 @@ public class PathFinder extends SimpleFileVisitor<Path> {
 		//System.out.println("PathFinder Matched " + numMatches + " with " + fileName);
 	}
 
-	public Vector<String> getPathsAsArray() {
+	public ArrayList<String> getPathsAsArray() {
 		return this.foundPaths;
 	}
 	

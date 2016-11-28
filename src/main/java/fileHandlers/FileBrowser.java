@@ -1,7 +1,13 @@
 package fileHandlers;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Vector;
 
 import javax.swing.filechooser.FileSystemView;
 
@@ -56,5 +62,31 @@ public class FileBrowser {
 		else if(fileExtension.equalsIgnoreCase("wmv")) return true;
 		//else if(fileExtension.equalsIgnoreCase("")) return true;
 		else return false;
+	}
+	
+	public static ArrayList<String> getRelatedFiles(File workingDirectory, String fileName) {
+
+		ArrayList<String> result = new ArrayList<String>();
+		
+		String fileRegex = FileBrowser.getFileRegex(fileName);
+		
+		try {
+			Path startingDir = Paths.get(workingDirectory.getAbsolutePath());
+			PathFinder finder = new PathFinder(fileRegex);
+			Files.walkFileTree(startingDir, finder);
+			result = finder.getPathsAsArray();
+			finder.done(fileName);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return result;
+	}
+
+	public static String getFileRegex(String fileName) {
+		
+		FileAdditionalInfo processedFile = new FileAdditionalInfo(fileName);
+		String fileRegex = processedFile.getFileRegex();
+		System.out.println("Channel=#" + processedFile.getChannel() + ", Regex=" + fileRegex);
+		return fileRegex;
 	}
 }

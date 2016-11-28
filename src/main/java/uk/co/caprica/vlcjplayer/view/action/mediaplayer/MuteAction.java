@@ -41,6 +41,6 @@ final class MuteAction extends MediaPlayerAction {
     @Override
     public void actionPerformed(ActionEvent e) {
     	application().getMediaPlayerComponent().forceMute();
-		((MainFrame) application().getMainFrame()).updateEnabledComponents();
+		application().updateControllState();
     }
 }

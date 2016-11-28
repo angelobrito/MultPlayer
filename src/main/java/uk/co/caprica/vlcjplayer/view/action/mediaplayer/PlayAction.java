@@ -43,6 +43,6 @@ final class PlayAction extends MediaPlayerAction {
 	public void actionPerformed(ActionEvent e) {
 		MultiScreensHandler mediaPlayerComponent = application().getMediaPlayerComponent();
 		mediaPlayerComponent.resume();
-		((MainFrame) application().getMainFrame()).updateEnabledComponents();
+		application().updateControllState();
 	}
 }

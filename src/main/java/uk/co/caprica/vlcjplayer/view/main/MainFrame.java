@@ -310,8 +310,8 @@ public final class MainFrame extends BaseFrame {
 		contentPane.setLayout(new BorderLayout());
 		
 		// FIXME the videoContentPane is not working properly then I set permanently the video screen on
-        //contentPane.add(videoContentPane, BorderLayout.CENTER);
-		contentPane.add(application().getMediaPlayerComponent(), BorderLayout.CENTER);
+        contentPane.add(videoContentPane, BorderLayout.CENTER);
+		//contentPane.add(application().getMediaPlayerComponent(), BorderLayout.CENTER);
 		contentPane.setTransferHandler(new MediaTransferHandler() {
 			@Override
 			protected void onMediaDropped(String[] uris) {
@@ -423,12 +423,12 @@ public final class MainFrame extends BaseFrame {
 		updateDirectoryTree(newDirectory);
 		
 		// FIXME to show the screens before starting playback, is here the best place for this?
-		showScreens(selectedFile);
 		if(selectedFile.isFile()) { 
 			multiMediaPlayerComponent.setSelectedFile(selectedFile.getName());
 			if(e != null) mediaPlayerActions.playbackPlayAction().actionPerformed(e);
 			updateEnabledComponents();
 			application().addRecentMedia(selectedFile.getAbsolutePath());
+			showScreens(selectedFile);
 		}
 	}
 	
@@ -581,7 +581,7 @@ public final class MainFrame extends BaseFrame {
 	public void showScreens(File selectedFile) {
 		libvlc_state_t state = multiMediaPlayerComponent.getMediaPlayerState();
 		if(state != null) {
-			switch(multiMediaPlayerComponent.getMediaPlayerState()){
+			switch(state){
 			case libvlc_Playing:
 				videoContentPane.showVideo();
 				//mouseMovementDetector.start();
@@ -603,6 +603,7 @@ public final class MainFrame extends BaseFrame {
 				videoContentPane.showDefault();
 				mouseMovementDetector.stop();
 				application().post(StoppedEvent.INSTANCE);
+				break;
 
 			default:
 				// libvlc_Buffering

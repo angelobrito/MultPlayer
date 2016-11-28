@@ -38,7 +38,6 @@ import javax.swing.SwingWorker;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
-import javax.swing.filechooser.FileSystemView;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
@@ -57,9 +56,7 @@ final class PlaylistPane extends FileBrowser {
 	private DefaultTreeModel treeModel;
 
 	/** Directory listing */
-	//    private JTable table;
 	private JProgressBar progressBar;
-
 
 	public PlaylistPane() {
 		super();
@@ -87,6 +84,7 @@ final class PlaylistPane extends FileBrowser {
 			// the File tree
 			DefaultMutableTreeNode root = new DefaultMutableTreeNode();
 			treeModel = new DefaultTreeModel(root);
+			JScrollPane treeScroll = new JScrollPane();
 
 			TreeSelectionListener treeSelectionListener = new TreeSelectionListener() {
 				@Override
@@ -128,7 +126,7 @@ final class PlaylistPane extends FileBrowser {
 			tree.setCellRenderer(new FileTreeCellRenderer());
 			tree.expandRow(0);
 			tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
-			JScrollPane treeScroll = new JScrollPane(tree);
+			treeScroll.setViewportView(tree);
 
 			// as per trashgod tip
 			tree.setVisibleRowCount(15);
@@ -152,6 +150,7 @@ final class PlaylistPane extends FileBrowser {
 	}
 	
 	public void showRootFile() {
+		
 		// ensure the main files are displayed
 		tree.setSelectionInterval(0,0);
 	}

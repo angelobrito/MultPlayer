@@ -174,4 +174,11 @@ public final class Application {
 		return this.multiMediaPlayerComponent;
 	}
 	
+	public void checkContinuousPlay() {
+		System.out.println("Application to check continuous play...");
+	}
+	
+	public void updateControllState() {
+		((MainFrame) this.mainFrame).updateEnabledComponents();
+	}
 }

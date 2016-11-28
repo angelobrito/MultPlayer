@@ -187,7 +187,7 @@ final class ControlsPane extends BasePanel {
 			@Override
 			public void stateChanged(ChangeEvent e) {
 				application().getMediaPlayerComponent().setVolume(volumeSlider.getValue());
-				((MainFrame) application().getMainFrame()).updateEnabledComponents();
+				application().updateControllState();
 			}
 		});
 
@@ -270,7 +270,7 @@ final class ControlsPane extends BasePanel {
 
 	private void MuteAction() {
 		application().getMediaPlayerComponent().forceMute();
-		((MainFrame) application().getMainFrame()).updateEnabledComponents();
+		application().updateControllState();
 	}
 
 	public void setEnabledComponents() {
