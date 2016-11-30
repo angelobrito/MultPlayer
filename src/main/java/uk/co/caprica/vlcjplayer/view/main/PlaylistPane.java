@@ -269,17 +269,18 @@ public class PlaylistPane extends FileBrowser {
 
 	public void clickNextItem() {
 		// TODO Auto-generated method stub
-		System.out.println("Click next?");
+		System.out.println("Click next Item?");
 	}
 
 	public void clickPreviousItem() {
 		// TODO Auto-generated method stub
-		System.out.println("Click previous?");
+		System.out.println("Click previous Item?");
 	}
 
 	public boolean hasNextToPlay() {
 		// TODO Auto-generated method stub
 		System.out.println("Has Next? Path=" + this.tree.getSelectionPath());
+		DefaultMutableTreeNode node = (DefaultMutableTreeNode) this.tree.getSelectionPath().getLastPathComponent();
 		return false;
 	}
 

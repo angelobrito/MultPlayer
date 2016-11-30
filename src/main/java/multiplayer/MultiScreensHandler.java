@@ -51,7 +51,7 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 
 	private int rowsNumber = 2;
 	private int columnsNumber = 2;
-	private List<PlayerInstance> players;
+	private List<MultiPlayerInstance> players;
 
 	private MediaPlayerFactory factory;
 
@@ -71,7 +71,7 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 		contentPane.setVisible(false);
 
 		timeTracker = new FileTimeTracker();
-		players = new ArrayList<PlayerInstance>();
+		players = new ArrayList<MultiPlayerInstance>();
 		mediaFilePath = new ArrayList<ArrayList<FileAdditionalInfo>>(application().getScreenQtt());
 		for(int i = 0; i < application().getScreenQtt(); i++) {
 			mediaFilePath.add(new ArrayList<FileAdditionalInfo>());
@@ -87,7 +87,7 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 				0.3f);
 		for(int i = 0; i < application().getScreenQtt(); i ++ ) {
 			EmbeddedMediaPlayer player = factory.newEmbeddedMediaPlayer(fullScreenStrategy);
-			PlayerInstance playerInstance = new PlayerInstance(player, ("#" + (i + 1)));
+			MultiPlayerInstance playerInstance = new MultiPlayerInstance(player, ("#" + (i + 1)));
 			playerInstance.setLogoImage(screenLogo.getImage());
 			playerInstance.enableLogo(true);
 			players.add(playerInstance);
@@ -132,12 +132,12 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 		return this.factory;
 	}
 
-	public List<PlayerInstance> getPlayers() {
+	public List<MultiPlayerInstance> getPlayers() {
 		return this.players;
 	}
 
 	public void screensRelease() {
-		for(PlayerInstance pi : this.players) {
+		for(MultiPlayerInstance pi : this.players) {
 			pi.release();
 		}
 		this.factory.release();
@@ -434,7 +434,7 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 
 	public boolean isPlaying() {
 		boolean result = false;
-		for(PlayerInstance player : this.players) {
+		for(MultiPlayerInstance player : this.players) {
 			if(!result) result = player.isPlaying();
 			else break;
 		}
@@ -443,7 +443,7 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 
 	public boolean isPlayable() {
 		boolean result = false;
-		for(PlayerInstance player : this.players) {
+		for(MultiPlayerInstance player : this.players) {
 			if(!result) result = player.isPlayable();
 			else break;
 		}
@@ -494,8 +494,17 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 		this.selectedFile = selectedFile;
 		System.out.println("setSelectedFile(" + selectedFile + ")");
 
-		ArrayList<FileAdditionalInfo> foundFiles = FileBrowser.getRelatedFiles(this.mediaDirectory, selectedFile);
+		// Search the folders and add them to the time tracker list
+		File startDirRoot = this.mediaDirectory;
+		while(startDirRoot.getName().contains("channel") || 
+				startDirRoot.getName().contains("cam") ||
+				startDirRoot.getName().contains("Channel")) startDirRoot = startDirRoot.getParentFile(); 
+		timeTracker.addFoldersToTrack(startDirRoot);
+		//timeTracker.run();
 
+		// Get Related files to the selected one to be played now
+		ArrayList<FileAdditionalInfo> foundFiles = FileBrowser.getRelatedFiles(this.mediaDirectory, selectedFile);
+		
 		// Clear Previous Media
 		for(int i = 0; i < application().getScreenQtt(); i++) this.mediaFilePath.get(i).clear();
 
@@ -527,9 +536,9 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 		for(int i = 0; i < this.players.size(); i++) playersToVisit.add(true);
 		
 		int queued = 0;
-		for (ArrayList<FileAdditionalInfo> channel : this.mediaFilePath) {
-			if(channel.size() > 0) {
-				FileAdditionalInfo info = channel.get(0);
+		for (ArrayList<FileAdditionalInfo> channelFiles : this.mediaFilePath) {
+			if(channelFiles.size() > 0) {
+				FileAdditionalInfo info = channelFiles.get(0);
 				int channelNumber = 0;
 				String filePath = "";
 				
@@ -643,7 +652,7 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 
 	public libvlc_state_t getMediaPlayerState() {
 		libvlc_state_t result = null;
-		for(PlayerInstance player : this.players){
+		for(MultiPlayerInstance player : this.players){
 			result = player.getMediaState();
 			if(result != null && ( 
 					result.toString().equalsIgnoreCase("libvlc_Playing") ||
@@ -756,7 +765,7 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 	}
 
 	public void getSnapshots() {
-		for( PlayerInstance player : this.players){
+		for( MultiPlayerInstance player : this.players){
 			if(player.isPlaying())
 				this.snapshotTaken(player.mediaPlayer(), player.getMediaPath());
 		}

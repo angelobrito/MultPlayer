@@ -39,7 +39,7 @@ import uk.co.caprica.vlcjplayer.event.StoppedEvent;
 /**
  * A single player instance and associated video surface.
  */
-public class PlayerInstance extends MediaPlayerEventAdapter {
+public class MultiPlayerInstance extends MediaPlayerEventAdapter {
 
     private final EmbeddedMediaPlayer mediaPlayer;
 
@@ -48,7 +48,7 @@ public class PlayerInstance extends MediaPlayerEventAdapter {
     private String mediaPath;
 	private String screenName;
 
-    public PlayerInstance(EmbeddedMediaPlayer mediaPlayer, String screenName) {
+    public MultiPlayerInstance(EmbeddedMediaPlayer mediaPlayer, String screenName) {
     	this.screenName = screenName;
     	this.mediaPath = "";
         this.mediaPlayer = mediaPlayer;
@@ -70,9 +70,6 @@ public class PlayerInstance extends MediaPlayerEventAdapter {
     public void mediaChanged(MediaPlayer mediaPlayer, libvlc_media_t media, String mrl) {
         System.out.println("@Timestamp=" + mediaPlayer.getTime() + " - mediaChanged{" + mrl + "} with media_t{" + media.toString() + "}");
         this.mediaPath = mrl;
-        File file = new File(mrl);
-        System.out.println("Is mrl a File? " + file.isFile());
-        System.out.println("Is mrl a Directory? " + file.isDirectory());
     }
 
     @Override

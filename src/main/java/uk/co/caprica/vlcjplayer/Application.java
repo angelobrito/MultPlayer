@@ -178,8 +178,8 @@ public final class Application {
 	public void checkContinuousPlay() {
 		System.out.println("Application to check continuous play...");
 		if(this.hasNextToPlay()) {
-			System.out.println("Application identifyed that there is next element");
-			
+			System.out.println("Application identifyed that there is next element to play on list");
+			this.playNextItem();
 		}
 	}
 	

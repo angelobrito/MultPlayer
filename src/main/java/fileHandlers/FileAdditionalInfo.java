@@ -3,14 +3,12 @@ package fileHandlers;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.DateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.regex.Pattern;
 
 public class FileAdditionalInfo {
 
-	private static String nameSeparator = "-";  // FIXME could be -, /, ' ' or '' then ? works as wild card? 
+	private String nameSeparator = "-";  // FIXME could be -, /, ' ' or '' then ? works as wild card? 
 	private int channel;
 	private Calendar date;
 	private String type;
@@ -33,7 +31,7 @@ public class FileAdditionalInfo {
 		this.processFileName(this.fileName);
 	}
 
-	private boolean hasPath(String filePath2) {
+	public boolean hasPath(String filePath2) {
 		return false;
 	}
 
@@ -46,7 +44,6 @@ public class FileAdditionalInfo {
 	}
 	
 	public void processFileName(String fileName) {
-		//String dateSeparator = ""; // FIXME could be -, /, ' ' or '' then ? works as wild card?
 		
 		/*
 		 * A fileName can have multiple formats and this program must support a few of them
@@ -140,5 +137,10 @@ public class FileAdditionalInfo {
 
 	public String getFilePath() {
 		return this.filePath;
+	}
+
+	public long getTimestamp() {
+		if(this.date != null) return this.date.getTimeInMillis();
+		else return 0;
 	}
 }
