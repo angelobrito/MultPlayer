@@ -19,12 +19,11 @@
 package multiplayer;
 
 import static uk.co.caprica.vlcjplayer.Application.application;
+
 import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.File;
-
-import com.google.common.io.Files;
 
 import uk.co.caprica.vlcj.binding.internal.libvlc_logo_position_e;
 import uk.co.caprica.vlcj.binding.internal.libvlc_media_t;
@@ -71,6 +70,9 @@ public class PlayerInstance extends MediaPlayerEventAdapter {
     public void mediaChanged(MediaPlayer mediaPlayer, libvlc_media_t media, String mrl) {
         System.out.println("@Timestamp=" + mediaPlayer.getTime() + " - mediaChanged{" + mrl + "} with media_t{" + media.toString() + "}");
         this.mediaPath = mrl;
+        File file = new File(mrl);
+        System.out.println("Is mrl a File? " + file.isFile());
+        System.out.println("Is mrl a Directory? " + file.isDirectory());
     }
 
     @Override

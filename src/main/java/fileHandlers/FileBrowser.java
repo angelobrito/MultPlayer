@@ -7,7 +7,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Vector;
 
 import javax.swing.filechooser.FileSystemView;
 
@@ -64,20 +63,29 @@ public class FileBrowser {
 		else return false;
 	}
 	
-	public static ArrayList<String> getRelatedFiles(File workingDirectory, String fileName) {
+	public static ArrayList<FileAdditionalInfo> getRelatedFiles(File workingDirectory, String fileName) {
 
-		ArrayList<String> result = new ArrayList<String>();
+		ArrayList<FileAdditionalInfo> result = new ArrayList<FileAdditionalInfo>();
+		System.out.println("getRelatedFiles(" + fileName + ")");
 		
 		String fileRegex = FileBrowser.getFileRegex(fileName);
+		ArrayList<String> filesPaths = new ArrayList<String>();
 		
 		try {
 			Path startingDir = Paths.get(workingDirectory.getAbsolutePath());
 			PathFinder finder = new PathFinder(fileRegex);
 			Files.walkFileTree(startingDir, finder);
-			result = finder.getPathsAsArray();
+			filesPaths = finder.getPathsAsArray();
 			finder.done(fileName);
 		} catch (IOException e) {
 			e.printStackTrace();
+		}
+		
+		int filesCounter = 0;
+		for(String filePath : filesPaths) {
+			result.add(new FileAdditionalInfo(filePath));
+			filesCounter++;
+			System.out.println("Found RelatedFile[" + filesCounter + "]={" + filePath + "}");
 		}
 		return result;
 	}

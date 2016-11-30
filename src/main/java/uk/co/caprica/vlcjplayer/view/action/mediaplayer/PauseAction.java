@@ -19,6 +19,8 @@
 
 package uk.co.caprica.vlcjplayer.view.action.mediaplayer;
 
+import static uk.co.caprica.vlcjplayer.Application.application;
+
 import java.awt.event.ActionEvent;
 
 import uk.co.caprica.vlcj.player.MediaPlayer;
@@ -26,12 +28,18 @@ import uk.co.caprica.vlcjplayer.view.action.Resource;
 
 final class PauseAction extends MediaPlayerAction {
 
-    PauseAction(Resource resource, MediaPlayer mediaPlayer) {
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 5277272706060832229L;
+
+	PauseAction(Resource resource, MediaPlayer mediaPlayer) {
         super(resource, mediaPlayer);
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         mediaPlayer.pause();
+        application().updateEnabledControlls();
     }
 }

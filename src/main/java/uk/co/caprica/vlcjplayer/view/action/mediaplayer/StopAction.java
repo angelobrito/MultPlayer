@@ -25,9 +25,13 @@ import java.awt.event.ActionEvent;
 
 import uk.co.caprica.vlcj.player.MediaPlayer;
 import uk.co.caprica.vlcjplayer.view.action.Resource;
-import uk.co.caprica.vlcjplayer.view.main.MainFrame;
 
 final class StopAction extends MediaPlayerAction {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1102429103732623560L;
 
 	StopAction(Resource resource, MediaPlayer mediaPlayer) {
 		super(resource, mediaPlayer);
@@ -36,6 +40,6 @@ final class StopAction extends MediaPlayerAction {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		application().getMediaPlayerComponent().stop();
-		application().updateControllState();
+		application().updateEnabledControlls();
 	}
 }

@@ -61,6 +61,10 @@ final class ControlsPane extends BasePanel {
 	private final Icon playIcon = newIcon("play");
 
 	private final Icon pauseIcon = newIcon("pause");
+	
+	private final Icon previousIcon = newIcon("previous");
+	
+	private final Icon nextIcon = newIcon("next");
 
 	private final Icon fullscreenIcon = newIcon("fullscreen");
 
@@ -70,9 +74,13 @@ final class ControlsPane extends BasePanel {
 
 	private final Icon volumeMutedIcon = newIcon("volume-muted");
 
+	private final JButton previousButton;
+	
 	private final JButton playPauseButton;
 
 	private final JButton stopButton;
+	
+	private final JButton nextButton;
 
 	private final JButton fullscreenButton;
 
@@ -103,12 +111,18 @@ final class ControlsPane extends BasePanel {
 
 		positionPane = new PositionPane(application().getMediaPlayerComponent());
 
+		previousButton = new StandardButton();
+        previousButton.setIcon(previousIcon);
+		
 		playPauseButton = new BigButton();
 		playPauseButton.setAction(mediaPlayerActions.playbackPlayAction());
 
 		stopButton = new StandardButton();
 		stopButton.setAction(mediaPlayerActions.playbackStopAction());
 
+		nextButton = new StandardButton();
+        nextButton.setIcon(nextIcon);
+		
 		fullscreenButton = new StandardButton();
 		fullscreenButton.setIcon(fullscreenIcon);
 
@@ -155,15 +169,14 @@ final class ControlsPane extends BasePanel {
 		add(logoPane, "West, wmax 120, hmax 80, gap 20 0");
 
 		add(positionPane, "North, gap 30");
-
-		add(playPauseButton, "Center, sg 2, al left, gap 30");
-		add(stopButton, "Center, sg 2, al left, gap 5");
-
+		
+		add(previousButton,   "Center, sg 2, al left, gap 30");
+		add(playPauseButton,  "Center, sg 2, al left, gap 5");
+		add(stopButton,       "Center, sg 2, al left, gap 5");
+		add(nextButton,       "Center, sg 2, al left, gap 5");
 		add(fullscreenButton, "Center, sg 2, al left, gap 5");
-
-		add(snapshotButton, "Center, sg 2, al left, gap 5");
-		add(effectsButton, "Center, sg 2, al left, gap 5");
-
+		add(snapshotButton,   "Center, sg 2, al left, gap 5");
+		add(effectsButton,    "Center, sg 2, al left, gap 5");
 
 		add(speedLabel, "sg 2, al left, gap 5");
 		add(speedSlider, "Center, sg 1, wmax 150, hmax 80, al left, gap 5");
@@ -187,7 +200,7 @@ final class ControlsPane extends BasePanel {
 			@Override
 			public void stateChanged(ChangeEvent e) {
 				application().getMediaPlayerComponent().setVolume(volumeSlider.getValue());
-				application().updateControllState();
+				application().updateEnabledControlls();
 			}
 		});
 
@@ -211,6 +224,22 @@ final class ControlsPane extends BasePanel {
 			public void actionPerformed(ActionEvent e) {
 				System.out.println("Effects Button");
 				application().post(ShowEffectsEvent.INSTANCE);
+			}
+		});
+		
+		nextButton.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				application().playNextItem();
+			}
+		});
+		
+		previousButton.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				application().playPreviousItem();
 			}
 		});
 	}
@@ -270,7 +299,7 @@ final class ControlsPane extends BasePanel {
 
 	private void MuteAction() {
 		application().getMediaPlayerComponent().forceMute();
-		application().updateControllState();
+		application().updateEnabledControlls();
 	}
 
 	public void setEnabledComponents() {
@@ -283,7 +312,9 @@ final class ControlsPane extends BasePanel {
 			playPauseButton.setIcon(playIcon);
 		}
 		positionPane.setEnabled(newState);
+		nextButton.setEnabled(newState && application().hasNextToPlay());
 		stopButton.setEnabled(newState);
+		previousButton.setEnabled(newState && application().hasPreviousToPlay());
 		fullscreenButton.setEnabled(newState);
 		effectsButton.setEnabled(newState);
 		snapshotButton.setEnabled(newState);

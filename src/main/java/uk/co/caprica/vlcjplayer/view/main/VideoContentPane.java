@@ -37,10 +37,14 @@ final class VideoContentPane extends JPanel {
     }
 
     public void showDefault() {
+    	System.out.println("VideoContentPane.showDefault()");
+    	videoBackground.setVisible(true);
         cardLayout.show(this, NAME_DEFAULT);
     }
 
     public void showVideo() {
+    	System.out.println("VideoContentPane.showVideo()");
+    	videoBackground.setVisible(false);
         cardLayout.show(this, NAME_VIDEO);
     }
 }

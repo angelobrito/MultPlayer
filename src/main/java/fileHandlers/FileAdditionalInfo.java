@@ -88,12 +88,12 @@ public class FileAdditionalInfo {
 			this.type    = fileName.substring((fileName.length()-3), fileName.length());
 		
 			this.date = Calendar.getInstance();
-			int year   = Integer.parseInt(fileName.substring(0, 5));
-			int month  = Integer.parseInt(fileName.substring(6, 8));
-			int date   = Integer.parseInt(fileName.substring(9, 11));
-			int hours  = Integer.parseInt(fileName.substring(13, 15));
-			int minute = Integer.parseInt(fileName.substring(16, 18));
-			int second = Integer.parseInt(fileName.substring(19, 21));
+			int year   = Integer.parseInt(fileName.substring(0, 4));
+			int month  = Integer.parseInt(fileName.substring(5, 7));
+			int date   = Integer.parseInt(fileName.substring(8, 10));
+			int hours  = Integer.parseInt(fileName.substring(11, 13));
+			int minute = Integer.parseInt(fileName.substring(14, 16));
+			int second = Integer.parseInt(fileName.substring(17, 19));
 			this.date.set(year, (month-1), date, hours, minute, second);
 
 			//  Regex = Prefix +      date      + sufix (timestamp.fileType)

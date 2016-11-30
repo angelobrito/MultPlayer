@@ -38,6 +38,7 @@ import multiplayer.MultiScreensHandler;
 import uk.co.caprica.vlcjplayer.event.TickEvent;
 import uk.co.caprica.vlcjplayer.view.action.mediaplayer.MediaPlayerActions;
 import uk.co.caprica.vlcjplayer.view.main.MainFrame;
+import uk.co.caprica.vlcjplayer.view.main.PlaylistPane;
 
 /**
  * Global application state.
@@ -176,9 +177,33 @@ public final class Application {
 	
 	public void checkContinuousPlay() {
 		System.out.println("Application to check continuous play...");
+		if(this.hasNextToPlay()) {
+			System.out.println("Application identifyed that there is next element");
+			
+		}
 	}
 	
-	public void updateControllState() {
+	public void updateEnabledControlls() {
 		((MainFrame) this.mainFrame).updateEnabledComponents();
+	}
+
+	public PlaylistPane getPlaylistPane() {
+		return ((MainFrame) this.mainFrame).getPlaylistPane();
+	}
+
+	public boolean hasNextToPlay() {
+		return ((MainFrame) this.mainFrame).getPlaylistPane().hasNextToPlay();
+	}
+
+	public boolean hasPreviousToPlay() {
+		return ((MainFrame) this.mainFrame).getPlaylistPane().hasPreviousToPlay();
+	}
+
+	public void playNextItem() {
+		((MainFrame) this.mainFrame).getPlaylistPane().clickNextItem();
+	}
+
+	public void playPreviousItem() {
+		((MainFrame) this.mainFrame).getPlaylistPane().clickPreviousItem();
 	}
 }

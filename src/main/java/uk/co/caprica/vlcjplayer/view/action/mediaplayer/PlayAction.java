@@ -26,7 +26,6 @@ import java.awt.event.ActionEvent;
 import multiplayer.MultiScreensHandler;
 import uk.co.caprica.vlcj.player.MediaPlayer;
 import uk.co.caprica.vlcjplayer.view.action.Resource;
-import uk.co.caprica.vlcjplayer.view.main.MainFrame;
 
 final class PlayAction extends MediaPlayerAction {
 
@@ -43,6 +42,6 @@ final class PlayAction extends MediaPlayerAction {
 	public void actionPerformed(ActionEvent e) {
 		MultiScreensHandler mediaPlayerComponent = application().getMediaPlayerComponent();
 		mediaPlayerComponent.resume();
-		application().updateControllState();
+		application().updateEnabledControlls();
 	}
 }

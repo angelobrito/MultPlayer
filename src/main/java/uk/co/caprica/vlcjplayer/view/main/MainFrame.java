@@ -358,7 +358,6 @@ public final class MainFrame extends BaseFrame {
 			@Override
 			public void playing(MediaPlayer mediaPlayer) {
 				videoContentPane.showVideo();
-				mouseMovementDetector.start();
 				updateEnabledComponents();
 				application().post(PlayingEvent.INSTANCE);
 			}
@@ -553,6 +552,8 @@ public final class MainFrame extends BaseFrame {
 
 	public void updateEnabledComponents() {
 
+		System.out.println("Update Enabled Components");
+		
 		// FIXME to avoid thread problems sleep a little to give time to other threads to run
 		try {
 			Thread.sleep(40);
@@ -561,7 +562,8 @@ public final class MainFrame extends BaseFrame {
 		}
 		
 		boolean playerRunning = multiMediaPlayerComponent.isPlayerReady();
-
+		System.out.println("Are There any players running? " + playerRunning);
+		
 		playbackMenu.setEnabled(playerRunning);
 		setEnabledMenuItemVolumeDecrease(0 < multiMediaPlayerComponent.getVolume() && 
 				!application().getMediaPlayerComponent().isMuteForced());
@@ -580,6 +582,7 @@ public final class MainFrame extends BaseFrame {
 
 	public void showScreens(File selectedFile) {
 		libvlc_state_t state = multiMediaPlayerComponent.getMediaPlayerState();
+		System.out.println("showScreens state=" + state);
 		if(state != null) {
 			switch(state){
 			case libvlc_Playing:
@@ -590,6 +593,7 @@ public final class MainFrame extends BaseFrame {
 
 			case libvlc_Paused:
 				mouseMovementDetector.stop();
+				videoContentPane.showVideo();
 				application().post(PausedEvent.INSTANCE);
 				break;
 

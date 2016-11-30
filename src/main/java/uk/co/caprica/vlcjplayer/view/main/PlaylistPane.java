@@ -46,7 +46,7 @@ import javax.swing.tree.TreeSelectionModel;
 import fileHandlers.FileBrowser;
 import fileHandlers.FileTreeCellRenderer;
 
-final class PlaylistPane extends FileBrowser {
+public class PlaylistPane extends FileBrowser {
 
 	/** Main GUI container */
 	private JPanel gui;
@@ -266,5 +266,26 @@ final class PlaylistPane extends FileBrowser {
 		// not found!
 		return null;
 	}
-	
+
+	public void clickNextItem() {
+		// TODO Auto-generated method stub
+		System.out.println("Click next?");
+	}
+
+	public void clickPreviousItem() {
+		// TODO Auto-generated method stub
+		System.out.println("Click previous?");
+	}
+
+	public boolean hasNextToPlay() {
+		// TODO Auto-generated method stub
+		System.out.println("Has Next? Path=" + this.tree.getSelectionPath());
+		return false;
+	}
+
+	public boolean hasPreviousToPlay() {
+		// TODO Auto-generated method stub
+		System.out.println("Has Previous?");
+		return false;
+	}	
 }

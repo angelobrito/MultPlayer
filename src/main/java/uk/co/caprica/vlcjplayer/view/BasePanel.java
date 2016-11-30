@@ -29,7 +29,12 @@ import uk.co.caprica.vlcjplayer.event.ShutdownEvent;
 
 public abstract class BasePanel extends JPanel {
 
-    public BasePanel() {
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 2040966148370378357L;
+
+	public BasePanel() {
         application().subscribe(this);
     }
 

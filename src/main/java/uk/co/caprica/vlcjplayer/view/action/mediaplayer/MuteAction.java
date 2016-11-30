@@ -25,7 +25,6 @@ import java.awt.event.ActionEvent;
 
 import uk.co.caprica.vlcj.player.MediaPlayer;
 import uk.co.caprica.vlcjplayer.view.action.Resource;
-import uk.co.caprica.vlcjplayer.view.main.MainFrame;
 
 final class MuteAction extends MediaPlayerAction {
 
@@ -41,6 +40,6 @@ final class MuteAction extends MediaPlayerAction {
     @Override
     public void actionPerformed(ActionEvent e) {
     	application().getMediaPlayerComponent().forceMute();
-		application().updateControllState();
+		application().updateEnabledControlls();
     }
 }

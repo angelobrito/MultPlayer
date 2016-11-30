@@ -29,7 +29,11 @@ import uk.co.caprica.vlcjplayer.view.main.MainFrame;
 
 final class RateAction extends MediaPlayerAction {
 
-    private final int rate;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 8540668613265947417L;
+	private final int rate;
 
     RateAction(Resource resource, MediaPlayer mediaPlayer, int rate) {
         super(resource, mediaPlayer);
