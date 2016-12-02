@@ -46,6 +46,7 @@ public final class MediaPlayerActions {
     private final List<Action> audioStereoModeActions;
     private final List<Action> audioControlActions;
 
+    private final List<Action> videoQuantityActions;
     private final List<Action> videoZoomActions;
     private final List<Action> videoAspectRatioActions;
     private final List<Action> videoCropActions;
@@ -62,6 +63,7 @@ public final class MediaPlayerActions {
         playbackControlActions  = newPlaybackControlActions (mediaPlayer.getHeadPlayer());
         audioStereoModeActions  = newAudioStereoModeActions (mediaPlayer.getHeadPlayer());
         audioControlActions     = newAudioControlActions    (mediaPlayer.getHeadPlayer());
+        videoQuantityActions    = newVideoQuantityActions   (mediaPlayer.getHeadPlayer());
         videoZoomActions        = newVideoZoomActions       (mediaPlayer.getHeadPlayer());
         videoAspectRatioActions = newVideoAspectRatioActions(mediaPlayer.getHeadPlayer());
         videoCropActions        = newVideoCropActions       (mediaPlayer.getHeadPlayer());
@@ -71,7 +73,17 @@ public final class MediaPlayerActions {
         videoSnapshotAction     = new SnapshotAction(resource("menu.video.item.snapshot"), mediaPlayer.getHeadPlayer());
     }
 
-    private List<Action> newPlaybackSpeedActions(MediaPlayer mediaPlayer) {
+    private List<Action> newVideoQuantityActions(MediaPlayer mediaPlayer) {
+		List<Action> actions = new ArrayList<>();
+        actions.add(new ScreenQuantityAction(resource("menu.video.item.quantity.item.1"    ), mediaPlayer, 1));
+        actions.add(new ScreenQuantityAction(resource("menu.video.item.quantity.item.2"    ), mediaPlayer, 2));
+        actions.add(new ScreenQuantityAction(resource("menu.video.item.quantity.item.4"    ), mediaPlayer, 4));
+        actions.add(new ScreenQuantityAction(resource("menu.video.item.quantity.item.6"    ), mediaPlayer, 6));
+        actions.add(new ScreenQuantityAction(resource("menu.video.item.quantity.item.8"    ), mediaPlayer, 8));
+        return ImmutableList.copyOf(actions);
+	}
+
+	private List<Action> newPlaybackSpeedActions(MediaPlayer mediaPlayer) {
         List<Action> actions = new ArrayList<>();
         actions.add(new RateAction(resource("menu.playback.item.speed.item.x4"    ), mediaPlayer, 5));
         actions.add(new RateAction(resource("menu.playback.item.speed.item.x2"    ), mediaPlayer, 4));
@@ -185,6 +197,10 @@ public final class MediaPlayerActions {
 
     public List<Action> videoZoomActions() {
         return videoZoomActions;
+    }
+    
+    public List<Action> videoQuantityActions() {
+        return videoQuantityActions;
     }
 
     public List<Action> videoAspectRatioActions() {

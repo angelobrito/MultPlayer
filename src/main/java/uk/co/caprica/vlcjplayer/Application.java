@@ -38,7 +38,6 @@ import multiplayer.MultiScreensHandler;
 import uk.co.caprica.vlcjplayer.event.TickEvent;
 import uk.co.caprica.vlcjplayer.view.action.mediaplayer.MediaPlayerActions;
 import uk.co.caprica.vlcjplayer.view.main.MainFrame;
-import uk.co.caprica.vlcjplayer.view.main.PlaylistPane;
 
 /**
  * Global application state.
@@ -53,7 +52,7 @@ public final class Application {
 
     private final EventBus eventBus;
     
-    private final int screenQtt;
+    private int screenQtt;
     
     private JFrame mainFrame;
 
@@ -147,6 +146,11 @@ public final class Application {
 	public int getScreenQtt() {
 		return screenQtt;
 	}
+	
+	public void setScreenQuantity(int screenQuantity) {
+		this.screenQtt = screenQuantity;
+		this.multiMediaPlayerComponent.setNewScreensLayout(screenQuantity);
+	}
 
 	/**
 	 * @return the mainFrame
@@ -187,23 +191,19 @@ public final class Application {
 		((MainFrame) this.mainFrame).updateEnabledComponents();
 	}
 
-	public PlaylistPane getPlaylistPane() {
-		return ((MainFrame) this.mainFrame).getPlaylistPane();
-	}
-
 	public boolean hasNextToPlay() {
-		return ((MainFrame) this.mainFrame).getPlaylistPane().hasNextToPlay();
+		return ((MultiScreensHandler) ((MainFrame) this.mainFrame).getPlayerHandler()).hasNextToPlay();
 	}
 
 	public boolean hasPreviousToPlay() {
-		return ((MainFrame) this.mainFrame).getPlaylistPane().hasPreviousToPlay();
+		return ((MultiScreensHandler) ((MainFrame) this.mainFrame).getPlayerHandler()).hasPreviousToPlay();
 	}
 
 	public void playNextItem() {
-		((MainFrame) this.mainFrame).getPlaylistPane().clickNextItem();
+		System.out.println("Next Video Item to play={" + this.multiMediaPlayerComponent.getNextVideo().getFileName() + "}");
 	}
 
 	public void playPreviousItem() {
-		((MainFrame) this.mainFrame).getPlaylistPane().clickPreviousItem();
+		System.out.println("Previous Video Item to play={" + this.multiMediaPlayerComponent.getPreviousVideo().getFileName() + "}");
 	}
 }

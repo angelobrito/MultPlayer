@@ -112,6 +112,7 @@ public final class MainFrame extends BaseFrame {
 	private final JMenu audioDeviceMenu;
 
 	private final JMenu videoMenu;
+	private final JMenu videoQuantityMenu;
 	private final JMenu videoZoomMenu;
 	private final JMenu videoCropMenu;
 	private final JMenuItem videoSnapshot;
@@ -239,6 +240,7 @@ public final class MainFrame extends BaseFrame {
 
 		//FIXME Update the speedSlideBar whenever the buttons are pressed
 		for (Action action : mediaPlayerActions.playbackSpeedActions()) {
+			// FIXME change back for JCheckBoxMenuItem 
 			playbackSpeedMenu.add(new JMenuItem(action));
 		}
 		playbackMenu.add(playbackSpeedMenu);
@@ -273,8 +275,16 @@ public final class MainFrame extends BaseFrame {
 		videoMenu = new JMenu(resource("menu.video").name());
 		videoMenu.setMnemonic(resource("menu.video").mnemonic());
 		videoMenu.add(new JCheckBoxMenuItem(videoFullscreenAction));
+		videoQuantityMenu = new JMenu(resource("menu.video.item.quantity").name());
+		videoQuantityMenu.setMnemonic(resource("menu.video.item.quantity").mnemonic());
+		for (Action action : mediaPlayerActions.videoQuantityActions()) {
+			videoQuantityMenu.add(new JCheckBoxMenuItem(action));
+		}
+		//videoQuantityMenu.setEnabled(false); // FIXME Enable this menu
+		videoMenu.add(videoQuantityMenu);
 		videoMenu.add(new JCheckBoxMenuItem(videoAlwaysOnTopAction));
 		videoMenu.add(new JSeparator());
+		
 		videoZoomMenu = new JMenu(resource("menu.video.item.zoom").name());
 		videoZoomMenu.setMnemonic(resource("menu.video.item.zoom").mnemonic());
 		addActions(mediaPlayerActions.videoZoomActions(), videoZoomMenu/*, true*/); // FIXME how to handle zoom 1:1 and fit to window - also, probably should not use addActions to select
@@ -285,8 +295,10 @@ public final class MainFrame extends BaseFrame {
 		addActions(mediaPlayerActions.videoCropActions(), videoCropMenu, true);
 		videoMenu.add(videoCropMenu);
 		videoMenu.add(new JSeparator());
+		
 		videoSnapshot = new JMenuItem(mediaPlayerActions.videoSnapshotAction());
 		videoMenu.add(videoSnapshot);
+		
 		menuBar.add(videoMenu);
 
 		toolsMenu = new JMenu(resource("menu.tools").name());
@@ -462,6 +474,7 @@ public final class MainFrame extends BaseFrame {
 				prefs.getInt("frameHeight", 600)
 				);
 		boolean alwaysOnTop = prefs.getBoolean("alwaysOnTop", false);
+		application().setScreenQuantity(prefs.getInt("screensQuantity", 4));
 		setAlwaysOnTop(alwaysOnTop);
 		videoAlwaysOnTopAction.select(alwaysOnTop);
 		fileChooser.setCurrentDirectory(new File(prefs.get("chooserDirectory", ".")));
@@ -484,6 +497,7 @@ public final class MainFrame extends BaseFrame {
 			prefs.putInt    ("frameY"          , getY     ());
 			prefs.putInt    ("frameWidth"      , getWidth ());
 			prefs.putInt    ("frameHeight"     , getHeight());
+			prefs.putInt    ("screensQuantity" , application().getScreenQtt());
 			prefs.putBoolean("alwaysOnTop"     , isAlwaysOnTop());
 			prefs.put       ("chooserDirectory", fileChooser.getCurrentDirectory().toString());
 
@@ -556,12 +570,12 @@ public final class MainFrame extends BaseFrame {
 		
 		// FIXME to avoid thread problems sleep a little to give time to other threads to run
 		try {
-			Thread.sleep(40);
+			Thread.sleep(100);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
 		
-		boolean playerRunning = multiMediaPlayerComponent.isPlayerReady();
+		boolean playerRunning = multiMediaPlayerComponent.hasRunningPlayer();
 		System.out.println("Are There any players running? " + playerRunning);
 		
 		playbackMenu.setEnabled(playerRunning);
@@ -576,6 +590,10 @@ public final class MainFrame extends BaseFrame {
 		videoSnapshot.setEnabled(playerRunning);
 		controlsPane.setEnabledComponents();
 		multiMediaPlayerComponent.setVisible(playerRunning);
+		
+		this.updateSelectedSpeedOption(playerRunning);
+		
+		this.updateSelectedScreenQuantity(playerRunning);
 		
 		showScreens(null);
 	}
@@ -627,6 +645,41 @@ public final class MainFrame extends BaseFrame {
 			mouseMovementDetector.stop();
 			application().post(StoppedEvent.INSTANCE);
 		}
+	}
+	
+	private void updateSelectedScreenQuantity(boolean playersRunning) {
+		int registeredScreenQtt = application().getScreenQtt();
+		for(Component item : this.videoQuantityMenu.getMenuComponents()) {
+			String[] sTemp = ((JCheckBoxMenuItem) item).getText().split(" ");
+			int toTest = Integer.parseInt(sTemp[0]);
+			((JCheckBoxMenuItem) item).setSelected(toTest == registeredScreenQtt);
+			item.setEnabled(!playersRunning);
+		}
+	}
+	
+	private void updateSelectedSpeedOption(boolean playersRunning) {
+		// FIXME
+//		float registeredSpeedRate = application().getMediaPlayerComponent().getRate();
+//		for(Component item : this.playbackSpeedMenu.getMenuComponents()) {
+//			if( (((JCheckBoxMenuItem) item).getText()).contains("x4/ ") && registeredSpeedRate == 4.0) {
+//				((JCheckBoxMenuItem) item).setSelected(true);
+//			}
+//			else if( (((JCheckBoxMenuItem) item).getText()).contains("x2/ ") && registeredSpeedRate == 2.0) {
+//				((JCheckBoxMenuItem) item).setSelected(true);
+//			}
+//			else if( (((JCheckBoxMenuItem) item).getText()).contains("x1/ ") && registeredSpeedRate == 1.0) {
+//				((JCheckBoxMenuItem) item).setSelected(true);
+//			}
+//			else if( (((JCheckBoxMenuItem) item).getText()).contains("x1//2 ") && registeredSpeedRate == 0.5) {
+//				((JCheckBoxMenuItem) item).setSelected(true);
+//			}
+//			else if( (((JCheckBoxMenuItem) item).getText()).contains("x1//4 ") && registeredSpeedRate == 0.25) {
+//				((JCheckBoxMenuItem) item).setSelected(true);
+//			}
+//			else {
+//				((JCheckBoxMenuItem) item).setSelected(false);
+//			}
+//		}
 	}
 
 	public Component getPlayerHandler(){

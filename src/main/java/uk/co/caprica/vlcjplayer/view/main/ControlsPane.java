@@ -303,9 +303,9 @@ final class ControlsPane extends BasePanel {
 	}
 
 	public void setEnabledComponents() {
-		boolean newState = application().getMediaPlayerComponent().isPlayerReady();
+		boolean newState = application().getMediaPlayerComponent().hasRunningPlayer();
 		libvlc_state_t state = application().getMediaPlayerComponent().getMediaPlayerState();
-		if(state != null && state.toString().equalsIgnoreCase("libvlc_Playing")) {
+		if(newState || (state != null && state.toString().equalsIgnoreCase("libvlc_Playing")) ) {
 			playPauseButton.setIcon(pauseIcon); 
 		}
 		else {

@@ -35,6 +35,7 @@ import uk.co.caprica.vlcj.player.embedded.EmbeddedMediaPlayer;
 import uk.co.caprica.vlcj.player.embedded.FullScreenStrategy;
 import uk.co.caprica.vlcjplayer.event.SnapshotImageEvent;
 import uk.co.caprica.vlcjplayer.view.image.ImagePane;
+import uk.co.caprica.vlcjplayer.view.main.MainFrame;
 
 
 public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements MediaPlayerEventListener, MouseListener, MouseMotionListener, MouseWheelListener, KeyListener{
@@ -48,6 +49,7 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 	private ArrayList<ArrayList<FileAdditionalInfo>> mediaFilePath;
 	private String selectedFile;
 	private FileTimeTracker timeTracker;
+	private MainFrame containerFrame;
 
 	private int rowsNumber = 2;
 	private int columnsNumber = 2;
@@ -55,7 +57,8 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 
 	private MediaPlayerFactory factory;
 
-	FullScreenStrategy fullScreenStrategy;
+	private FullScreenStrategy fullScreenStrategy;
+	private ImagePane screenLogo;
 
 	private int selectedScreen;
 	private boolean forcedMute;
@@ -64,44 +67,26 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 	private JPanel contentPane;
 
 	public MultiScreensHandler(JFrame containerFrame) {
-		contentPane = new JPanel();
-		contentPane.setBackground(Color.black);
-		setNewScreensLayout(application().getScreenQtt());
-		contentPane.setBorder(new EmptyBorder(16, 16, 16, 16));
-		contentPane.setVisible(false);
 
-		timeTracker = new FileTimeTracker();
-		players = new ArrayList<MultiPlayerInstance>();
-		mediaFilePath = new ArrayList<ArrayList<FileAdditionalInfo>>(application().getScreenQtt());
-		for(int i = 0; i < application().getScreenQtt(); i++) {
-			mediaFilePath.add(new ArrayList<FileAdditionalInfo>());
-		}
-
-		factory = new MediaPlayerFactory();
-
-		FullScreenStrategy fullScreenStrategy = new DefaultFullScreenStrategy(containerFrame);
-
-		ImagePane screenLogo = new ImagePane(
+		this.containerFrame = (MainFrame) containerFrame;
+		this.factory     = new MediaPlayerFactory();
+		this.timeTracker = new FileTimeTracker();
+		this.fullScreenStrategy = new DefaultFullScreenStrategy(this.containerFrame);
+		this.screenLogo = new ImagePane(
 				ImagePane.Mode.CENTER, 
 				getClass().getResource("/MultTecnologia-logo.png"), 
 				0.3f);
-		for(int i = 0; i < application().getScreenQtt(); i ++ ) {
-			EmbeddedMediaPlayer player = factory.newEmbeddedMediaPlayer(fullScreenStrategy);
-			MultiPlayerInstance playerInstance = new MultiPlayerInstance(player, ("#" + (i + 1)));
-			playerInstance.setLogoImage(screenLogo.getImage());
-			playerInstance.enableLogo(true);
-			players.add(playerInstance);
+		this.contentPane = new JPanel();
+		this.contentPane.setBackground(Color.BLACK);
+		this.contentPane.setVisible(false);
+		this.contentPane.setBorder(new EmptyBorder(16, 16, 16, 16));
+		this.contentPane.setLayout(new GridLayout(this.rowsNumber, this.columnsNumber, 16, 16));
+		
+		setNewScreensLayout(application().getScreenQtt());
 
-			JPanel playerPanel = new JPanel();
-			playerPanel.setLayout(new BorderLayout());
-			playerPanel.setBorder(new LineBorder(Color.white, 2));
-			playerPanel.add(playerInstance.videoSurface());
+		this.contentPane.setVisible(true);
 
-			contentPane.add(playerPanel);
-		}
-		contentPane.setVisible(true);
-
-		this.add(contentPane, BorderLayout.CENTER);
+		this.add(this.contentPane, BorderLayout.CENTER);
 		this.setVisible(true);
 	}
 
@@ -125,7 +110,27 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 		}
 		while((this.rowsNumber * this.columnsNumber) < qttScreens);
 
-		contentPane.setLayout(new GridLayout(this.rowsNumber, this.columnsNumber, 16, 16));
+		this.contentPane.removeAll();
+		
+		this.mediaFilePath = new ArrayList<ArrayList<FileAdditionalInfo>>(application().getScreenQtt());
+		this.players     = new ArrayList<MultiPlayerInstance>(qttScreens);
+
+		for(int i = 0; i < application().getScreenQtt(); i++) {
+			EmbeddedMediaPlayer player = this.factory.newEmbeddedMediaPlayer(this.fullScreenStrategy);
+			MultiPlayerInstance playerInstance = new MultiPlayerInstance(player, ("#" + (i + 1)));
+			playerInstance.setLogoImage(this.screenLogo.getImage());
+			playerInstance.enableLogo(true);
+			this.players.add(playerInstance);
+
+			JPanel playerPanel = new JPanel();
+			playerPanel.setLayout(new BorderLayout());
+			playerPanel.setBorder(new LineBorder(Color.white, 2));
+			playerPanel.setSize(this.contentPane.getSize());
+			playerPanel.add(playerInstance.videoSurface());
+
+			this.contentPane.add(playerPanel);
+			this.mediaFilePath.add(new ArrayList<FileAdditionalInfo>());
+		}
 	}
 
 	public MediaPlayerFactory getFactory() {
@@ -500,7 +505,6 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 				startDirRoot.getName().contains("cam") ||
 				startDirRoot.getName().contains("Channel")) startDirRoot = startDirRoot.getParentFile(); 
 		timeTracker.addFoldersToTrack(startDirRoot);
-		//timeTracker.run();
 
 		// Get Related files to the selected one to be played now
 		ArrayList<FileAdditionalInfo> foundFiles = FileBrowser.getRelatedFiles(this.mediaDirectory, selectedFile);
@@ -522,9 +526,13 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 
 			if(channel > 0 && channel <= this.mediaFilePath.size()) {
 				this.mediaFilePath.get(channel-1).add(info);
+				timeTracker.addRunningItem(info);
 			}
 			else {
-				if(!(this.mediaFilePath.get(i).size() > 0)) this.mediaFilePath.get(i).add(info);;
+				if(!(this.mediaFilePath.get(i).size() > 0)) {
+					this.mediaFilePath.get(i).add(info);
+					timeTracker.addRunningItem(info);
+				}
 			}
 		}
 		this.updateScreensMedia();
@@ -580,11 +588,28 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 		}
 	}
 	
-	public boolean isPlayerReady() {
-		return this.isPlaying() || 
-				this.isPlayable();
+	public boolean hasRunningPlayer() {
+		return isPlayable() && isPlaying() && isRunningState();
 	}
-
+	
+	private boolean isRunningState() {
+		libvlc_state_t state = getMediaPlayerState();
+		return state.toString().equalsIgnoreCase("libvlc_Playing") ||
+				state.toString().equalsIgnoreCase("libvlc_Paused");
+	}
+	
+	public libvlc_state_t getMediaPlayerState() {
+		libvlc_state_t result = null;
+		for(MultiPlayerInstance player : this.players){
+			result = player.getMediaState();
+			if(result != null && ( 
+					result.toString().equalsIgnoreCase("libvlc_Playing") ||
+					result.toString().equalsIgnoreCase("libvlc_Paused")
+					) ) break;
+		}
+		return result;
+	}
+	
 	public void resume() {
 		this.setVisible(true);
 		for(int i = 0; i < this.players.size(); i++){
@@ -610,7 +635,6 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 			else {
 				System.out.println("Screen[" + (i+1) + "] is not ready");
 			}
-
 
 			// Set a small delay to let the other threads to run and update the state
 			try {
@@ -645,21 +669,17 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 			this.players.get(i).setRate(rate);
 		}
 	}
+	
+	public float getRate() {
+		float result = 0;
+		for(MultiPlayerInstance player : this.players) {
+			if(result < player.getRate()) result = player.getRate();
+		}
+		return result;
+	}
 
 	public boolean isPaused() {
 		return this.paused;
-	}
-
-	public libvlc_state_t getMediaPlayerState() {
-		libvlc_state_t result = null;
-		for(MultiPlayerInstance player : this.players){
-			result = player.getMediaState();
-			if(result != null && ( 
-					result.toString().equalsIgnoreCase("libvlc_Playing") ||
-					result.toString().equalsIgnoreCase("libvlc_Paused")
-					) ) break;
-		}
-		return result;
 	}
 
 	public void setContrast(float contrast) {
@@ -787,5 +807,21 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 			incremental++;
 			fileName = outputFileDirectoryPath + "\\screenshot" + incremental + ".png"; 
 		}
+	}
+
+	public boolean hasNextToPlay() {
+		return this.timeTracker.hasNextVideo();
+	}
+	
+	public FileAdditionalInfo getNextVideo() {
+		return this.timeTracker.getNextVideoItem();
+	}
+	
+	public FileAdditionalInfo getPreviousVideo() {
+		return this.timeTracker.getPreviousVideoItem();
+	}
+
+	public boolean hasPreviousToPlay() {
+		return this.timeTracker.hasPreviousVideo();
 	}
 }

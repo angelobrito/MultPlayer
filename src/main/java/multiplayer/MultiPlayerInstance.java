@@ -107,8 +107,6 @@ public class MultiPlayerInstance extends MediaPlayerEventAdapter {
     }
     
     public void clearScreen() {
-    	
-    	// TODO clear to a black screen or use logo
     	System.out.println("@Timestamp=" + mediaPlayer.getTime() + " - Screen[" + this.screenName + "] TODO Clear Screen");
     	this.mediaPlayer.enableLogo(true);
     	application().post(StoppedEvent.INSTANCE);
@@ -254,6 +252,10 @@ public class MultiPlayerInstance extends MediaPlayerEventAdapter {
 
 	public String getMediaPath() {
 		return this.mediaPath;
+	}
+
+	public float getRate() {
+		return this.mediaPlayer.getRate();
 	}
 }
 

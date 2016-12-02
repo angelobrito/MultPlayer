@@ -280,7 +280,7 @@ public class PlaylistPane extends FileBrowser {
 	public boolean hasNextToPlay() {
 		// TODO Auto-generated method stub
 		System.out.println("Has Next? Path=" + this.tree.getSelectionPath());
-		DefaultMutableTreeNode node = (DefaultMutableTreeNode) this.tree.getSelectionPath().getLastPathComponent();
+		//DefaultMutableTreeNode node = (DefaultMutableTreeNode) this.tree.getSelectionPath().getLastPathComponent();
 		return false;
 	}
 
