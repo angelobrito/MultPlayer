@@ -620,6 +620,7 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 			if(!mediaPlayer.isPlaying() && !mediaPlayer.getMediaPlayerState().toString().equalsIgnoreCase("libvlc_Ended")){
 				System.out.println("Player Started...");
 				this.players.get(i).start();
+				this.timeTracker.start();
 			}
 			else if(mediaPlayer.isPlaying()) {
 				System.out.print("Screen[" + (i+1) + "] is already playing ");
@@ -656,6 +657,7 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 	}
 
 	public void stop() {
+		this.timeTracker.resetTimer();
 		for(int i = 0; i < this.players.size(); i++){
 
 			//System.out.println("Stop for=" + i);
@@ -823,5 +825,18 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 
 	public boolean hasPreviousToPlay() {
 		return this.timeTracker.hasPreviousVideo();
+	}
+
+	public void startTimer() {
+		this.timeTracker.start();
+	}
+	
+	public void stopTimer() {
+		this.timeTracker.stop();
+	}
+
+	public void updateTimer(boolean state) {
+		if(state) this.timeTracker.start();
+		else this.timeTracker.stop();
 	}
 }

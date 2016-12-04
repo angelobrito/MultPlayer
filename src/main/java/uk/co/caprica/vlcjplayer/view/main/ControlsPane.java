@@ -164,7 +164,8 @@ final class ControlsPane extends BasePanel {
 
 		logoPane = new ImagePane(ImagePane.Mode.FIT, getClass().getResource("/MultTecnologia-logo-name.png"), 1.0f);
 		logoPane.setBackground(new Color(Transparency.TRANSLUCENT));
-		logoPane.setPreferredSize(new Dimension(50, 50));
+		logoPane.setMinimumSize(new Dimension(250, 80));
+		logoPane.setPreferredSize(new Dimension(250, 80));
 		logoPane.setIgnoreRepaint(true);
 		add(logoPane, "West, wmax 120, hmax 80, gap 20 0");
 

@@ -1,10 +1,15 @@
 package fileHandlers;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 
 import javax.swing.JPanel;
+import javax.swing.Timer;
+
+import com.google.common.eventbus.Subscribe;
 
 import multiplayer.MultiPlayerInstance;
 import static uk.co.caprica.vlcjplayer.Application.application;
@@ -13,14 +18,17 @@ import uk.co.caprica.vlcj.player.MediaMeta;
 import uk.co.caprica.vlcj.player.MediaPlayer;
 import uk.co.caprica.vlcj.player.MediaPlayerFactory;
 import uk.co.caprica.vlcj.player.embedded.EmbeddedMediaPlayer;
+import uk.co.caprica.vlcjplayer.event.TickEvent;
 
 public class FileTimeTracker {
 
+	private static final int TIMER_DELAY = 1000;
 	private long startTimestamp; // since January 1, 1970 UTC
 	private long allVideosLength;
 	private long runningTime;
 	private ArrayList<FileAdditionalInfo> timedPlaylist;
 	private ArrayList<FileAdditionalInfo> runningItem;
+	private Timer timer;
 	
 	public FileTimeTracker() {
 		this.startTimestamp = 0;
@@ -28,6 +36,14 @@ public class FileTimeTracker {
 		this.runningTime = 0;
 		timedPlaylist = new ArrayList<FileAdditionalInfo>();
 		runningItem   = new ArrayList<FileAdditionalInfo>();
+		
+		// the timer variable must be a javax.swing.Timer
+		// TIMER_DELAY is a constant int and = 35;
+		timer = new javax.swing.Timer(TIMER_DELAY, new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				onTick();
+			}
+		});
 	}
 	
 	public void setAllVideosLength(long length) {
@@ -147,5 +163,45 @@ public class FileTimeTracker {
 		}
 		if(index > 0) result = this.timedPlaylist.get(index-1);
 		return result;
+	}
+
+    public void onTick() {
+
+    	// Update timer
+    	this.runningTime++;
+    	System.out.println("FileTimeTracker: TickEvent@" + this.runningTime);
+    	
+    	// Check if there is next Videos to start
+    	if(this.hasNextVideo()) {
+    		System.out.println("Has next Video to play");
+    		FileAdditionalInfo item;
+    		System.out.println("Next Items:");
+    		while(this.hasNextVideo()) {
+    			item = this.getNextVideoItem();
+    			if(item != null) System.out.println("   * item:" + item.getFileName() + "@" + item.getTimestamp());
+    			else break;
+    		}
+    	}
+    	else {
+    		System.out.println("There isn't next videos to play");
+    	}
+    }
+	
+    public void start() {
+    	this.timer.start();
+    }
+    
+    public void stop() {
+    	this.timer.stop();
+    }
+    
+    public boolean isRunning() {
+    	return this.timer.isRunning();
+    }
+
+	public void resetTimer() {
+		this.runningTime = 0;
+		this.timer.restart();
+		this.timer.stop();
 	}
 }

@@ -590,6 +590,7 @@ public final class MainFrame extends BaseFrame {
 		videoSnapshot.setEnabled(playerRunning);
 		controlsPane.setEnabledComponents();
 		multiMediaPlayerComponent.setVisible(playerRunning);
+		multiMediaPlayerComponent.updateTimer(playerRunning);
 		
 		this.updateSelectedSpeedOption(playerRunning);
 		
