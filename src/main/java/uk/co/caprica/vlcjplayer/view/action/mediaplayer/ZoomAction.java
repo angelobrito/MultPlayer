@@ -39,6 +39,7 @@ final class ZoomAction extends MediaPlayerAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
+    	System.out.println("Zoom:" + this.zoom);
         mediaPlayer.setScale(zoom);
     }
 }

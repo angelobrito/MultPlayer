@@ -219,9 +219,9 @@ public class FileAdditionalInfo {
 	public boolean equals(FileAdditionalInfo toTest) {
 		if(this.channel != toTest.channel)                    return false;
 		else if(!this.fileName.equals(toTest.getFileName()))  return false;
-		else if(this.filePath.equals(toTest.getFilePath()))   return false;
-		else if(this.fileRegex.equals(toTest.getFileRegex())) return false;
-		else if(this.type.equals(toTest.getType()))           return false;
+		else if(!this.filePath.equals(toTest.getFilePath()))   return false;
+		else if(!this.fileRegex.equals(toTest.getFileRegex())) return false;
+		else if(!this.type.equals(toTest.getType()))           return false;
 		else if(this.getTimestamp() != toTest.getTimestamp()) return false;
 		else                                                  return true;
 	}

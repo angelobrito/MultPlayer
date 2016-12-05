@@ -47,9 +47,11 @@ public class MultiPlayerInstance extends MediaPlayerEventAdapter {
     
     private String mediaPath;
 	private String screenName;
+	private int channel;
 
-    public MultiPlayerInstance(EmbeddedMediaPlayer mediaPlayer, String screenName) {
-    	this.screenName = screenName;
+    public MultiPlayerInstance(EmbeddedMediaPlayer mediaPlayer, int channel) {
+    	this.channel = channel;
+    	this.screenName = "Channel #" + channel;
     	this.mediaPath = "";
         this.mediaPlayer = mediaPlayer;
         this.videoSurface = new Canvas();
@@ -92,7 +94,7 @@ public class MultiPlayerInstance extends MediaPlayerEventAdapter {
     public void finished(MediaPlayer mediaPlayer) {
         System.out.println("@Timestamp=" + mediaPlayer.getTime() + " - Screen[" + this.screenName + "] Finished playback");
         clearScreen();
-        application().checkContinuousPlay();
+        application().checkContinuousPlay(this.channel);
     }
 
     @Override

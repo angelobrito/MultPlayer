@@ -46,7 +46,6 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 	private static final long serialVersionUID = -6723807719374506428L;
 
 	private File mediaDirectory;
-	private ArrayList<ArrayList<FileAdditionalInfo>> mediaFilePath;
 	private String selectedFile;
 	private FileTimeTracker timeTracker;
 	private MainFrame containerFrame;
@@ -108,12 +107,11 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 		this.contentPane.removeAll();
 		this.contentPane.setLayout(new GridLayout(this.rowsNumber, this.columnsNumber, 16, 16));
 		this.timeTracker.resetRunningList();
-		this.mediaFilePath = new ArrayList<ArrayList<FileAdditionalInfo>>(application().getScreenQtt());
 		this.players     = new ArrayList<MultiPlayerInstance>(qttScreens);
 
 		for(int i = 0; i < application().getScreenQtt(); i++) {
 			EmbeddedMediaPlayer player = this.factory.newEmbeddedMediaPlayer(this.fullScreenStrategy);
-			MultiPlayerInstance playerInstance = new MultiPlayerInstance(player, ("#" + (i + 1)));
+			MultiPlayerInstance playerInstance = new MultiPlayerInstance(player, (i + 1));
 			playerInstance.setLogoImage(this.screenLogo.getImage());
 			playerInstance.enableLogo(true);
 			this.players.add(playerInstance);
@@ -125,7 +123,6 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 			playerPanel.add(playerInstance.videoSurface());
 
 			this.contentPane.add(playerPanel);
-			this.mediaFilePath.add(new ArrayList<FileAdditionalInfo>());
 		}
 	}
 
@@ -503,70 +500,69 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 				startDirRoot.getName().contains("Cam") ||
 				startDirRoot.getName().contains("Camera") ||
 				startDirRoot.getName().contains("Channel")) startDirRoot = startDirRoot.getParentFile(); 
+
+		// Add Related folder to be time tracked
 		timeTracker.addFoldersToTrack(startDirRoot);
 
 		// Get Related files to the selected one to be played now
 		ArrayList<FileAdditionalInfo> foundFiles = FileBrowser.getRelatedFiles(this.mediaDirectory, selectedFile);
 		
-		// Clear Previous Media
-		for(int i = 0; i < application().getScreenQtt(); i++) this.mediaFilePath.get(i).clear();
-
+		// Then add the selected File as the First RunningItem
+		FileAdditionalInfo selectedFileInfo = new FileAdditionalInfo(this.mediaDirectory + "\\" + selectedFile);
+		timeTracker.addRunningItem(selectedFileInfo);
+		
+		// Then For each Player
 		for(int i = 0; i < this.players.size(); i++) {
 			
+			// Get one of the Related Found files and add it for an available player
 			FileAdditionalInfo info;
-			int channel = -1;
-			
 			if(foundFiles.size() > 0) {
 				info = foundFiles.get(0);
 				foundFiles.remove(0);
-				channel = info.getChannel();
 			}
 			else info = null;
 
-			if(channel > 0 && channel <= this.mediaFilePath.size()) {
-				this.mediaFilePath.get(channel-1).add(info);
-				timeTracker.addRunningItem(info);
-			}
-			else {
-				if(!(this.mediaFilePath.get(i).size() > 0)) {
-					this.mediaFilePath.get(i).add(info);
-					timeTracker.addRunningItem(info);
-				}
-			}
+			// Add the found file to the Running Items (even null that is filtered by the function)
+			timeTracker.addRunningItem(info);
 		}
+		
+		// Then update the players media
 		this.updateScreensMedia();
 	}
 
 	private void updateScreensMedia() {
 		
 		ArrayList<Boolean> playersToVisit = new ArrayList<Boolean>(this.players.size());
-		for(int i = 0; i < this.players.size(); i++) playersToVisit.add(true);
-		
 		int queued = 0;
-		for (ArrayList<FileAdditionalInfo> channelFiles : this.mediaFilePath) {
-			if(channelFiles.size() > 0) {
-				FileAdditionalInfo info = channelFiles.get(0);
-				int channelNumber = 0;
-				String filePath = "";
-				
-				if(info != null) {
-					filePath = info.getFilePath();
-					channelNumber = info.getChannel();
-				}
-				
-				if(channelNumber > 0 && channelNumber <= this.players.size()) {
-					queued = channelNumber-1;
-				}
-				else {
-					
-					// For files that has no channels definition get the first free player 
-					queued = 0;
-					for(Boolean free : playersToVisit) {
-						if(free) break;
-						else queued = (queued+1)%this.players.size();
-					}
-				}
+		for(int i = 0; i < this.players.size(); i++) {
+			
+			playersToVisit.add(true);
+			
+			FileAdditionalInfo info = this.timeTracker.getNextVideoItem(i);
+			int channelNumber = -1;
+			String filePath = "";
 
+			// If there is a valid file fetch its info
+			if(info != null) {
+				filePath = info.getFilePath();
+				channelNumber = info.getChannel();
+			}
+			
+			// Check if the video file has a predefined valid channel otherwise uses queued mode
+			if(channelNumber > 0 && channelNumber <= this.players.size()) {
+				queued = channelNumber-1;
+			}
+			else {
+				
+				// For files that has no channels definition get the first free player 
+				queued = 0;
+				for(MultiPlayerInstance free : this.players) {
+					if(isPlayerFree(free)) break;
+					else queued++;
+				}
+			}
+
+			if(queued < this.players.size()) {
 				this.players.get(queued).prepareMedia(filePath);
 				this.players.get(queued).setVideoSurface(this.factory.newVideoSurface(this.players.get(queued).videoSurface()));
 				this.players.get(queued).enableLogo(filePath.equals(""));
@@ -607,6 +603,15 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 					) ) break;
 		}
 		return result;
+	}
+	
+	public boolean isPlayerFree(MultiPlayerInstance player) {
+		libvlc_state_t state = player.getMediaState();
+		if(!player.isPlayable()) return true;
+		else if(!player.isPlaying()) return true;
+		else if(!state.toString().equalsIgnoreCase("libvlc_Playing") &&
+				!state.toString().equalsIgnoreCase("libvlc_Paused")) return true;
+		else return false;
 	}
 	
 	public void resume() {
@@ -809,21 +814,29 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 			fileName = outputFileDirectoryPath + "\\screenshot" + incremental + ".png"; 
 		}
 	}
+	
+	public boolean hasPreviousToPlay(int channel) {
+		return this.timeTracker.hasPreviousVideo(channel);
+	}
+	
+	public boolean hasPreviousToPlay() {
+		return this.timeTracker.hasPreviousVideo();
+	}
 
 	public boolean hasNextToPlay() {
 		return this.timeTracker.hasNextVideo();
 	}
-	
-	public FileAdditionalInfo getNextVideo() {
-		return this.timeTracker.getNextVideoItem();
-	}
-	
-	public FileAdditionalInfo getPreviousVideo() {
-		return this.timeTracker.getPreviousVideoItem();
-	}
 
-	public boolean hasPreviousToPlay() {
-		return this.timeTracker.hasPreviousVideo();
+	public boolean hasNextToPlay(int channel) {
+		return this.timeTracker.hasNextVideo(channel);
+	}
+	
+	public FileAdditionalInfo getNextVideo(int channel) {
+		return this.timeTracker.getNextVideoItem(channel);
+	}
+	
+	public FileAdditionalInfo getPreviousVideo(int channel) {
+		return this.timeTracker.getPreviousVideoItem(channel);
 	}
 
 	public void startTimer() {

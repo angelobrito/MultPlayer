@@ -315,7 +315,7 @@
     <ROW File="msvcr100.dll" Component_="msvcr100.dll" FileName="msvcr100.dll" Attributes="0" SourcePath="C:\Program Files (x86)\Java\jre1.8.0_111\bin\msvcr100.dll" SelfReg="false" NextFile="msvcr120.dll"/>
     <ROW File="msvcr100.dll_1" Component_="msvcr100.dll_1" FileName="msvcr100.dll" Attributes="0" SourcePath="C:\Program Files (x86)\Java\jre1.8.0_111\bin\plugin2\msvcr100.dll" SelfReg="false" NextFile="npjp2.dll"/>
     <ROW File="msvcr120.dll" Component_="msvcr120.dll" FileName="msvcr120.dll" Attributes="0" SourcePath="C:\Program Files (x86)\Java\jre1.8.0_111\bin\msvcr120.dll" SelfReg="false" NextFile="net.dll"/>
-    <ROW File="multTecnologiaplayer1.1.3.jar" Component_="multTecnologiaplayer1.1.2.jar" FileName="MULT-T~2.JAR|mult-Tecnologia-player-1.1.3.jar" Attributes="0" SourcePath="mult-Tecnologia-player-1.1.3.jar" SelfReg="false"/>
+    <ROW File="multTecnologiaplayer1.1.3.jar" Component_="multTecnologiaplayer1.1.2.jar" FileName="MULT-T~2.JAR|mult-Tecnologia-player-1.1.3.jar" Attributes="0" SourcePath="..\target\mult-Tecnologia-player-1.1.3.jar" SelfReg="false"/>
     <ROW File="nashorn.jar" Component_="accessbridge32.jar" FileName="nashorn.jar" Attributes="0" SourcePath="C:\Program Files (x86)\Java\jre1.8.0_111\lib\ext\nashorn.jar" SelfReg="false" NextFile="sunec.jar"/>
     <ROW File="net.dll" Component_="net.dll" FileName="net.dll" Attributes="0" SourcePath="C:\Program Files (x86)\Java\jre1.8.0_111\bin\net.dll" SelfReg="false" NextFile="nio.dll"/>
     <ROW File="net.properties" Component_="accessibility.properties" FileName="NET~1.PRO|net.properties" Attributes="0" SourcePath="C:\Program Files (x86)\Java\jre1.8.0_111\lib\net.properties" SelfReg="false" NextFile="plugin.jar"/>

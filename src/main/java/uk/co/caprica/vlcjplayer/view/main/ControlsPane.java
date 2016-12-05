@@ -232,7 +232,9 @@ final class ControlsPane extends BasePanel {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				application().playNextItem();
+				System.out.println("ControlPane: pressed next Item");
+				// TODO
+				//application().playNextItem();
 			}
 		});
 		
@@ -240,7 +242,9 @@ final class ControlsPane extends BasePanel {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				application().playPreviousItem();
+				System.out.println("ControlPane: pressed previous Item");
+				// TODO
+				//application().playPreviousItem();
 			}
 		});
 	}
@@ -313,7 +317,7 @@ final class ControlsPane extends BasePanel {
 			playPauseButton.setIcon(playIcon);
 		}
 		positionPane.setEnabled(newState);
-		nextButton.setEnabled(newState && application().hasNextToPlay());
+		nextButton.setEnabled(newState && application().hasNextToPlay(0));
 		stopButton.setEnabled(newState);
 		previousButton.setEnabled(newState && application().hasPreviousToPlay());
 		fullscreenButton.setEnabled(newState);

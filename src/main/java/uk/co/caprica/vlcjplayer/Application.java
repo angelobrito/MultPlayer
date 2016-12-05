@@ -179,11 +179,11 @@ public final class Application {
 		return this.multiMediaPlayerComponent;
 	}
 	
-	public void checkContinuousPlay() {
+	public void checkContinuousPlay(int channel) {
 		System.out.println("Application to check continuous play...");
-		if(this.hasNextToPlay()) {
+		if(this.hasNextToPlay(channel)) {
 			System.out.println("Application identifyed that there is next element to play on list");
-			this.playNextItem();
+			this.playNextItem(channel);
 		}
 	}
 	
@@ -194,17 +194,25 @@ public final class Application {
 	public boolean hasNextToPlay() {
 		return ((MultiScreensHandler) ((MainFrame) this.mainFrame).getPlayerHandler()).hasNextToPlay();
 	}
+	
+	public boolean hasNextToPlay(int channel) {
+		return ((MultiScreensHandler) ((MainFrame) this.mainFrame).getPlayerHandler()).hasNextToPlay(channel);
+	}
 
 	public boolean hasPreviousToPlay() {
 		return ((MultiScreensHandler) ((MainFrame) this.mainFrame).getPlayerHandler()).hasPreviousToPlay();
 	}
-
-	public void playNextItem() {
-		System.out.println("Next Video Item to play={" + this.multiMediaPlayerComponent.getNextVideo().getFileName() + "}");
+	
+	public boolean hasPreviousToPlay(int channel) {
+		return ((MultiScreensHandler) ((MainFrame) this.mainFrame).getPlayerHandler()).hasPreviousToPlay(channel);
 	}
 
-	public void playPreviousItem() {
-		System.out.println("Previous Video Item to play={" + this.multiMediaPlayerComponent.getPreviousVideo().getFileName() + "}");
+	public void playNextItem(int channel) {
+		System.out.println("Next Video Item to play={" + this.multiMediaPlayerComponent.getNextVideo(channel).getFileName() + "}");
+	}
+
+	public void playPreviousItem(int channel) {
+		System.out.println("Previous Video Item to play={" + this.multiMediaPlayerComponent.getPreviousVideo(channel).getFileName() + "}");
 	}
 
 	public void removeFromRunningItems(String mediaPath) {

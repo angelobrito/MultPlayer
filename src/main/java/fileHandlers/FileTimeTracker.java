@@ -26,15 +26,14 @@ public class FileTimeTracker {
 	private long startTimestamp; // since January 1, 1970 UTC
 	private long allVideosLength;
 	private long runningTime;
-	private ArrayList<FileAdditionalInfo> timedPlaylist;
-	private ArrayList<ArrayList<FileAdditionalInfo>> runningItems;
+	private ArrayList<ArrayList<FileAdditionalInfo>> timedPlaylist;
+	private ArrayList<FileAdditionalInfo> runningItems;
 	private Timer timer;
 	
 	public FileTimeTracker() {
 		this.startTimestamp = 0;
 		this.allVideosLength = 0;
 		this.runningTime = 0;
-		this.timedPlaylist = new ArrayList<FileAdditionalInfo>();
 		resetRunningList();
 		
 		// the timer variable must be a javax.swing.Timer
@@ -47,9 +46,11 @@ public class FileTimeTracker {
 	}
 	
 	public void resetRunningList() {
-		this.runningItems = new ArrayList<ArrayList<FileAdditionalInfo>>(application().getScreenQtt()+1);
-		for(int channel = 0; channel < application().getScreenQtt(); channel++) {
-			this.runningItems.add(new ArrayList<FileAdditionalInfo>());
+		this.timedPlaylist = new ArrayList<ArrayList<FileAdditionalInfo>>();
+		this.runningItems  = new ArrayList<FileAdditionalInfo>(application().getScreenQtt()+1);
+		for(int channel = 0; channel <= application().getScreenQtt(); channel++) {
+			this.timedPlaylist.add(new ArrayList<FileAdditionalInfo>());
+			this.runningItems.add(null);
 		}
 	}
 	
@@ -71,22 +72,46 @@ public class FileTimeTracker {
 	
 	public boolean hasPreviousVideo() {
 		boolean result = false;
-		for(int channel = 0; channel < application().getScreenQtt(); channel++) {
-			for(FileAdditionalInfo item : this.runningItems.get(channel)){
+		for(int channel = 0; channel < this.timedPlaylist.size(); channel++) {
+			for(FileAdditionalInfo item : this.timedPlaylist.get(channel)){
 				if(item != null && this.startTimestamp < item.getTimestamp()) result = true;
+				if(result) break;
 			}
+			if(result) break;
 		}
 		return result;
 	}
 	
+	public boolean hasPreviousVideo(int channel) {
+		boolean result = false;
+		for(FileAdditionalInfo item : this.timedPlaylist.get(channel)){
+			if(item != null && this.startTimestamp < item.getTimestamp()) result = true;
+			if(result) break;
+		}
+		return result;
+	}
+
 	public boolean hasNextVideo() {
 		boolean result = false;
-		for(int channel = 0; channel < application().getScreenQtt(); channel++) {
-			for(FileAdditionalInfo item : this.runningItems.get(channel)){
+		for(int channel = 0; channel < this.timedPlaylist.size(); channel++) {
+			for(FileAdditionalInfo item : this.timedPlaylist.get(channel)){
 				if(item != null && (item.getTimestamp() + this.getVideoLength(item)) < this.allVideosLength) {
 					result = true;
 				}
+				if(result) break;
 			}
+			if(result) break;
+		}
+		return result;
+	}
+
+	public boolean hasNextVideo(int channel) {
+		boolean result = false;
+		for(FileAdditionalInfo item : this.timedPlaylist.get(channel)){
+			if(item != null && (item.getTimestamp() + this.getVideoLength(item)) < this.allVideosLength) {
+				result = true;
+			}
+			if(result) break;
 		}
 		return result;
 	}
@@ -124,19 +149,22 @@ public class FileTimeTracker {
 	}
 
 	private void insertOnTimedList(FileAdditionalInfo childFileInfo) {
-		int index = this.timedPlaylist.size();
+		int channel = childFileInfo.getChannel();
+		if(channel < 0 || channel >= this.timedPlaylist.size()) channel = 0;
+		
+		int index = this.timedPlaylist.get(channel).size();
 		
 		// search for the point to insert this file
-		while(index > 0 && this.timedPlaylist.get(index-1).getTimestamp() > childFileInfo.getTimestamp()) {
+		while(index > 0 && this.timedPlaylist.get(channel).get(index-1).getTimestamp() > childFileInfo.getTimestamp()) {
 			index--;
 		}
 		
 		if(index >= 0) {
-			this.timedPlaylist.add(index, childFileInfo);
+			this.timedPlaylist.get(channel).add(index, childFileInfo);
 		}
 		else {
 			
-			this.timedPlaylist.add(childFileInfo);
+			this.timedPlaylist.get(channel).add(childFileInfo);
 		}
 		
 		// Whenever its the first element to be inserted update the first timestamp
@@ -163,33 +191,34 @@ public class FileTimeTracker {
 		int channel = -1;
 		if(info != null) {
 			channel = info.getChannel();
-			if(channel > 0 && channel < application().getScreenQtt()) this.runningItems.get(channel).add(info);
-			else this.runningItems.get(0).add(info);
+			if(!(channel > 0 && channel < this.runningItems.size())) channel = 0;
+			this.runningItems.add(channel, info);
 		}
 	}
 
-	public FileAdditionalInfo getNextVideoItem() {
+	public FileAdditionalInfo getNextVideoItem(int channel) {
 		FileAdditionalInfo result = null;
 		int index = 0;
-		for(FileAdditionalInfo item : this.timedPlaylist) {
+		for(FileAdditionalInfo item : this.timedPlaylist.get(channel)) {
+			FileAdditionalInfo toCheck = this.runningItems.get(channel);
+			if(item.equals(toCheck)) break;
 			index++;
-			if(item.equals(this.runningItems)) break;
 		}
 		if(index+1 < this.timedPlaylist.size()) {
-			result = this.timedPlaylist.get(index+1);
+			result = this.timedPlaylist.get(channel).get(index+1);
 		}
 		return result;
 	}
 
-	public FileAdditionalInfo getPreviousVideoItem() {
+	public FileAdditionalInfo getPreviousVideoItem(int channel) {
 		FileAdditionalInfo result = null;
 		int index = 0;
-		for(FileAdditionalInfo item : this.timedPlaylist){
+		for(FileAdditionalInfo item : this.timedPlaylist.get(channel)){
 			index++;
 			if(item.equals(this.runningItems)) break;
 		}
 		if(index > 0) {
-			result = this.timedPlaylist.get(index-1);
+			result = this.timedPlaylist.get(channel).get(index-1);
 		}
 		return result;
 	}
@@ -201,18 +230,23 @@ public class FileTimeTracker {
     	System.out.println("FileTimeTracker: TickEvent@" + this.runningTime);
     	System.out.println("RunningItems:");
     	for(int channel = 0; channel < application().getScreenQtt(); channel++){
-    		for(FileAdditionalInfo item : this.runningItems.get(channel)) {
+    		for(FileAdditionalInfo item : this.runningItems) {
     			System.out.println("   * Item[" + channel + "]:" + item.toString());
     		}
     		
     		// Check if there is next Videos to start
-    		if(this.hasNextVideo()) {
+    		if(this.hasNextVideo(channel)) {
     			System.out.println("Channel #" + channel + " has next Video to play");
-    			FileAdditionalInfo item;
+    			FileAdditionalInfo item = null;
     			System.out.println("Next Items:");
-    			while(this.hasNextVideo()) {
-    				item = this.getNextVideoItem();
-    				if(item != null) System.out.println("   * item:" + item.getFileName() + "@" + item.getTimestamp());
+    			while(this.hasNextVideo(channel)) {
+    				
+    				int index = 0;
+    				while(item == null) {
+    					item = this.getNextVideoItem(index);
+    					index++;
+    				}
+    				if(item != null) System.out.println("   * item:" + item.getFileName().toString());
     				else break;
     			}
     		}
@@ -244,13 +278,18 @@ public class FileTimeTracker {
 	public void removeFromRunningItems(String mediaPath) {
 		FileAdditionalInfo removeItem = new FileAdditionalInfo(mediaPath);
 		System.out.println("To remove item:" + removeItem.toString());
-		for(FileAdditionalInfo item : this.runningItems.get(removeItem.getChannel())) {
-			if(removeItem.equals(item)) {
-				if(this.runningItems.remove(item)) System.out.println("   ---Removed");
-			}
+		int channel = removeItem.getChannel();
+		if(!(channel > 0 && channel < this.runningItems.size())) channel = 0;
+
+		FileAdditionalInfo itemToRemove = this.runningItems.get(channel);
+		if(removeItem.equals(itemToRemove)) {
+			if(this.runningItems.remove(itemToRemove)) System.out.println("   ---Removed");
+			this.runningItems.add(channel, null);
 		}
+		
+		// FIXME just for debug should be removed
 		System.out.println("After remove RunningItems:");
-    	for(FileAdditionalInfo item : this.runningItems.get(removeItem.getChannel())) {
+    	for(FileAdditionalInfo item : this.runningItems) {
     		System.out.println("   * Item:" + item.toString());
     	}
 	}
