@@ -40,7 +40,7 @@ public class FileBrowser {
 		return files;
 	}
 	
-	public boolean isValidVideoFile(File file){
+	public static boolean isValidVideoFile(File file){
 
 		String fileName;      
 		String fileExtension = ""; 

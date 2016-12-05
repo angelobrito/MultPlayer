@@ -206,4 +206,8 @@ public final class Application {
 	public void playPreviousItem() {
 		System.out.println("Previous Video Item to play={" + this.multiMediaPlayerComponent.getPreviousVideo().getFileName() + "}");
 	}
+
+	public void removeFromRunningItems(String mediaPath) {
+		this.multiMediaPlayerComponent.removeFromRunningItems(mediaPath);
+	}
 }

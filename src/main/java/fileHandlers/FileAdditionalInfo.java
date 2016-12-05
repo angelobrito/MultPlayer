@@ -1,5 +1,6 @@
 package fileHandlers;
 
+import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.DateFormat;
@@ -30,8 +31,22 @@ public class FileAdditionalInfo {
 		
 		this.processFileName(this.fileName);
 	}
+	
+	public FileAdditionalInfo(File file) {
+		this.channel = -1;
+		this.date = null;
+		this.type = "";
+		this.prefix = "";
+		this.fileRegex = "";
+		this.filePath = file.getAbsolutePath();
+		
+		Path path = Paths.get(this.filePath);
+		this.fileName = path.getFileName().toString();
+		
+		this.processFileName(this.fileName);
+	}
 
-	public boolean hasPath(String filePath2) {
+	public boolean hasPath(String filePath) {
 		return false;
 	}
 
@@ -75,7 +90,7 @@ public class FileAdditionalInfo {
 			
 			//  Regex = Prefix +      date      + sufix (timestamp.fileType)
 			this.fileRegex = this.prefix  + fileName.substring(4, 24);
-			System.out.println("Pattern1={" + this.prefix + ", " + this.getChannel() + ", " + this.getType() + ", " + this.getDate() + ", " + this.getTime() + "}");
+			System.out.println("Pattern1=" + this.toString());
 		}
 		else if(pattern2.matcher(fileName).matches()) {
 			
@@ -95,7 +110,46 @@ public class FileAdditionalInfo {
 
 			//  Regex = Prefix +      date      + sufix (timestamp.fileType)
 			this.fileRegex = fileName;
-			System.out.println("Pattern2={" + this.prefix + ", " + this.getChannel() + ", " + this.getType() + ", " + this.getDate() + ", " + this.getTime() + "}");
+			
+			// Try to fetch this file channel from the parent folder
+			File parentFile = new File(this.filePath).getParentFile();
+			if(parentFile.getName().contains("channel")) {
+				System.out.println("Parent file with channel" + parentFile.getName());
+			}
+			else if(parentFile.getName().contains("camera")) {
+				String operation = parentFile.getName();
+				operation = operation.replace("camera", "");
+				this.channel = Integer.parseInt(operation);
+				System.out.println("Parent file with camera:" + parentFile.getName() + ", operation:" + operation);
+			}
+			else if(parentFile.getName().contains("cam")) {
+				String operation = parentFile.getName();
+				operation = operation.replace("cam", "");
+				this.channel = Integer.parseInt(operation);
+				System.out.println("Parent file with cam:" + parentFile.getName() + ", operation:" + operation);
+			}
+			else if(parentFile.getName().contains("Camera")) {
+				String operation = parentFile.getName();
+				operation = operation.replace("Camera", "");
+				this.channel = Integer.parseInt(operation);
+				System.out.println("Parent file with Camera:" + parentFile.getName() + ", operation:" + operation);
+			}
+			else if(parentFile.getName().contains("Cam")) {
+				String operation = parentFile.getName();
+				operation = operation.replace("Cam", "");
+				this.channel = Integer.parseInt(operation);
+				System.out.println("Parent file with Cam:" + parentFile.getName() + ", operation:" + operation);
+			}
+			else if(parentFile.getName().contains("CAM")) {
+				String operation = parentFile.getName();
+				operation = operation.replace("CAM", "");
+				this.channel = Integer.parseInt(operation);
+				System.out.println("Parent file with CAM:" + parentFile.getName() + ", operation:" + operation);
+			}
+			else {
+				System.out.println("Parent file does not identify a channel.");
+			}
+			System.out.println("Pattern2=" + this.toString());
 		}
 		else {
 			
@@ -105,11 +159,24 @@ public class FileAdditionalInfo {
 			if(!fileName.equals("")) this.type = fileName.substring(fileName.length()-3, fileName.length());
 			else this.type = "";
 			this.fileRegex = fileName;
-			System.out.println("No Pattern={" + fileName + "}");
+			
+			// Try to fetch this file channel from the parent folder
+			File parentFile = new File(this.filePath).getParentFile();
+			System.out.println("filePath=" + this.filePath );
+//			if(parentFile.getName().contains("channel")) {
+//				System.out.println("Parent file with channel" + parentFile.getName());
+//			}
+//			else if(parentFile.getName().contains("cam")) {
+//				System.out.println("Parent file with cam" + parentFile.getName());
+//			}
+//			else {
+//				System.out.println("Parent file does not identify a channel.");
+//			}
+			System.out.println("No Pattern=" + this.toString());
 		}
 	}
 
-	private String getType() {
+	public String getType() {
 		return this.type;
 	}
 
@@ -142,5 +209,20 @@ public class FileAdditionalInfo {
 	public long getTimestamp() {
 		if(this.date != null) return this.date.getTimeInMillis();
 		else return 0;
+	}
+	
+	@Override
+	public String toString() {
+		return "{FileName:" + this.fileName + ", Channel:" + this.channel + ", Timestamp:" + this.getTimestamp() + ", Regex:" + this.fileRegex  + ", Path:" + this.filePath + "}";
+	}
+	
+	public boolean equals(FileAdditionalInfo toTest) {
+		if(this.channel != toTest.channel)                    return false;
+		else if(!this.fileName.equals(toTest.getFileName()))  return false;
+		else if(this.filePath.equals(toTest.getFilePath()))   return false;
+		else if(this.fileRegex.equals(toTest.getFileRegex())) return false;
+		else if(this.type.equals(toTest.getType()))           return false;
+		else if(this.getTimestamp() != toTest.getTimestamp()) return false;
+		else                                                  return true;
 	}
 }

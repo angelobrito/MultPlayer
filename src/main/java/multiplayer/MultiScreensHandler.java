@@ -80,7 +80,6 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 		this.contentPane.setBackground(Color.BLACK);
 		this.contentPane.setVisible(false);
 		this.contentPane.setBorder(new EmptyBorder(16, 16, 16, 16));
-		this.contentPane.setLayout(new GridLayout(this.rowsNumber, this.columnsNumber, 16, 16));
 		
 		setNewScreensLayout(application().getScreenQtt());
 
@@ -93,25 +92,22 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 	public void setNewScreensLayout(int qttScreens) {
 
 		// Calculate the number of Rows and Columns that
-		this.rowsNumber = 0;
-		this.columnsNumber = 0;
-		boolean rows = false;
+		this.rowsNumber = 1;
+		this.columnsNumber = 1;
 
-		do{
-			if(!rows) {
+		while((this.rowsNumber * this.columnsNumber) < qttScreens) {
+			if( (this.rowsNumber%2) != 0) {
 				this.rowsNumber++;
-				rows = true;
 			}
 			else {
 				this.columnsNumber++;
-				rows = false;
 			}
 			System.out.println("qttScreen[" + qttScreens + "] Debug={rows=" + this.rowsNumber + ", collums=" + this.columnsNumber + "}");
 		}
-		while((this.rowsNumber * this.columnsNumber) < qttScreens);
 
 		this.contentPane.removeAll();
-		
+		this.contentPane.setLayout(new GridLayout(this.rowsNumber, this.columnsNumber, 16, 16));
+		this.timeTracker.resetRunningList();
 		this.mediaFilePath = new ArrayList<ArrayList<FileAdditionalInfo>>(application().getScreenQtt());
 		this.players     = new ArrayList<MultiPlayerInstance>(qttScreens);
 
@@ -503,6 +499,9 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 		File startDirRoot = this.mediaDirectory;
 		while(startDirRoot.getName().contains("channel") || 
 				startDirRoot.getName().contains("cam") ||
+				startDirRoot.getName().contains("camera") ||
+				startDirRoot.getName().contains("Cam") ||
+				startDirRoot.getName().contains("Camera") ||
 				startDirRoot.getName().contains("Channel")) startDirRoot = startDirRoot.getParentFile(); 
 		timeTracker.addFoldersToTrack(startDirRoot);
 
@@ -838,5 +837,9 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 	public void updateTimer(boolean state) {
 		if(state) this.timeTracker.start();
 		else this.timeTracker.stop();
+	}
+
+	public void removeFromRunningItems(String mediaPath) {
+		this.timeTracker.removeFromRunningItems(mediaPath);
 	}
 }

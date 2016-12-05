@@ -109,6 +109,7 @@ public class MultiPlayerInstance extends MediaPlayerEventAdapter {
     public void clearScreen() {
     	System.out.println("@Timestamp=" + mediaPlayer.getTime() + " - Screen[" + this.screenName + "] TODO Clear Screen");
     	this.mediaPlayer.enableLogo(true);
+    	application().removeFromRunningItems(this.mediaPath);
     	application().post(StoppedEvent.INSTANCE);
     }
     
