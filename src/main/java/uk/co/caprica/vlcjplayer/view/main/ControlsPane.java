@@ -312,9 +312,9 @@ final class ControlsPane extends BasePanel {
 			playPauseButton.setIcon(playIcon);
 		}
 		positionPane.setEnabled(newState);
-		nextButton.setEnabled(newState && application().hasNextToPlay());
+		nextButton.setEnabled(newState && application().hasNextToPlay() && false); //FIXME
 		stopButton.setEnabled(newState);
-		previousButton.setEnabled(newState && application().hasPreviousToPlay());
+		previousButton.setEnabled(newState && application().hasPreviousToPlay() && false); //FIXME
 		fullscreenButton.setEnabled(newState);
 		effectsButton.setEnabled(newState);
 		snapshotButton.setEnabled(newState);

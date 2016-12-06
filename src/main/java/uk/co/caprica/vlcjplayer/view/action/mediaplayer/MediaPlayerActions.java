@@ -57,16 +57,16 @@ public final class MediaPlayerActions {
     private final Action       videoSnapshotAction;
 
     public MediaPlayerActions(MultiScreensHandler mediaPlayer) {
-        playbackSpeedActions    = newPlaybackSpeedActions   (mediaPlayer.getHeadPlayer());
-        playbackSkipActions     = newPlaybackSkipActions    (mediaPlayer.getHeadPlayer());
-        playbackChapterActions  = newPlaybackChapterActions (mediaPlayer.getHeadPlayer());
-        playbackControlActions  = newPlaybackControlActions (mediaPlayer.getHeadPlayer());
-        audioStereoModeActions  = newAudioStereoModeActions (mediaPlayer.getHeadPlayer());
-        audioControlActions     = newAudioControlActions    (mediaPlayer.getHeadPlayer());
-        videoQuantityActions    = newVideoQuantityActions   (mediaPlayer.getHeadPlayer());
-        videoZoomActions        = newVideoZoomActions       (mediaPlayer.getHeadPlayer());
-        videoAspectRatioActions = newVideoAspectRatioActions(mediaPlayer.getHeadPlayer());
-        videoCropActions        = newVideoCropActions       (mediaPlayer.getHeadPlayer());
+        playbackSpeedActions    = newPlaybackSpeedActions   (mediaPlayer.getMediaPlayer());
+        playbackSkipActions     = newPlaybackSkipActions    (mediaPlayer.getMediaPlayer());
+        playbackChapterActions  = newPlaybackChapterActions (mediaPlayer.getMediaPlayer());
+        playbackControlActions  = newPlaybackControlActions (mediaPlayer.getMediaPlayer());
+        audioStereoModeActions  = newAudioStereoModeActions (mediaPlayer.getMediaPlayer());
+        audioControlActions     = newAudioControlActions    (mediaPlayer.getMediaPlayer());
+        videoQuantityActions    = newVideoQuantityActions   (mediaPlayer.getMediaPlayer());
+        videoZoomActions        = newVideoZoomActions       (mediaPlayer.getMediaPlayer());
+        videoAspectRatioActions = newVideoAspectRatioActions(mediaPlayer.getMediaPlayer());
+        videoCropActions        = newVideoCropActions       (mediaPlayer.getMediaPlayer());
 
         playbackPlayAction      = new PlayAction    (resource("menu.playback.item.play" ), mediaPlayer.getHeadPlayer());
         playbackStopAction      = new StopAction    (resource("menu.playback.item.stop" ), mediaPlayer.getHeadPlayer());

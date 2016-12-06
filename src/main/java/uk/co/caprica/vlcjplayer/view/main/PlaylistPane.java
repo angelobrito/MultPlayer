@@ -35,6 +35,7 @@ import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
 import javax.swing.SwingWorker;
+import javax.swing.Timer;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
@@ -57,10 +58,13 @@ public class PlaylistPane extends FileBrowser {
 
 	/** Directory listing */
 	private JProgressBar progressBar;
+	
+	private Timer updater;
 
 	public PlaylistPane() {
 		super();
 		application().getMediaPlayerComponent().setMediaDirectory(System.getProperty("user.home"));
+		// TODO insert a updater to always check the File list from time to time
 	}    
 
 	public void updateDirectoryTree(File workingDirectoryPath) {

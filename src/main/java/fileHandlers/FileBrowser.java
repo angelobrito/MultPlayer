@@ -10,6 +10,8 @@ import java.util.Arrays;
 
 import javax.swing.filechooser.FileSystemView;
 
+import uk.co.caprica.vlcj.runtime.RuntimeUtil;
+
 public class FileBrowser {
 
 	/** Title of the application */
@@ -27,7 +29,26 @@ public class FileBrowser {
 	public File[] getRoots() {
 		
 		// FIXME I supose the getRoots always return the files on same order
-		return fileSystemView.getRoots();
+		ArrayList<File> rootList = new ArrayList<File>();
+		if (RuntimeUtil.isNix()) {
+			for(File dir : fileSystemView.getRoots()) {
+				rootList.add(dir);
+			}
+		}
+		else {
+			System.out.println("Root List:");
+			for(File dir : fileSystemView.getRoots()) {
+				System.out.println("   * rootItem: " + dir.getName());
+				for(File newDir : this.getFiles(dir)) {
+					if(newDir.isDirectory()) rootList.add(newDir);
+					System.out.println("      * subItem: " + newDir.getName());
+				}
+			}
+		}
+		
+		File[] cleanedRoots = new File[rootList.size()];
+		cleanedRoots = rootList.toArray(cleanedRoots);
+		return cleanedRoots;
 	}
 	
 	public File[] getFiles(File directory){

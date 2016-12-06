@@ -206,4 +206,12 @@ public final class Application {
 	public void playPreviousItem() {
 		System.out.println("Previous Video Item to play={" + this.multiMediaPlayerComponent.getPreviousVideo().getFileName() + "}");
 	}
+
+	public void setScale(float zoom) {
+		this.multiMediaPlayerComponent.setScale(zoom);
+	}
+
+	public void setAspectRatio(String aspectRatio) {
+		this.multiMediaPlayerComponent.setAspectRatio(aspectRatio);
+	}
 }

@@ -80,7 +80,7 @@ public class MultTecnologiaPlayer {
     	// This will locate LibVLC for the vast majority of cases
     	try {
     		NativeDiscovery env = new NativeDiscovery(); 
-    		if(!env.discover()) throw new Exception("Native Library não foi encontrada. Contact o administrador de sistemas.");
+    		if(!env.discover()) throw new Exception("Native Library não foi encontrada. Contate o administrador de sistemas.");
     	}
     	catch(Exception e){
     		JOptionPane.showMessageDialog(null, e.toString(), "Error",

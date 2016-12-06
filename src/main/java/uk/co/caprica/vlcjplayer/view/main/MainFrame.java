@@ -586,10 +586,11 @@ public final class MainFrame extends BaseFrame {
 
 		videoFullscreenAction.setEnabled(playerRunning);
 		videoZoomMenu.setEnabled(playerRunning);
-		videoCropMenu.setEnabled(playerRunning);
+		videoCropMenu.setEnabled(playerRunning && false); //FIXME
 		videoSnapshot.setEnabled(playerRunning);
 		controlsPane.setEnabledComponents();
 		multiMediaPlayerComponent.setVisible(playerRunning);
+		//multiMediaPlayerComponent.updateTimer(playerRunning);
 		
 		this.updateSelectedSpeedOption(playerRunning);
 		

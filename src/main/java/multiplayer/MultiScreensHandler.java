@@ -80,7 +80,6 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 		this.contentPane.setBackground(Color.BLACK);
 		this.contentPane.setVisible(false);
 		this.contentPane.setBorder(new EmptyBorder(16, 16, 16, 16));
-		this.contentPane.setLayout(new GridLayout(this.rowsNumber, this.columnsNumber, 16, 16));
 		
 		setNewScreensLayout(application().getScreenQtt());
 
@@ -111,7 +110,7 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 		while((this.rowsNumber * this.columnsNumber) < qttScreens);
 
 		this.contentPane.removeAll();
-		
+		this.contentPane.setLayout(new GridLayout(this.rowsNumber, this.columnsNumber, 16, 16));
 		this.mediaFilePath = new ArrayList<ArrayList<FileAdditionalInfo>>(application().getScreenQtt());
 		this.players     = new ArrayList<MultiPlayerInstance>(qttScreens);
 
@@ -153,7 +152,7 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 	}
 
 	public MediaPlayer getHeadPlayer() {
-		return this.players.get(this.selectedScreen).mediaPlayer();
+		return this.getMediaPlayer();
 	}
 
 	public File getMediaDirectory() {
@@ -823,5 +822,17 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 
 	public boolean hasPreviousToPlay() {
 		return this.timeTracker.hasPreviousVideo();
+	}
+
+	public void setScale(float zoom) {
+		for(MultiPlayerInstance player : this.players) {
+			player.setScale(zoom);
+		}
+	}
+
+	public void setAspectRatio(String aspectRatio) {
+		for(MultiPlayerInstance player : this.players) {
+			player.setAspectRatio(aspectRatio);
+		}
 	}
 }

@@ -257,5 +257,21 @@ public class MultiPlayerInstance extends MediaPlayerEventAdapter {
 	public float getRate() {
 		return this.mediaPlayer.getRate();
 	}
+
+	public float getScale() {
+		return this.mediaPlayer.getScale();
+	}
+	
+	public void setScale(float zoom) {
+		this.mediaPlayer.setScale(zoom);
+	}
+
+	public void setAspectRatio(String aspectRatio) {
+		this.mediaPlayer.setAspectRatio(aspectRatio);
+	}
+	
+	public String getAspectRatio() {
+		return this.mediaPlayer.getAspectRatio();
+	}
 }
 
