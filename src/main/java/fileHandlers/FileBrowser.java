@@ -36,12 +36,9 @@ public class FileBrowser {
 			}
 		}
 		else {
-			System.out.println("Root List:");
 			for(File dir : fileSystemView.getRoots()) {
-				System.out.println("   * rootItem: " + dir.getName());
 				for(File newDir : this.getFiles(dir)) {
 					if(newDir.isDirectory()) rootList.add(newDir);
-					System.out.println("      * subItem: " + newDir.getName());
 				}
 			}
 		}

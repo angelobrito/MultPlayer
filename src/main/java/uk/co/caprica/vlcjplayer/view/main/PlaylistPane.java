@@ -22,12 +22,17 @@ package uk.co.caprica.vlcjplayer.view.main;
 import static uk.co.caprica.vlcjplayer.Application.application;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -44,6 +49,8 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
+import org.apache.log4j.net.SyslogAppender;
+
 import fileHandlers.FileBrowser;
 import fileHandlers.FileTreeCellRenderer;
 
@@ -58,82 +65,62 @@ public class PlaylistPane extends FileBrowser {
 
 	/** Directory listing */
 	private JProgressBar progressBar;
-	
+
+	private static final int TIMER_DELAY = 5000;
 	private Timer updater;
+	private JScrollPane treeScroll;
+	private TreeSelectionListener treeSelectionListener;
+	private File[] roots;
 
 	public PlaylistPane() {
 		super();
 		application().getMediaPlayerComponent().setMediaDirectory(System.getProperty("user.home"));
-		// TODO insert a updater to always check the File list from time to time
+
+		treeSelectionListener = new TreeSelectionListener() {
+			@Override
+			public void valueChanged(TreeSelectionEvent tse){
+				DefaultMutableTreeNode node = (DefaultMutableTreeNode)tse.getPath().getLastPathComponent();
+				System.out.println("TreeselectedAction=" + tse.toString());
+				showChildren(node);
+
+				// This node.toString serves as the Absolut path to a then could be used in the exact same way as filechooser
+				File newSelectedFile = new File(node.toString());
+				if(newSelectedFile != null) {
+					((MainFrame) application().getMainFrame()).actOpenNewMedia(
+							new ActionEvent(
+									tse,
+									0,
+									"TreeSelectionEvent"
+									)
+							, newSelectedFile);
+				}
+			}
+		};
+
+		// the timer variable must be a javax.swing.Timer
+		// TIMER_DELAY is a constant int and = 35;
+		updater = new javax.swing.Timer(TIMER_DELAY, new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				onTimer();
+			}
+		});
+		updater.start();
 	}    
 
-	public void updateDirectoryTree(File workingDirectoryPath) {
-
-		this.navitageToDirectory(workingDirectoryPath);
-		DefaultMutableTreeNode node = new DefaultMutableTreeNode(workingDirectoryPath);
-		this.showChildren(node);
-	}
-
 	public void jTree1ValueChanged(TreeSelectionEvent tse ) {
-		
+
 		DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
 		if (node.isLeaf()) application().getMediaPlayerComponent().setSelectedFile(node.toString());;
 	}
-	
+
 	public Container getGui() {
 		if (gui==null) {
 			gui = new JPanel(new BorderLayout(3,3));
 			gui.setBorder(new EmptyBorder(5,5,5,5));
+			treeScroll = new JScrollPane();
 
 			// the File tree
-			DefaultMutableTreeNode root = new DefaultMutableTreeNode();
-			treeModel = new DefaultTreeModel(root);
-			JScrollPane treeScroll = new JScrollPane();
-
-			TreeSelectionListener treeSelectionListener = new TreeSelectionListener() {
-				@Override
-				public void valueChanged(TreeSelectionEvent tse){
-					DefaultMutableTreeNode node =
-							(DefaultMutableTreeNode)tse.getPath().getLastPathComponent();
-					showChildren(node);
-
-					// This node.toString serves as the Absolut path to a then could be used in the exact same way as filechooser
-					File newSelectedFile = new File(node.toString());
-					if(newSelectedFile != null) {
-						((MainFrame) application().getMainFrame()).actOpenNewMedia(
-								new ActionEvent(
-										tse,
-										0,
-										"TreeSelectionEvent"
-										)
-								, newSelectedFile);
-					}
-				}
-			};
-
-			// show the file system roots.
-			File[] roots = this.getRoots();
-			for (File fileSystemRoot : roots) {
-				DefaultMutableTreeNode node = new DefaultMutableTreeNode(fileSystemRoot);
-				root.add( node );
-				File[] files = this.getFiles(fileSystemRoot);
-				for (File file : files) {
-					if (file.isDirectory()) {
-						node.add(new DefaultMutableTreeNode(file));
-					}
-				}
-			}
-
-			tree = new JTree(treeModel);
-			tree.setRootVisible(false);
-			tree.addTreeSelectionListener(treeSelectionListener);
-			tree.setCellRenderer(new FileTreeCellRenderer());
-			tree.expandRow(0);
-			tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
-			treeScroll.setViewportView(tree);
-
-			// as per trashgod tip
-			tree.setVisibleRowCount(15);
+			createTree();
 
 			Dimension preferredSize = treeScroll.getPreferredSize();
 			Dimension widePreferred = new Dimension(
@@ -152,13 +139,43 @@ public class PlaylistPane extends FileBrowser {
 		}
 		return gui;
 	}
-	
+
+	public void createTree() {
+		DefaultMutableTreeNode root = new DefaultMutableTreeNode();
+		treeModel = new DefaultTreeModel(root);
+
+		// show the file system roots.
+		roots = this.getRoots();
+		for (File fileSystemRoot : roots) {
+			DefaultMutableTreeNode node = new DefaultMutableTreeNode(fileSystemRoot);
+			root.add( node );
+			File[] files = this.getFiles(fileSystemRoot);
+			for (File file : files) {
+				if (file.isDirectory()) {
+					node.add(new DefaultMutableTreeNode(file));
+				}
+			}
+		}
+
+		tree = new JTree(treeModel);
+		tree.setEditable(true);
+		tree.setRootVisible(false);
+		tree.setExpandsSelectedPaths(true);
+		tree.addTreeSelectionListener(treeSelectionListener);
+		tree.setCellRenderer(new FileTreeCellRenderer());
+		tree.expandRow(0);
+		tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+		treeScroll.setViewportView(tree);
+
+		// as per trashgod tip
+		tree.setVisibleRowCount(15);
+	}
+
 	public void showRootFile() {
-		
+
 		// ensure the main files are displayed
 		tree.setSelectionInterval(0,0);
 	}
-
 
 	public void showThrowable(Throwable t) {
 		t.printStackTrace();
@@ -227,22 +244,44 @@ public class PlaylistPane extends FileBrowser {
 		};
 		worker.execute();
 	}
+	
+	
 
-	/** Add the files that are contained within the directory of this node.
-    Thanks to Hovercraft Full Of Eels for the SwingWorker fix. */
-	public void navitageToDirectory(File newDirectoryPath) {
+	private void onTimer() {
 		tree.setEnabled(false);
 		progressBar.setVisible(true);
 		progressBar.setIndeterminate(true);
 
-		DefaultMutableTreeNode lastLeaf = new DefaultMutableTreeNode(newDirectoryPath);
-		TreePath path = new TreePath(lastLeaf.getPath());
-		tree.setSelectionPath(path);
-
+//		System.out.println("Updating the tree");
+//		DefaultMutableTreeNode goalNode = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
+//		TreePath path = tree.getSelectionPath();
+//		createTree();
+//		
+//		if(path != null) {
+//			System.out.println("Path=" + path.toString());
+//			for(int i = 0; i < path.getPathCount(); i++) {
+//				System.out.println("i=" + i + "/" + path.getPathCount());
+//				TreeSelectionEvent me = new TreeSelectionEvent(tree, path, true, null, path); 
+//			}
+//		}
+//		
+//		if(goalNode != null){
+//			File file = (File) goalNode.getUserObject();
+//			System.out.println("Selected node=" + goalNode.toString());
+//			for(int i = 0; i < tree.getRowCount(); i++){
+//				TreePath pathNew = tree.getPathForRow(i);
+//				if(path != null && 
+//						file.getAbsolutePath().contains(pathNew.getLastPathComponent().toString()) ||
+//						file.getAbsolutePath().equals(pathNew.getLastPathComponent().toString())) {
+//					System.out.println("Path[" + i + "]=" + pathNew.toString());
+//					tree.setSelectionRow(i);
+//				}
+//			}
+//		}
+		
 		progressBar.setIndeterminate(false);
 		progressBar.setVisible(false);
 		tree.setEnabled(true);
-		findTreePath(newDirectoryPath);
 	}
 
 	protected DefaultMutableTreeNode buildNodeFromString(File goal)

@@ -105,7 +105,6 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 				this.columnsNumber++;
 				rows = false;
 			}
-			System.out.println("qttScreen[" + qttScreens + "] Debug={rows=" + this.rowsNumber + ", collums=" + this.columnsNumber + "}");
 		}
 		while((this.rowsNumber * this.columnsNumber) < qttScreens);
 
@@ -502,6 +501,9 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 		File startDirRoot = this.mediaDirectory;
 		while(startDirRoot.getName().contains("channel") || 
 				startDirRoot.getName().contains("cam") ||
+				startDirRoot.getName().contains("camera") ||
+				startDirRoot.getName().contains("Cam") ||
+				startDirRoot.getName().contains("Camera") ||
 				startDirRoot.getName().contains("Channel")) startDirRoot = startDirRoot.getParentFile(); 
 		timeTracker.addFoldersToTrack(startDirRoot);
 
