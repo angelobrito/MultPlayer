@@ -53,7 +53,8 @@ public final class MediaPlayerActions {
 
     private final Action       playbackPlayAction;
     private final Action       playbackStopAction;
-
+    private final Action       playbackRecordAction;
+    
     private final Action       videoSnapshotAction;
 
     public MediaPlayerActions(MultiScreensHandler mediaPlayer) {
@@ -70,6 +71,7 @@ public final class MediaPlayerActions {
 
         playbackPlayAction      = new PlayAction    (resource("menu.playback.item.play" ), mediaPlayer.getHeadPlayer());
         playbackStopAction      = new StopAction    (resource("menu.playback.item.stop" ), mediaPlayer.getHeadPlayer());
+        playbackRecordAction    = new RecordAction  (resource("menu.playback.item.record" ), mediaPlayer.getHeadPlayer());
         videoSnapshotAction     = new SnapshotAction(resource("menu.video.item.snapshot"), mediaPlayer.getHeadPlayer());
     }
 
@@ -219,6 +221,10 @@ public final class MediaPlayerActions {
         return playbackStopAction;
     }
 
+    public Action playbackRecordAction() {
+        return playbackRecordAction;
+    }
+    
     public Action videoSnapshotAction() {
         return videoSnapshotAction;
     }

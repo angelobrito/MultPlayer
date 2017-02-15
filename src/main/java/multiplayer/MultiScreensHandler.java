@@ -5,10 +5,13 @@ import static uk.co.caprica.vlcjplayer.Application.application;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.GridLayout;
+import java.awt.Window;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
@@ -65,13 +68,12 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 	private boolean paused;
 
 	private JPanel contentPane;
-
+	
 	public MultiScreensHandler(JFrame containerFrame) {
 
 		this.containerFrame = (MainFrame) containerFrame;
 		this.factory     = new MediaPlayerFactory();
 		this.timeTracker = new FileTimeTracker();
-		this.fullScreenStrategy = new DefaultFullScreenStrategy(this.containerFrame);
 		this.screenLogo = new ImagePane(
 				ImagePane.Mode.CENTER, 
 				getClass().getResource("/MultTecnologia-logo.png"), 
@@ -80,6 +82,10 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 		this.contentPane.setBackground(Color.BLACK);
 		this.contentPane.setVisible(false);
 		this.contentPane.setBorder(new EmptyBorder(16, 16, 16, 16));
+		this.fullScreenStrategy = new DefaultFullScreenStrategy(new Window(this.containerFrame));
+		
+		// To deactivate unwanted borders
+		this.selectedScreen = -1;
 		
 		setNewScreensLayout(application().getScreenQtt());
 
@@ -114,20 +120,34 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 		this.players     = new ArrayList<MultiPlayerInstance>(qttScreens);
 
 		for(int i = 0; i < application().getScreenQtt(); i++) {
-			EmbeddedMediaPlayer player = this.factory.newEmbeddedMediaPlayer(this.fullScreenStrategy);
-			MultiPlayerInstance playerInstance = new MultiPlayerInstance(player, ("#" + (i + 1)));
+			MultiPlayerInstance playerInstance = new MultiPlayerInstance(("Screen #" + (i + 1)), this.factory, this.fullScreenStrategy);
 			playerInstance.setLogoImage(this.screenLogo.getImage());
 			playerInstance.enableLogo(true);
 			this.players.add(playerInstance);
 
 			JPanel playerPanel = new JPanel();
 			playerPanel.setLayout(new BorderLayout());
-			playerPanel.setBorder(new LineBorder(Color.white, 2));
+			if(i == this.selectedScreen) playerInstance.setBorder(new LineBorder(Color.YELLOW, 2));
+			else playerInstance.setBorder(new LineBorder(Color.WHITE, 2));
+			playerPanel.setBorder(playerInstance.getBorder());
 			playerPanel.setSize(this.contentPane.getSize());
+			playerInstance.setPlayerPanel(playerPanel);
 			playerPanel.add(playerInstance.videoSurface());
 
 			this.contentPane.add(playerPanel);
 			this.mediaFilePath.add(new ArrayList<FileAdditionalInfo>());
+		}
+	}
+	
+	public void updateScreensLayout() {
+		for(int i = 0; i < application().getScreenQtt(); i++) {
+			MultiPlayerInstance playerInstance = this.players.get(i);
+
+			JPanel playerPanel = playerInstance.getPlayerPanel();
+			if(i == this.selectedScreen) playerInstance.setBorder(new LineBorder(Color.YELLOW, 2));
+			else playerInstance.setBorder(new LineBorder(Color.WHITE, 2));
+			playerPanel.setBorder(playerInstance.getBorder());
+			playerPanel.setSize(this.contentPane.getSize());
 		}
 	}
 
@@ -172,12 +192,6 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 	public void run(){
 		this.start();
 	}
-
-	public void activateScreen(int screenNumber) {
-		//TODO New feature for future implementations: Change screen color and unmute
-		System.out.println("The not implemented function ::MultiScreensHandler.activateScreen(int screenNumber):: was called.");
-	}
-
 
 	@Override
 	public void mediaChanged(MediaPlayer mediaPlayer, libvlc_media_t media, String mrl) {
@@ -486,6 +500,14 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 	public EmbeddedMediaPlayer getSelectedScreen() {
 		return this.players.get(this.selectedScreen).mediaPlayer();
 	}
+	
+	public void setSelectedScreen(int screenNumber) {
+		System.out.println("Updating screenNumber=" + screenNumber);
+		this.selectedScreen = (screenNumber % application().getScreenQtt());
+
+		//FIXME fix the updated Border lines 
+		updateScreensLayout();
+	}
 
 	public String getSelectedFile() {
 		return selectedFile;
@@ -570,7 +592,7 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 				}
 
 				this.players.get(queued).prepareMedia(filePath);
-				this.players.get(queued).setVideoSurface(this.factory.newVideoSurface(this.players.get(queued).videoSurface()));
+				this.players.get(queued).updateVideoSurface();
 				this.players.get(queued).enableLogo(filePath.equals(""));
 				if(playersToVisit.size() > 0) {
 					playersToVisit.add(queued, false);
@@ -583,7 +605,7 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 
 			if(playersToVisit.get(i)) {
 				this.players.get(i).prepareMedia("");
-				this.players.get(i).setVideoSurface(this.factory.newVideoSurface(this.players.get(i).videoSurface()));
+				this.players.get(i).updateVideoSurface();
 				this.players.get(i).enableLogo(true);
 			}
 		}
@@ -594,9 +616,10 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 	}
 	
 	private boolean isRunningState() {
-		libvlc_state_t state = getMediaPlayerState();
-		return state.toString().equalsIgnoreCase("libvlc_Playing") ||
-				state.toString().equalsIgnoreCase("libvlc_Paused");
+		for(MultiPlayerInstance player : this.players) {
+			if(player.isRunningState()) return true;
+		}
+		return false;
 	}
 	
 	public libvlc_state_t getMediaPlayerState() {
@@ -609,6 +632,13 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 					) ) break;
 		}
 		return result;
+	}
+	
+	public boolean isRecording(){
+		for(MultiPlayerInstance player: this.players){
+			if(player.isRecording()) return true;
+		}
+		return false;
 	}
 	
 	public void resume() {
@@ -657,11 +687,9 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 	}
 
 	public void stop() {
-		for(int i = 0; i < this.players.size(); i++){
-
-			//System.out.println("Stop for=" + i);
-			this.players.get(i).stop();
-			//System.out.println("Player screen running?" + (this.players.get(i).mediaPlayer().isPlaying()));
+		for(MultiPlayerInstance player : this.players){
+			player.stop();
+			if(player.isRecording()) player.record();
 		}
 	}
 
@@ -835,6 +863,53 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 	public void setAspectRatio(String aspectRatio) {
 		for(MultiPlayerInstance player : this.players) {
 			player.setAspectRatio(aspectRatio);
+		}
+	}
+	
+	@Override
+	public void mouseClicked(java.awt.event.MouseEvent e) {
+		System.out.println("Clicked Screen #");
+		super.mouseClicked(e);
+	}
+
+	@Override
+	public void mousePressed(java.awt.event.MouseEvent e) {
+		System.out.println("Pressed Screen #");
+		super.mousePressed(e);
+	}
+
+	@Override
+	public void mouseReleased(java.awt.event.MouseEvent e) {
+		System.out.println("Released Screen #" );
+		super.mouseReleased(e);
+	}
+
+	@Override
+	public void mouseEntered(java.awt.event.MouseEvent e) {
+		System.out.println("Entered Screen #");
+		super.mouseEntered(e);
+	}
+
+	@Override
+	public void mouseExited(java.awt.event.MouseEvent e) {
+		System.out.println("Leaved Screen #");
+		super.mouseExited(e);
+	}
+
+	// FIXME record just the selected screen and not just screen 0
+	public void record() {
+		this.players.get(0).record();
+      
+//		for(MultiPlayerInstance player : this.players) {
+//			// TODO include an if or remove the for to just save the selected screen
+//			player.record();
+//		}
+	}
+
+	// FIXME record just the selected screen
+	public void stopRecord() {
+		for(int screen = 0; screen < application().getScreenQtt(); screen++) {
+			this.players.get(screen).stopRecord();
 		}
 	}
 }

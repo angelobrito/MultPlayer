@@ -34,6 +34,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JSlider;
+import javax.swing.JToggleButton;
 import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -104,6 +105,8 @@ final class ControlsPane extends BasePanel {
 
 	private final PositionPane positionPane;
 
+	private ToggleButton recordButton;
+
 	ControlsPane(MediaPlayerActions mediaPlayerActions) {
 
 		this.setMinimumSize(new Dimension(1200, 100));
@@ -120,6 +123,9 @@ final class ControlsPane extends BasePanel {
 		stopButton = new StandardButton();
 		stopButton.setAction(mediaPlayerActions.playbackStopAction());
 
+		recordButton = new ToggleButton();
+		recordButton.setAction(mediaPlayerActions.playbackRecordAction());
+		
 		nextButton = new StandardButton();
         nextButton.setIcon(nextIcon);
 		
@@ -173,6 +179,7 @@ final class ControlsPane extends BasePanel {
 		add(previousButton,   "Center, sg 2, al left, gap 30");
 		add(playPauseButton,  "Center, sg 2, al left, gap 5");
 		add(stopButton,       "Center, sg 2, al left, gap 5");
+		add(recordButton,     "Center, sg 2, al left, gap 5");
 		add(nextButton,       "Center, sg 2, al left, gap 5");
 		add(fullscreenButton, "Center, sg 2, al left, gap 5");
 		add(snapshotButton,   "Center, sg 2, al left, gap 5");
@@ -215,7 +222,8 @@ final class ControlsPane extends BasePanel {
 		fullscreenButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				application().getMediaPlayerComponent().getMediaPlayer().toggleFullScreen();
+				System.out.println("DEBUG Started FULLSCREEN");
+				application().getSelectedMediaPlayerComponent().toggleFullScreen();
 			}
 		});
 
@@ -292,6 +300,25 @@ final class ControlsPane extends BasePanel {
 			setHideActionText(true);
 		}
 	}
+	
+	private class ToggleButton extends JToggleButton {
+
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 9085852454690492593L;
+
+		private ToggleButton() {
+			setBorder(BorderFactory.createEmptyBorder(6, 6, 6, 6));
+			setHideActionText(true);
+		}
+		
+		@Override
+		public void setEnabled(boolean enable){
+			super.setEnabled(enable);
+			if(!enable) this.setSelected(enable);
+		}
+	}
 
 	private Icon newIcon(String name) {
 		return new ImageIcon(getClass().getResource("/icons/buttons/" + name + ".png"), name);
@@ -314,8 +341,9 @@ final class ControlsPane extends BasePanel {
 		positionPane.setEnabled(newState);
 		nextButton.setEnabled(newState && application().hasNextToPlay() && false); //FIXME
 		stopButton.setEnabled(newState);
+		recordButton.setEnabled(newState);
 		previousButton.setEnabled(newState && application().hasPreviousToPlay() && false); //FIXME
-		fullscreenButton.setEnabled(newState);
+		fullscreenButton.setEnabled(newState && false); // FIXME
 		effectsButton.setEnabled(newState);
 		snapshotButton.setEnabled(newState);
 		speedSlider.setEnabled(newState);

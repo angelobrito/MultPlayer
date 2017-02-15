@@ -11,10 +11,10 @@
     <ROW Property="ARPCONTACT" Value="Anderson_Nobrega@hotmail.com; angelo.brito@outlook.com.br"/>
     <ROW Property="ARPPRODUCTICON" Value="MultTecnologialogo.exe" Type="8"/>
     <ROW Property="Manufacturer" Value="Mult Tecnologia"/>
-    <ROW Property="ProductCode" Value="1033:{0AA19A09-56B7-4555-A7FA-23380A02562E} 1046:{FD1AA2C0-AC59-475C-ABD5-CD8C75FFFCC4} " Type="16"/>
+    <ROW Property="ProductCode" Value="1033:{FB103AA0-EAD8-4116-8447-FB0231320E25} 1046:{4B280AC1-14FE-4834-83FC-43CBC3DC9DF1} " Type="16"/>
     <ROW Property="ProductLanguage" Value="1033"/>
     <ROW Property="ProductName" Value="Mult Tecnologia Player"/>
-    <ROW Property="ProductVersion" Value="1.1.4" Type="32"/>
+    <ROW Property="ProductVersion" Value="1.1.5" Type="32"/>
     <ROW Property="SecureCustomProperties" Value="OLDPRODUCTS;AI_NEWERPRODUCTFOUND;AI_SETUPEXEPATH;SETUPEXEDIR"/>
     <ROW Property="UpgradeCode" Value="{2DC6DBB5-EF53-4D22-A727-EE9720F815B5}"/>
     <ROW Property="WindowsType9X" MultiBuildValue="DefaultBuild:Windows 9x/ME" ValueLocId="-"/>
@@ -196,7 +196,7 @@
     <ROW File="THIRDPARTYLICENSEREADMEJAVAFX.txt" Component_="COPYRIGHT" FileName="THIRDP~1.TXT|THIRDPARTYLICENSEREADME-JAVAFX.txt" Attributes="0" SourcePath="C:\Program Files (x86)\Java\jre1.8.0_111\THIRDPARTYLICENSEREADME-JAVAFX.txt" SelfReg="false" NextFile="THIRDPARTYLICENSEREADME.txt"/>
     <ROW File="US_export_policy.jar" Component_="blacklist" FileName="US_EXP~1.JAR|US_export_policy.jar" Attributes="0" SourcePath="C:\Program Files (x86)\Java\jre1.8.0_111\lib\security\US_export_policy.jar" SelfReg="false" NextFile="sound.properties"/>
     <ROW File="Uninstall.ico" Component_="multTecnologiaplayer1.1.2.jar" FileName="UNINST~1.ICO|Uninstall.ico" Attributes="0" SourcePath="..\src\main\resources\icons\Uninstall.ico" SelfReg="false" NextFile="vlc2.2.4win32.exe"/>
-    <ROW File="VLC.aip" Component_="VLC.aip" FileName="VLC.aip" Attributes="0" SourcePath="VLC\VLC.aip" SelfReg="false" NextFile="multTecnologiaplayer1.1.3.jar"/>
+    <ROW File="VLC.aip" Component_="VLC.aip" FileName="VLC.aip" Attributes="0" SourcePath="VLC\VLC.aip" SelfReg="false" NextFile="multTecnologiaplayer1.1.5.jar"/>
     <ROW File="Welcome.html" Component_="COPYRIGHT" FileName="WELCOM~1.HTM|Welcome.html" Attributes="0" SourcePath="C:\Program Files (x86)\Java\jre1.8.0_111\Welcome.html" SelfReg="false" NextFile="MultTecnologiaPlayer.exe"/>
     <ROW File="WindowsAccessBridge32.dll" Component_="WindowsAccessBridge32.dll" FileName="WINDOW~1.DLL|WindowsAccessBridge-32.dll" Attributes="0" SourcePath="C:\Program Files (x86)\Java\jre1.8.0_111\bin\WindowsAccessBridge-32.dll" SelfReg="false" NextFile="wsdetect.dll"/>
     <ROW File="Xusage.txt" Component_="classes.jsa" FileName="Xusage.txt" Attributes="0" SourcePath="C:\Program Files (x86)\Java\jre1.8.0_111\bin\client\Xusage.txt" SelfReg="false" NextFile="dcpr.dll"/>
@@ -315,12 +315,7 @@
     <ROW File="msvcr100.dll" Component_="msvcr100.dll" FileName="msvcr100.dll" Attributes="0" SourcePath="C:\Program Files (x86)\Java\jre1.8.0_111\bin\msvcr100.dll" SelfReg="false" NextFile="msvcr120.dll"/>
     <ROW File="msvcr100.dll_1" Component_="msvcr100.dll_1" FileName="msvcr100.dll" Attributes="0" SourcePath="C:\Program Files (x86)\Java\jre1.8.0_111\bin\plugin2\msvcr100.dll" SelfReg="false" NextFile="npjp2.dll"/>
     <ROW File="msvcr120.dll" Component_="msvcr120.dll" FileName="msvcr120.dll" Attributes="0" SourcePath="C:\Program Files (x86)\Java\jre1.8.0_111\bin\msvcr120.dll" SelfReg="false" NextFile="net.dll"/>
-<<<<<<< HEAD
-    <ROW File="multTecnologiaplayer1.1.3.jar" Component_="multTecnologiaplayer1.1.2.jar" FileName="MULT-T~2.JAR|mult-Tecnologia-player-1.1.3.jar" Attributes="0" SourcePath="mult-Tecnologia-player-1.1.3.jar" SelfReg="false" NextFile="multTecnologiaplayer1.1.4.jar"/>
-    <ROW File="multTecnologiaplayer1.1.4.jar" Component_="multTecnologiaplayer1.1.2.jar" FileName="MULT-T~1.JAR|mult-Tecnologia-player-1.1.4.jar" Attributes="0" SourcePath="..\target\mult-Tecnologia-player-1.1.4.jar" SelfReg="false"/>
-=======
-    <ROW File="multTecnologiaplayer1.1.3.jar" Component_="multTecnologiaplayer1.1.2.jar" FileName="MULT-T~2.JAR|mult-Tecnologia-player-1.1.3.jar" Attributes="0" SourcePath="..\target\mult-Tecnologia-player-1.1.3.jar" SelfReg="false"/>
->>>>>>> refs/heads/master
+    <ROW File="multTecnologiaplayer1.1.5.jar" Component_="multTecnologiaplayer1.1.2.jar" FileName="MULT-T~3.JAR|mult-Tecnologia-player-1.1.5.jar" Attributes="0" SourcePath="..\target\mult-Tecnologia-player-1.1.5.jar" SelfReg="false"/>
     <ROW File="nashorn.jar" Component_="accessbridge32.jar" FileName="nashorn.jar" Attributes="0" SourcePath="C:\Program Files (x86)\Java\jre1.8.0_111\lib\ext\nashorn.jar" SelfReg="false" NextFile="sunec.jar"/>
     <ROW File="net.dll" Component_="net.dll" FileName="net.dll" Attributes="0" SourcePath="C:\Program Files (x86)\Java\jre1.8.0_111\bin\net.dll" SelfReg="false" NextFile="nio.dll"/>
     <ROW File="net.properties" Component_="accessibility.properties" FileName="NET~1.PRO|net.properties" Attributes="0" SourcePath="C:\Program Files (x86)\Java\jre1.8.0_111\lib\net.properties" SelfReg="false" NextFile="plugin.jar"/>
@@ -498,7 +493,7 @@
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiIniFileComponent">
     <ROW IniFile="ApplicationType" FileName="MULTTE~2.INI|Mult Tecnologia Player.ini" DirProperty="APPDIR" Section="Application" Key="Application Type" Value="gui" Action="0" Component_="MultTecnologiaPlayer.exe"/>
-    <ROW IniFile="ClassPath" FileName="MULTTE~2.INI|Mult Tecnologia Player.ini" DirProperty="APPDIR" Section="Class Path" Key="Class Path" Value="[#multTecnologiaplayer1.1.4.jar];" Action="0" Component_="MultTecnologiaPlayer.exe"/>
+    <ROW IniFile="ClassPath" FileName="MULTTE~2.INI|Mult Tecnologia Player.ini" DirProperty="APPDIR" Section="Class Path" Key="Class Path" Value="[#multTecnologiaplayer1.1.5.jar];" Action="0" Component_="MultTecnologiaPlayer.exe"/>
     <ROW IniFile="FailureCheck" FileName="MULTTE~2.INI|Mult Tecnologia Player.ini" DirProperty="APPDIR" Section="Application" Key="Failure Check" Value="yes" Action="0" Component_="MultTecnologiaPlayer.exe"/>
     <ROW IniFile="MainClass" FileName="MULTTE~2.INI|Mult Tecnologia Player.ini" DirProperty="APPDIR" Section="Java Runtime Environment" Key="Main Class" Value="uk.co.caprica.vlcjplayer.MultTecnologiaPlayer" Action="0" Component_="MultTecnologiaPlayer.exe"/>
     <ROW IniFile="MaximumVersion" FileName="MULTTE~2.INI|Mult Tecnologia Player.ini" DirProperty="APPDIR" Section="Java Runtime Environment" Key="Maximum Version" Value="any" Action="0" Component_="MultTecnologiaPlayer.exe"/>

@@ -35,6 +35,7 @@ import javax.swing.SwingUtilities;
 import com.google.common.eventbus.EventBus;
 
 import multiplayer.MultiScreensHandler;
+import uk.co.caprica.vlcj.player.embedded.EmbeddedMediaPlayer;
 import uk.co.caprica.vlcjplayer.event.TickEvent;
 import uk.co.caprica.vlcjplayer.view.action.mediaplayer.MediaPlayerActions;
 import uk.co.caprica.vlcjplayer.view.main.MainFrame;
@@ -93,6 +94,10 @@ public final class Application {
     public void subscribe(Object subscriber) {
         eventBus.register(subscriber);
     }
+    
+    public boolean isRecording() {
+    	return multiMediaPlayerComponent.isRecording();
+    }
 
     public void post(Object event) {
         // Events are always posted and processed on the Swing Event Dispatch thread
@@ -113,6 +118,10 @@ public final class Application {
         return multiMediaPlayerComponent;
     }
 
+    public EmbeddedMediaPlayer getSelectedMediaPlayerComponent() {
+        return multiMediaPlayerComponent.getSelectedScreen();
+    }
+    
     public MediaPlayerActions mediaPlayerActions() {
         return mediaPlayerActions;
     }
