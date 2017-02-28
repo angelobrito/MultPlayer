@@ -54,6 +54,7 @@ public final class Application {
     private final EventBus eventBus;
     
     private int screenQtt;
+    private int chnSyncThreshold;
     
     private JFrame mainFrame;
 
@@ -80,6 +81,7 @@ public final class Application {
     private Application() {
         eventBus = new EventBus();
         screenQtt = 4;
+        chnSyncThreshold = 1;
         mainFrame = null;
         multiMediaPlayerComponent = null;
         mediaPlayerActions = null;
@@ -222,5 +224,13 @@ public final class Application {
 
 	public void setAspectRatio(String aspectRatio) {
 		this.multiMediaPlayerComponent.setAspectRatio(aspectRatio);
+	}
+
+	public int getchannelSyncThreshold() {
+		return this.chnSyncThreshold;
+	}
+
+	public void setChnSyncThreshold(int chnSyncThreshold) {
+		this.chnSyncThreshold = chnSyncThreshold;
 	}
 }

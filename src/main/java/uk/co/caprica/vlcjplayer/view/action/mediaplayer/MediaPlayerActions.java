@@ -47,6 +47,7 @@ public final class MediaPlayerActions {
     private final List<Action> audioControlActions;
 
     private final List<Action> videoQuantityActions;
+    private final List<Action> videoChnSyncActions;
     private final List<Action> videoZoomActions;
     private final List<Action> videoAspectRatioActions;
     private final List<Action> videoCropActions;
@@ -65,6 +66,7 @@ public final class MediaPlayerActions {
         audioStereoModeActions  = newAudioStereoModeActions (mediaPlayer.getMediaPlayer());
         audioControlActions     = newAudioControlActions    (mediaPlayer.getMediaPlayer());
         videoQuantityActions    = newVideoQuantityActions   (mediaPlayer.getMediaPlayer());
+        videoChnSyncActions     = newVideoChnSyncActions    (mediaPlayer.getMediaPlayer());
         videoZoomActions        = newVideoZoomActions       (mediaPlayer.getMediaPlayer());
         videoAspectRatioActions = newVideoAspectRatioActions(mediaPlayer.getMediaPlayer());
         videoCropActions        = newVideoCropActions       (mediaPlayer.getMediaPlayer());
@@ -82,6 +84,18 @@ public final class MediaPlayerActions {
         actions.add(new ScreenQuantityAction(resource("menu.video.item.quantity.item.4"    ), mediaPlayer, 4));
         actions.add(new ScreenQuantityAction(resource("menu.video.item.quantity.item.6"    ), mediaPlayer, 6));
         actions.add(new ScreenQuantityAction(resource("menu.video.item.quantity.item.8"    ), mediaPlayer, 8));
+        return ImmutableList.copyOf(actions);
+	}
+    
+    private List<Action> newVideoChnSyncActions(MediaPlayer mediaPlayer) {
+		List<Action> actions = new ArrayList<>();
+		actions.add(new ChnSyncAction(resource("menu.video.item.chnSync.item.0"    ), mediaPlayer, 0));
+		actions.add(new ChnSyncAction(resource("menu.video.item.chnSync.item.1"    ), mediaPlayer, 1));
+        actions.add(new ChnSyncAction(resource("menu.video.item.chnSync.item.2"    ), mediaPlayer, 2));
+        actions.add(new ChnSyncAction(resource("menu.video.item.chnSync.item.3"    ), mediaPlayer, 3));
+        actions.add(new ChnSyncAction(resource("menu.video.item.chnSync.item.4"    ), mediaPlayer, 4));
+        actions.add(new ChnSyncAction(resource("menu.video.item.chnSync.item.5"    ), mediaPlayer, 5));
+        actions.add(new ChnSyncAction(resource("menu.video.item.chnSync.item.6"    ), mediaPlayer, 6));
         return ImmutableList.copyOf(actions);
 	}
 
@@ -203,6 +217,10 @@ public final class MediaPlayerActions {
     
     public List<Action> videoQuantityActions() {
         return videoQuantityActions;
+    }
+    
+    public List<Action> videoChnSyncActions() {
+        return videoChnSyncActions;
     }
 
     public List<Action> videoAspectRatioActions() {

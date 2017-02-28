@@ -116,6 +116,7 @@ public final class MainFrame extends BaseFrame {
 
 	private final JMenu videoMenu;
 	private final JMenu videoQuantityMenu;
+	private final JMenu videoSyncMenu;
 	private final JMenu videoZoomMenu;
 	private final JMenu videoCropMenu;
 	private final JMenuItem videoSnapshot;
@@ -286,6 +287,13 @@ public final class MainFrame extends BaseFrame {
 		}
 		//videoQuantityMenu.setEnabled(false); // FIXME Enable this menu
 		videoMenu.add(videoQuantityMenu);
+		videoSyncMenu = new JMenu(resource("menu.video.item.chnSync").name());
+		videoSyncMenu.setMnemonic(resource("menu.video.item.chnSync").mnemonic());
+		for (Action action : mediaPlayerActions.videoChnSyncActions()) {
+			videoSyncMenu.add(new JCheckBoxMenuItem(action));
+		}
+		//videoQuantityMenu.setEnabled(false); // FIXME Enable this menu
+		videoMenu.add(videoSyncMenu);
 		videoMenu.add(new JCheckBoxMenuItem(videoAlwaysOnTopAction));
 		videoMenu.add(new JSeparator());
 		
@@ -477,8 +485,9 @@ public final class MainFrame extends BaseFrame {
 				prefs.getInt("frameWidth" , 800),
 				prefs.getInt("frameHeight", 600)
 				);
-		boolean alwaysOnTop = prefs.getBoolean("alwaysOnTop", false);
 		application().setScreenQuantity(prefs.getInt("screensQuantity", 4));
+		application().setChnSyncThreshold(prefs.getInt("chnSyncThreshold", 1));
+		boolean alwaysOnTop = prefs.getBoolean("alwaysOnTop", false);
 		setAlwaysOnTop(alwaysOnTop);
 		videoAlwaysOnTopAction.select(alwaysOnTop);
 		fileChooser.setCurrentDirectory(new File(prefs.get("chooserDirectory", ".")));
@@ -502,6 +511,7 @@ public final class MainFrame extends BaseFrame {
 			prefs.putInt    ("frameWidth"      , getWidth ());
 			prefs.putInt    ("frameHeight"     , getHeight());
 			prefs.putInt    ("screensQuantity" , application().getScreenQtt());
+			prefs.putInt    ("chnSyncThreshold", application().getchannelSyncThreshold());
 			prefs.putBoolean("alwaysOnTop"     , isAlwaysOnTop());
 			prefs.put       ("chooserDirectory", fileChooser.getCurrentDirectory().toString());
 
@@ -599,6 +609,7 @@ public final class MainFrame extends BaseFrame {
 		this.updateSelectedSpeedOption(playerRunning);
 		
 		this.updateSelectedScreenQuantity(playerRunning);
+		this.updateSelectedChnSyncThreshold(playerRunning);
 		
 		showScreens(null);
 	}
@@ -658,6 +669,17 @@ public final class MainFrame extends BaseFrame {
 			String[] sTemp = ((JCheckBoxMenuItem) item).getText().split(" ");
 			int toTest = Integer.parseInt(sTemp[0]);
 			((JCheckBoxMenuItem) item).setSelected(toTest == registeredScreenQtt);
+			item.setEnabled(!playersRunning);
+		}
+	}
+	
+	private void updateSelectedChnSyncThreshold(boolean playersRunning) {
+		int registeredOption = application().getchannelSyncThreshold();
+		String registeredStr = resources().getString("menu.video.item.chnSync.item." + registeredOption);
+				
+		for(Component item : this.videoSyncMenu.getMenuComponents()) {
+			String toTest = ((JCheckBoxMenuItem) item).getText();
+			((JCheckBoxMenuItem) item).setSelected(toTest.equals(registeredStr));
 			item.setEnabled(!playersRunning);
 		}
 	}

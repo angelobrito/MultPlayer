@@ -535,14 +535,15 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 		// Clear Previous Media
 		for(int i = 0; i < application().getScreenQtt(); i++) this.mediaFilePath.get(i).clear();
 
-		for(int i = 0; i < this.players.size(); i++) {
+		// Set new Media Files
+		for(FileAdditionalInfo file : foundFiles) {
 			
 			FileAdditionalInfo info;
 			int channel = -1;
 			
-			if(foundFiles.size() > 0) {
-				info = foundFiles.get(0);
-				foundFiles.remove(0);
+			if(foundFiles.size() > 0 && file != null) {
+				info = file;
+				//foundFiles.remove(file);
 				channel = info.getChannel();
 			}
 			else info = null;
@@ -552,8 +553,8 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 				timeTracker.addRunningItem(info);
 			}
 			else {
-				if(!(this.mediaFilePath.get(i).size() > 0)) {
-					this.mediaFilePath.get(i).add(info);
+				if(!(this.mediaFilePath.get(0).size() > 0)) {
+					this.mediaFilePath.get(0).add(info);
 					timeTracker.addRunningItem(info);
 				}
 			}

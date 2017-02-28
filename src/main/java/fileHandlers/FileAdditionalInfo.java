@@ -6,6 +6,7 @@ import java.nio.file.Paths;
 import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.regex.Pattern;
+import static uk.co.caprica.vlcjplayer.Application.application;
 
 public class FileAdditionalInfo {
 
@@ -89,7 +90,10 @@ public class FileAdditionalInfo {
 			this.date.set(year, (month-1), date, hours, minute, second);
 			
 			//  Regex = Prefix +      date      + sufix (timestamp.fileType)
-			this.fileRegex = this.prefix  + fileName.substring(4, 19) + "?" + fileName.substring(20, 24);
+			// TODO The sufix must have a tolerance sync to channel's synchornization
+			String sufix = "";
+			for(int i = 0; i < application().getchannelSyncThreshold(); i++) sufix = sufix + "?";
+			this.fileRegex = this.prefix  + fileName.substring(4, (20 - sufix.length())) + sufix + fileName.substring(20, 24);
 			System.out.println("Pattern1=" + this.toString());
 		}
 		else if(pattern2.matcher(fileName).matches()) {
@@ -109,7 +113,10 @@ public class FileAdditionalInfo {
 			this.date.set(year, (month-1), date, hours, minute, second);
 
 			//  Regex = Prefix +      date      + sufix (timestamp.fileType)
-			this.fileRegex = fileName.substring(0, (fileName.length()-5)) + "?" + fileName.substring((fileName.length()-4), fileName.length());;
+			// TODO The sufix must have a tolerance sync to channel's synchornization
+			String sufix = "";
+			for(int i = 0; i < application().getchannelSyncThreshold(); i++) sufix = sufix + "?";
+			this.fileRegex = fileName.substring(0, (fileName.length()-(8 - sufix.length()))) + sufix + fileName.substring((fileName.length()-4), fileName.length());;
 			
 			// Try to fetch this file channel from the parent folder
 			this.getChannelFromParentFolders();
