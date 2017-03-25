@@ -10,7 +10,7 @@ import static uk.co.caprica.vlcjplayer.Application.application;
 
 public class FileAdditionalInfo {
 
-	private String nameSeparator = "-";  // FIXME could be -, /, ' ' or '' then ? works as wild card? 
+	private String nameSeparator = "[-_.]";  // FIXME could be -, /, ' ' or '' then ? works as wild card? 
 	private int channel;
 	private Calendar date;
 	private String type;
@@ -65,63 +65,121 @@ public class FileAdditionalInfo {
 		 * A fileName can have multiple formats and this program must support a few of them
 		 * 1 - CHxx-YYYYMMDD-hhmmss.typ
 		 * 2 - YYYY-MM-DD_HHhMMmSSs.typ
-		 * 3 - Single unformated string name
+		 * 3 - CHxx_YYYYMMDDHHMMSS_WIDTH_X_HEIGHT_x.typ // where width and height can vary 
+		 * 4 - XX_CH_R_DDMMYYYYHHMMSS.typ
+		 * 5 - Single unformated string name
 		 */
 		
-		Pattern pattern1 = Pattern.compile("[cC][hH]\\d{2}[-]\\d{4}\\d{2}\\d{2}-\\d{2}\\d{2}\\d{2}[.].{3}");
-		Pattern pattern2 = Pattern.compile("\\d{4}[-]\\d{2}[-]\\d{2}[_]\\d{2}[hH]\\d{2}[mM]\\d{2}[sS][.].{3}");
+		Pattern pattern1 = Pattern.compile("[cC][hH]\\d{2}"+nameSeparator+"\\d{4}\\d{2}\\d{2}"+nameSeparator+"\\d{2}\\d{2}\\d{2}[.].{3}");
+		Pattern pattern2 = Pattern.compile("\\d{4}"+nameSeparator+"\\d{2}"+nameSeparator+"\\d{2}"+nameSeparator+"\\d{2}[hH]\\d{2}[mM]\\d{2}[sS][.].{3}");
+		Pattern pattern3 = Pattern.compile("[cC][hH]\\d{1}"+nameSeparator+"\\d{4}\\d{2}\\d{2}\\d{2}\\d{2}\\d{2}"+nameSeparator+"\\d{3,4}"+nameSeparator+"[xX]"+nameSeparator+"\\d{3,4}"+nameSeparator+"\\d[.].{3}");
+		Pattern pattern4 = Pattern.compile("\\d{1,3}"+nameSeparator+"\\d{2}"+nameSeparator+"[R]"+nameSeparator+"\\d{2}\\d{2}\\d{4}\\d{2}\\d{2}\\d{2}[.].{4}");
 		
 		System.out.println("processFileName file=" + fileName);
 		if(pattern1.matcher(fileName).matches()) {
 			
 			// Pattern 1 fileName style: CHxx-YYYYMMDD-hhmmss.typ
-			this.prefix  = "CH??";
-			this.channel = Integer.parseInt(fileName.substring(2, 4));
-			this.type    = fileName.substring(21, 24);
+			String[] substrings = fileName.split(nameSeparator);
+			this.prefix  = "[cC][hH][0-9][0-9]";
+			this.channel = Integer.parseInt(substrings[0].substring(2, 4));
+			this.type    = substrings[3];
 
 			// Calculate Date
 			this.date = Calendar.getInstance();
-			int year   = Integer.parseInt(fileName.substring(5, 9));
-			int month  = Integer.parseInt(fileName.substring(9, 11));
-			int date   = Integer.parseInt(fileName.substring(11, 13));
-			int hours  = Integer.parseInt(fileName.substring(14, 16));
-			int minute = Integer.parseInt(fileName.substring(16, 18));
-			int second = Integer.parseInt(fileName.substring(18, 20));
-			this.date.set(year, (month-1), date, hours, minute, second);
+			int year   = Integer.parseInt(substrings[1].substring(0, 4));
+			int month  = Integer.parseInt(substrings[1].substring(4, 6));
+			int day    = Integer.parseInt(substrings[1].substring(6, 8));
+			
+			int hours  = Integer.parseInt(substrings[2].substring(0, 2));
+			int minute = Integer.parseInt(substrings[2].substring(2, 4));
+			int second = Integer.parseInt(substrings[2].substring(4, 6));
+			this.date.set(year, (month-1), day, hours, minute, second);
 			
 			//  Regex = Prefix +      date      + sufix (timestamp.fileType)
-			// TODO The sufix must have a tolerance sync to channel's synchornization
 			String sufix = "";
-			for(int i = 0; i < application().getchannelSyncThreshold(); i++) sufix = sufix + "?";
-			this.fileRegex = this.prefix  + fileName.substring(4, (20 - sufix.length())) + sufix + fileName.substring(20, 24);
+			for(int i = 0; i < application().getchannelSyncThreshold(); i++) {
+				if(i == 6) sufix = "?" + nameSeparator + sufix;
+				else sufix = "?" + sufix;
+			}
+			if(sufix.length() < 6) sufix = substrings[1] + nameSeparator + substrings[2].substring(0, substrings[2].length() - sufix.length()) + sufix;
+			else sufix = substrings[1].substring(0, substrings[1].length() - sufix.length()) + sufix;
+			this.fileRegex = this.prefix + nameSeparator + sufix + nameSeparator + this.type;
 			System.out.println("Pattern1=" + this.toString());
 		}
 		else if(pattern2.matcher(fileName).matches()) {
 			
 			// Pattern 2 fileName style: YYYY-MM-DD_HHhMMmSSs.typ
+			String[] substrings = fileName.split(nameSeparator);
 			this.prefix  = "";
 			this.channel = 0;
-			this.type    = fileName.substring((fileName.length()-3), fileName.length());
+			this.type    = substrings[4];
 		
 			this.date = Calendar.getInstance();
-			int year   = Integer.parseInt(fileName.substring(0, 4));
-			int month  = Integer.parseInt(fileName.substring(5, 7));
-			int date   = Integer.parseInt(fileName.substring(8, 10));
-			int hours  = Integer.parseInt(fileName.substring(11, 13));
-			int minute = Integer.parseInt(fileName.substring(14, 16));
-			int second = Integer.parseInt(fileName.substring(17, 19));
-			this.date.set(year, (month-1), date, hours, minute, second);
+			int year   = Integer.parseInt(substrings[0]);
+			int month  = Integer.parseInt(substrings[1]);
+			int day    = Integer.parseInt(substrings[2]);
+			int hours  = Integer.parseInt(substrings[3].substring(0, 2));
+			int minute = Integer.parseInt(substrings[3].substring(3, 5));
+			int second = Integer.parseInt(substrings[3].substring(6, 8));
+			this.date.set(year, (month-1), day, hours, minute, second);
 
 			//  Regex = Prefix +      date      + sufix (timestamp.fileType)
-			// TODO The sufix must have a tolerance sync to channel's synchornization
 			String sufix = "";
-			for(int i = 0; i < application().getchannelSyncThreshold(); i++) sufix = sufix + "?";
+			for(int i = 0; i < application().getchannelSyncThreshold(); i++) {
+				if(i == 0) sufix = "?s";
+				else if(i == 2) sufix = "?m" + sufix;
+				else if(i == 4) sufix = "?h" + sufix;
+				else if(i == 6 || i == 8 || i == 10) sufix = "?" + nameSeparator + sufix;
+				else sufix = "?" + sufix;
+			}
 			this.fileRegex = fileName.substring(0, (fileName.length()-(8 - sufix.length()))) + sufix + fileName.substring((fileName.length()-4), fileName.length());;
 			
 			// Try to fetch this file channel from the parent folder
 			this.getChannelFromParentFolders();
 			
 			System.out.println("Pattern2=" + this.toString());
+		}
+		else if(pattern3.matcher(fileName).matches()) {
+			
+			// Pattern 3 fileName style: CHx_YYYYMMDDHHMMSS_WIDTH_X_HEIGHT_x.typ
+			String[] substrings = fileName.split(nameSeparator);
+			this.prefix  = "[cC][hH]*[0-9]";
+			this.channel = Integer.parseInt(substrings[0].substring(2, substrings[0].length()));
+			this.type    = substrings[6];
+
+			// Calculate Date
+			this.date  = Calendar.getInstance();
+			int year   = Integer.parseInt(substrings[1].substring( 0, 4));
+			int month  = Integer.parseInt(substrings[1].substring( 4, 6));
+			int day    = Integer.parseInt(substrings[1].substring( 6, 8));
+			int hours  = Integer.parseInt(substrings[1].substring( 8, 10));
+			int minute = Integer.parseInt(substrings[1].substring(10, 12));
+			int second = Integer.parseInt(substrings[1].substring(12, 14));
+			this.date.set(year, (month-1), day, hours, minute, second);
+			
+			this.fileRegex = this.prefix + nameSeparator + this.getDateRegex(substrings[1]) + nameSeparator + substrings[2] + nameSeparator + substrings[3] + nameSeparator + substrings[4] + nameSeparator + substrings[5] + nameSeparator + substrings[6];
+			System.out.println("Pattern3=" + this.toString());
+		}
+		else if(pattern4.matcher(fileName).matches()) {
+			
+			// Pattern 4 fileName style: XXX_CH_R_DDMMYYYYHHMMSS.typ
+			String[] substrings = fileName.split(nameSeparator);
+			this.prefix  = "*" + nameSeparator + "[0-9][0-9]" + nameSeparator + "[" + substrings[2] + "]"; // XXX_
+			this.channel = Integer.parseInt(substrings[1]); // _CH_ excluding _
+			this.type    = substrings[4]; // typ
+
+			// Calculate Date
+			this.date  = Calendar.getInstance();
+			int day    = Integer.parseInt(substrings[3].substring( 0, 2));
+			int month  = Integer.parseInt(substrings[3].substring( 2, 4));
+			int year   = Integer.parseInt(substrings[3].substring( 4, 8));
+			int hours  = Integer.parseInt(substrings[3].substring( 8, 10));
+			int minute = Integer.parseInt(substrings[3].substring(10, 12));
+			int second = Integer.parseInt(substrings[3].substring(12, 14));
+			this.date.set(year, (month-1), day, hours, minute, second);
+			
+			this.fileRegex = this.prefix + nameSeparator + this.getDateRegex(substrings[3]) + nameSeparator + type;
+			System.out.println("Pattern4=" + this.toString());
 		}
 		else {
 			
@@ -139,9 +197,20 @@ public class FileAdditionalInfo {
 		}
 	}
 
+	private String getDateRegex(String dateStr) {
+		// TODO Auto-generated method stub
+		//  Regex = Prefix +      date      + sufix (timestamp.fileType)
+		String sufix = "";
+		for(int i = 0; i < application().getchannelSyncThreshold(); i++) sufix = sufix + "?";
+		return dateStr.substring(0, (dateStr.length() - sufix.length())) + sufix;
+	}
+
 	public void getChannelFromParentFolders() {
 		File parentFile = new File(this.filePath).getParentFile();
-		if(parentFile.getName().contains("channel")) {
+		if(parentFile == null){
+			System.out.println("First Parent folder does not identify a channel.");
+		}
+		else if(parentFile.getName().contains("channel")) {
 			System.out.println("Parent file with channel" + parentFile.getName());
 		}
 		else if(parentFile.getName().contains("camera")) {

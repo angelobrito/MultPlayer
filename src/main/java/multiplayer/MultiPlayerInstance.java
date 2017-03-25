@@ -65,6 +65,7 @@ public class MultiPlayerInstance extends MediaPlayerEventAdapter implements Runn
 
 	private long elapsedTime;
 	private boolean recording;
+	private String recordDestination;
 
 
     public MultiPlayerInstance(String screenName, MediaPlayerFactory factory, FullScreenStrategy fullScreenStrategy) {
@@ -75,6 +76,7 @@ public class MultiPlayerInstance extends MediaPlayerEventAdapter implements Runn
         this.videoSurface = new Canvas();
         this.videoSurface.setBackground(Color.black);
         this.recording = false;
+        this.recordDestination = "";
         elapsedTime = 0;
 
         mediaPlayer.addMediaPlayerEventListener(this);
@@ -216,7 +218,10 @@ public class MultiPlayerInstance extends MediaPlayerEventAdapter implements Runn
 
 	public void prepareMedia(String mrl) {
 		this.stop();
-		this.mediaPlayer.prepareMedia(mrl);
+		String[] substrings = this.mediaPath.split("\\.");
+		String forcedDemuxerOption = "";
+		//if(substrings[substrings.length -1].equals("h264")) forcedDemuxerOption = ":demux=h264";
+		this.mediaPlayer.prepareMedia(mrl, forcedDemuxerOption);
 		this.mediaPath = mrl;
 	}
 
@@ -345,28 +350,30 @@ public class MultiPlayerInstance extends MediaPlayerEventAdapter implements Runn
 
 	public void record() {
 
-		if(!this.recording && this.isPlaying() && this.isRunningState()) {
+		if(!this.recording && this.isRunningState()) {
 			
 			// Set starting of record point
 			System.out.println(this.screenName + " - Started record");
+			this.recording = true;
 		
 			this.elapsedTime = this.mediaPlayer.getTime();
 			System.out.println(this.screenName + " - ElapsedTime=" + elapsedTime);
 
-			this.recording = true;
 			
 			// FIXME from here the file opens but it is out of sync and records much more than needed
 			
 			String MRL  = this.mediaPlayer.mrl();
 			int bits    = 2048;
-			String destination = "";
-			for(int i = 0; i >= 0; i++) {
-				destination = this.mediaPath.split(".avi")[0] + "-record" + i + ".avi";
-				File testFile = new File(destination);
+			String[] substrings = this.mediaPath.split("\\.");
+			for(int i = 0; i >= 0 && i <= 500; i++) {
+				recordDestination = substrings[0] + "-record" + i + "." + substrings[substrings.length-1];
+				File testFile = new File(recordDestination);
 				if(!testFile.exists()) break;
 			};
 			//String SOUT = ":sout=#transcode{vcodec=mp4v,acodec=mpga,vb=%d,start-time=%f,stop-time=%f,run-time=%f}:file{dst=%s}";
-			String SOUT = ":sout=#transcode{vcodec=mp4v,acodec=mpga,vb=%d}:file{dst=%s}";
+			String forcedDemuxerOption = "";
+			if(substrings[substrings.length-1].equals("h264")) forcedDemuxerOption = ":demux=h264";
+			String SOUT = ":sout=#transcode{vcodec=mp4v,acodec=mpga,vb=%d}:file{dst=%s}"+forcedDemuxerOption;
 			
 			float  fps = 20;
 			String FPS = ":screen-fps=%f";
@@ -375,14 +382,14 @@ public class MultiPlayerInstance extends MediaPlayerEventAdapter implements Runn
 			String CACHING = ":screen-caching=%d";
 
 			System.out.println(this.screenName + " - MediaPath=" + this.mediaPath);
-			System.out.println(this.screenName + " - Destination=" + destination);
+			System.out.println(this.screenName + " - Destination=" + recordDestination);
 			
 
 			float startTime = (float) ((this.elapsedTime)*(0.001));
 			System.out.println(this.screenName + " - startTime="  + startTime);
 			
 			String[] mediaRecordOptions = new String[] {
-					String.format(SOUT, bits, destination),
+					String.format(SOUT, bits, recordDestination),
 					String.format(FPS, fps),
 					String.format(CACHING, caching)
 			};
@@ -398,34 +405,51 @@ public class MultiPlayerInstance extends MediaPlayerEventAdapter implements Runn
 
 	public void stopRecord() {
 		System.out.println(this.screenName + " - Stoping Record");
-		System.out.println(this.screenName + " - ElapsedTime="  + this.elapsedTime);
 		
-		float endTime = (float) (this.mediaPlayer.getTime()*(0.001));
-		System.out.println(this.screenName + " - endTime="  + endTime);
-		
-		float duration   = (this.mediaPlayer.getTime() - this.elapsedTime);
-		System.out.println(this.screenName + " - End point of recording=" + this.mediaPlayer.getTime());
-		System.out.println(this.screenName + " - Duration=" + duration);
-		
-		// A delay of 1000 represents a duration of 48s
-		// then 1000 / 48 = 21
-//		int delay = 50;
-//		for(int i = 1; i <= (duration/1000); i++) {
-//		int i = 1;
-//			System.out.println(this.screenName + " - Giving a litle time #" + (i*delay) + "/" + (duration/1000));
-//			try {
-//				Thread.sleep(delay);
-//			} catch (InterruptedException e) {
-//				e.printStackTrace();
-//			}
-//		}
+		if(this.isRecording()) {
 
-		recordMediaPlayer.stop();
-		recordMediaPlayer.release();
-		this.elapsedTime = 0;
-		this.recording = false;
-		
-		System.out.println(this.screenName + " - Finished Record");
+			System.out.println(this.screenName + " - ElapsedTime="  + this.elapsedTime);
+
+			String message = "Gravação de " + this.recordDestination;
+			int optionPane;
+			if(recordMediaPlayer.getMediaState().toString().equalsIgnoreCase("libvlc_NothingSpecial")) {
+				message += " falhou.";
+				optionPane = javax.swing.JOptionPane.ERROR_MESSAGE;
+			}
+			else {
+				message += " finalizada.";
+				optionPane = javax.swing.JOptionPane.INFORMATION_MESSAGE;
+			}
+			
+			float endTime = (float) (this.mediaPlayer.getTime()*(0.001));
+			System.out.println(this.screenName + " - endTime="  + endTime);
+
+			float duration   = (this.mediaPlayer.getTime() - this.elapsedTime);
+			System.out.println(this.screenName + " - End point of recording=" + this.mediaPlayer.getTime());
+			System.out.println(this.screenName + " - Duration=" + duration);
+
+			// A delay of 1000 represents a duration of 48s
+			// then 1000 / 48 = 21
+			int delay = 50;
+			for(int i = 1; i <= (duration/1000); i++) {
+				//		int i = 1;
+				System.out.println(this.screenName + " - Giving a litle time #" + (i*delay) + "/" + (duration/1000));
+				try {
+					Thread.sleep(delay);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+			
+			recordMediaPlayer.stop();
+			recordMediaPlayer.release();
+			this.elapsedTime = 0;
+			this.recording = false;
+
+			// FIXME this is an interface message, shouldm't it be on a better place? 
+			javax.swing.JOptionPane.showMessageDialog(application().getMainFrame(),message, "Record", optionPane);
+			System.out.println(this.screenName + " - Finished Record");
+		}
 	}
 
 	public void updateVideoSurface() {
@@ -440,6 +464,19 @@ public class MultiPlayerInstance extends MediaPlayerEventAdapter implements Runn
 	public void run() {
 		System.out.println(this.screenName + " - Started run");
 		this.record();
+	}
+
+	public void forcePause() {
+		if(this.isPlaying() && !this.isPaused()) this.pause();
+	}
+
+	public boolean isPaused() {
+		libvlc_state_t state = this.getMediaState();
+		return state.toString().equalsIgnoreCase("libvlc_Paused");
+	}
+
+	public void unpause() {
+		if(this.isPaused()) this.pause();
 	}
 }
 

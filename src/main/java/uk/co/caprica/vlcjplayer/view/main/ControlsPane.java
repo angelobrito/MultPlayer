@@ -95,7 +95,7 @@ final class ControlsPane extends BasePanel {
 
 	private static final int FPS_MIN = 1;
 
-	private static final int FPS_MAX = 5;
+	private static final int FPS_MAX = 9;
 
 	private final JSlider speedSlider;
 
@@ -149,7 +149,7 @@ final class ControlsPane extends BasePanel {
 
 		speedLabel = new JLabel("Velocidade: ");
 
-		speedSlider = new JSlider(SwingConstants.HORIZONTAL, FPS_MIN, FPS_MAX, 3);
+		speedSlider = new JSlider(SwingConstants.HORIZONTAL, FPS_MIN, FPS_MAX, 5);
 		speedSlider.setMajorTickSpacing(1);
 		speedSlider.setMinorTickSpacing(1);
 		speedSlider.setPaintTicks(true);
@@ -158,11 +158,15 @@ final class ControlsPane extends BasePanel {
 
 		// FIXME Fix the layout of the Controll pane its ugly
 		Hashtable<Integer, JLabel> labelTable = new Hashtable<Integer, JLabel>();
-		labelTable.put( new Integer( 1 ), new JLabel("x1/4") );
-		labelTable.put( new Integer( 2 ), new JLabel("x1/2") );
-		labelTable.put( new Integer( 3 ), new JLabel("x1") );
-		labelTable.put( new Integer( 4 ), new JLabel("x2") );
-		labelTable.put( new Integer( 5 ), new JLabel("x4") );
+		labelTable.put( new Integer( 1 ), new JLabel("x1/16") );
+		labelTable.put( new Integer( 2 ), new JLabel("") );
+		labelTable.put( new Integer( 3 ), new JLabel("x1/4") );
+		labelTable.put( new Integer( 4 ), new JLabel("") );
+		labelTable.put( new Integer( 5 ), new JLabel("x1") );
+		labelTable.put( new Integer( 6 ), new JLabel("") );
+		labelTable.put( new Integer( 7 ), new JLabel("x4") );
+		labelTable.put( new Integer( 8 ), new JLabel("") );
+		labelTable.put( new Integer( 9 ), new JLabel("x16") );
 		speedSlider.setLabelTable(labelTable);
 
 		MigLayout layout = new MigLayout("fill, insets 0 0 0 0", "[]12[]10[]10[]12[]10[]12[]push[]10[]", "[]"); 
@@ -186,7 +190,7 @@ final class ControlsPane extends BasePanel {
 		add(effectsButton,    "Center, sg 2, al left, gap 5");
 
 		add(speedLabel, "sg 2, al left, gap 5");
-		add(speedSlider, "Center, sg 1, wmax 150, hmax 80, al left, gap 5");
+		add(speedSlider, "Center, sg 1, wmax 600, hmax 80, al left, gap 5");
 		add(muteButton, "Center, sg 2, al left, gap 5");
 		add(volumeSlider, "Center, sg 1, wmax 150, hmax 80, al center center");
 
@@ -199,7 +203,7 @@ final class ControlsPane extends BasePanel {
 
 			@Override
 			public void stateChanged(ChangeEvent e) {
-				application().getMediaPlayerComponent().setRate( (float) Math.pow(2, speedSlider.getValue())/8);
+				application().getMediaPlayerComponent().setRate( (float) Math.pow(2, speedSlider.getValue())/32);
 			}
 		});
 
@@ -327,6 +331,10 @@ final class ControlsPane extends BasePanel {
 	private void MuteAction() {
 		application().getMediaPlayerComponent().forceMute();
 		application().updateEnabledControlls();
+	}
+	
+	public boolean isRecording() {
+		return false;
 	}
 
 	public void setEnabledComponents() {

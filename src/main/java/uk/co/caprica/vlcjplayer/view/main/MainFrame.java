@@ -32,10 +32,14 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.prefs.Preferences;
 
 import javax.swing.AbstractAction;
@@ -139,8 +143,6 @@ public final class MainFrame extends BaseFrame {
 
 	private final MediaPlayerActions mediaPlayerActions;
 	
-	private JFrame recordFrame;
-
 	public MainFrame() {
 		super(resource("main.aplication.name").name());
 
@@ -479,7 +481,7 @@ public final class MainFrame extends BaseFrame {
 
 	private void applyPreferences() {
 		Preferences prefs = Preferences.userNodeForPackage(MainFrame.class);
-		setBounds(
+		this.setBounds(
 				prefs.getInt("frameX"     , 100),
 				prefs.getInt("frameY"     , 100),
 				prefs.getInt("frameWidth" , 800),
@@ -488,9 +490,9 @@ public final class MainFrame extends BaseFrame {
 		application().setScreenQuantity(prefs.getInt("screensQuantity", 4));
 		application().setChnSyncThreshold(prefs.getInt("chnSyncThreshold", 1));
 		boolean alwaysOnTop = prefs.getBoolean("alwaysOnTop", false);
-		setAlwaysOnTop(alwaysOnTop);
-		videoAlwaysOnTopAction.select(alwaysOnTop);
-		fileChooser.setCurrentDirectory(new File(prefs.get("chooserDirectory", ".")));
+		this.setAlwaysOnTop(alwaysOnTop);
+		this.videoAlwaysOnTopAction.select(alwaysOnTop);
+		this.fileChooser.setCurrentDirectory(new File(prefs.get("chooserDirectory", ".")));
 		
 		String recentMedia = prefs.get("recentMedia", "");
 		if (recentMedia.length() > 0) {
@@ -710,7 +712,48 @@ public final class MainFrame extends BaseFrame {
 	}
 	
 	public void record() {
-		this.multiMediaPlayerComponent.record();
+		
+		if(!application().getMediaPlayerComponent().isRecording()) {
+			
+			// First Pause screens 
+			this.multiMediaPlayerComponent.pauseScreens();
+
+			// then create a alert with options
+			int selected = this.askScreenRecord();
+
+			// then unpause Screens
+			this.multiMediaPlayerComponent.unpauseScreens();
+
+			// Finally record
+			if(selected > 0 && selected <= application().getScreenQtt()) this.multiMediaPlayerComponent.record(selected-1);
+		}
+		else {
+			this.multiMediaPlayerComponent.stopRecord();
+		}
+	}
+
+	private int askScreenRecord() {
+		ArrayList<String> possibilities = new ArrayList<>();
+		for(int i = 0; i < application().getScreenQtt(); i++) {
+			if(application().getMediaPlayerComponent().isScreenRecordable(i)) possibilities.add((i+1)+"");
+		}
+		
+		if(possibilities.size() > 1) {
+
+			String answer = (String) JOptionPane.showInputDialog(
+					this,
+					"Selecione uma tela para gravar:",
+					"Selecionar tela",
+					JOptionPane.QUESTION_MESSAGE,
+					null,
+					possibilities.toArray(),
+					"1");
+
+			System.err.println("Debug answer=" + answer);
+			if(answer != null) return Integer.parseInt(answer);
+		}
+		else if(possibilities.size() == 1) return Integer.parseInt(possibilities.get(0)) - 1;
+        return 0;
 	}
 
 	public Component getPlayerHandler(){

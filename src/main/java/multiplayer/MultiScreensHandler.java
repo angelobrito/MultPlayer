@@ -65,14 +65,12 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 
 	private int selectedScreen;
 	private boolean forcedMute;
-	private boolean paused;
 
 	private JPanel contentPane;
 	
 	public MultiScreensHandler(JFrame containerFrame) {
 
 		this.containerFrame = (MainFrame) containerFrame;
-		this.factory     = new MediaPlayerFactory();
 		this.timeTracker = new FileTimeTracker();
 		this.screenLogo = new ImagePane(
 				ImagePane.Mode.CENTER, 
@@ -84,6 +82,10 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 		this.contentPane.setBorder(new EmptyBorder(16, 16, 16, 16));
 		this.fullScreenStrategy = new DefaultFullScreenStrategy(new Window(this.containerFrame));
 		
+		// Set some options for libvlc
+		String[] libvlcArgs = {"--demux", "h264"};
+		this.factory        = new MediaPlayerFactory(libvlcArgs);
+
 		// To deactivate unwanted borders
 		this.selectedScreen = -1;
 		
@@ -348,10 +350,13 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 	}
 
 	public void pauseScreens() {
-		if(!this.paused) this.paused = true;
-		else this.paused = false;
 		for(int i = 0; i < this.players.size(); i++) 
-			this.players.get(i).pause();
+			this.players.get(i).forcePause();
+	}
+	
+	public void unpauseScreens() {
+		for(int i = 0; i < this.players.size(); i++) 
+			this.players.get(i).unpause();
 	}
 
 	@Override
@@ -690,7 +695,7 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 	public void stop() {
 		for(MultiPlayerInstance player : this.players){
 			player.stop();
-			if(player.isRecording()) player.record();
+			if(player.isRecording()) player.stopRecord();
 		}
 	}
 
@@ -709,7 +714,14 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 	}
 
 	public boolean isPaused() {
-		return this.paused;
+		boolean result = false;
+		for(MultiPlayerInstance player : this.players) {
+			if(player.isPaused()) {
+				result = true;
+				break;
+			}
+		}
+		return result;
 	}
 
 	public void setContrast(float contrast) {
@@ -897,14 +909,8 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 		super.mouseExited(e);
 	}
 
-	// FIXME record just the selected screen and not just screen 0
-	public void record() {
-		this.players.get(0).record();
-      
-//		for(MultiPlayerInstance player : this.players) {
-//			// TODO include an if or remove the for to just save the selected screen
-//			player.record();
-//		}
+	public void record(int screen) {
+		this.players.get(screen).record();
 	}
 
 	// FIXME record just the selected screen
@@ -912,5 +918,15 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 		for(int screen = 0; screen < application().getScreenQtt(); screen++) {
 			this.players.get(screen).stopRecord();
 		}
+	}
+
+	public boolean isScreenRecordable(int screen) {
+		boolean result = false;
+		MultiPlayerInstance player;
+		if(screen >= 0 && screen < application().getScreenQtt()) {
+			player = this.players.get(screen);
+			result = player.isPlayable() && player.isRunningState();
+		}
+		return result;
 	}
 }

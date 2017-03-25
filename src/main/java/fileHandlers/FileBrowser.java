@@ -77,6 +77,7 @@ public class FileBrowser {
 		else if(fileExtension.equalsIgnoreCase("vob")) return true;
 		else if(fileExtension.equalsIgnoreCase("mov")) return true;
 		else if(fileExtension.equalsIgnoreCase("wmv")) return true;
+		else if(fileExtension.equalsIgnoreCase("h264")) return true;
 		//else if(fileExtension.equalsIgnoreCase("")) return true;
 		else return false;
 	}
@@ -112,7 +113,7 @@ public class FileBrowser {
 		
 		FileAdditionalInfo processedFile = new FileAdditionalInfo(fileName);
 		String fileRegex = processedFile.getFileRegex();
-		System.out.println("Channel=#" + processedFile.getChannel() + ", Regex=" + fileRegex);
+		System.out.println("getFileRegex: Channel=#" + processedFile.getChannel() + ", Regex=" + fileRegex);
 		return fileRegex;
 	}
 }
