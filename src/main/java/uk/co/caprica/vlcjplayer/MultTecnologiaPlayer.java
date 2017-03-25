@@ -31,7 +31,7 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
 import multiplayer.MultiScreensHandler;
-import multiplayer.MultiPlayerInstance;
+import multiplayer.MultiPlayerSingleInstance;
 import uk.co.caprica.vlcj.discovery.NativeDiscovery;
 import uk.co.caprica.vlcj.log.NativeLog;
 import uk.co.caprica.vlcj.player.embedded.EmbeddedMediaPlayer;
@@ -128,7 +128,7 @@ public class MultTecnologiaPlayer {
                     nativeStreams.release();
                 }
                 application().post(ShutdownEvent.INSTANCE);
-                for(MultiPlayerInstance pi : mediaPlayerComponent.getPlayers()) {
+                for(MultiPlayerSingleInstance pi : mediaPlayerComponent.getPlayers()) {
                     pi.mediaPlayer().release();
                 }
                 mediaPlayerComponent.getFactory().release();

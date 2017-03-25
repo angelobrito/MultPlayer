@@ -73,7 +73,7 @@ public class FileAdditionalInfo {
 		Pattern pattern1 = Pattern.compile("[cC][hH]\\d{2}"+nameSeparator+"\\d{4}\\d{2}\\d{2}"+nameSeparator+"\\d{2}\\d{2}\\d{2}[.].{3}");
 		Pattern pattern2 = Pattern.compile("\\d{4}"+nameSeparator+"\\d{2}"+nameSeparator+"\\d{2}"+nameSeparator+"\\d{2}[hH]\\d{2}[mM]\\d{2}[sS][.].{3}");
 		Pattern pattern3 = Pattern.compile("[cC][hH]\\d{1}"+nameSeparator+"\\d{4}\\d{2}\\d{2}\\d{2}\\d{2}\\d{2}"+nameSeparator+"\\d{3,4}"+nameSeparator+"[xX]"+nameSeparator+"\\d{3,4}"+nameSeparator+"\\d[.].{3}");
-		Pattern pattern4 = Pattern.compile("\\d{1,3}"+nameSeparator+"\\d{2}"+nameSeparator+"[R]"+nameSeparator+"\\d{2}\\d{2}\\d{4}\\d{2}\\d{2}\\d{2}[.].{4}");
+		Pattern pattern4 = Pattern.compile("\\d{1,3}"+nameSeparator+"\\d{2}"+nameSeparator+"[R]"+nameSeparator+"\\d{2}\\d{2}\\d{4}\\d{2}\\d{2}\\d{2}[.].{3,4}");
 		
 		System.out.println("processFileName file=" + fileName);
 		if(pattern1.matcher(fileName).matches()) {

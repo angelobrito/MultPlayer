@@ -56,7 +56,7 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 
 	private int rowsNumber = 2;
 	private int columnsNumber = 2;
-	private List<MultiPlayerInstance> players;
+	private List<MultiPlayerSingleInstance> players;
 
 	private MediaPlayerFactory factory;
 
@@ -119,10 +119,10 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 		this.contentPane.removeAll();
 		this.contentPane.setLayout(new GridLayout(this.rowsNumber, this.columnsNumber, 16, 16));
 		this.mediaFilePath = new ArrayList<ArrayList<FileAdditionalInfo>>(application().getScreenQtt());
-		this.players     = new ArrayList<MultiPlayerInstance>(qttScreens);
+		this.players     = new ArrayList<MultiPlayerSingleInstance>(qttScreens);
 
 		for(int i = 0; i < application().getScreenQtt(); i++) {
-			MultiPlayerInstance playerInstance = new MultiPlayerInstance(("Screen #" + (i + 1)), this.factory, this.fullScreenStrategy);
+			MultiPlayerSingleInstance playerInstance = new MultiPlayerSingleInstance(("Screen #" + (i + 1)), this.factory, this.fullScreenStrategy);
 			playerInstance.setLogoImage(this.screenLogo.getImage());
 			playerInstance.enableLogo(true);
 			this.players.add(playerInstance);
@@ -143,7 +143,7 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 	
 	public void updateScreensLayout() {
 		for(int i = 0; i < application().getScreenQtt(); i++) {
-			MultiPlayerInstance playerInstance = this.players.get(i);
+			MultiPlayerSingleInstance playerInstance = this.players.get(i);
 
 			JPanel playerPanel = playerInstance.getPlayerPanel();
 			if(i == this.selectedScreen) playerInstance.setBorder(new LineBorder(Color.YELLOW, 2));
@@ -157,12 +157,12 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 		return this.factory;
 	}
 
-	public List<MultiPlayerInstance> getPlayers() {
+	public List<MultiPlayerSingleInstance> getPlayers() {
 		return this.players;
 	}
 
 	public void screensRelease() {
-		for(MultiPlayerInstance pi : this.players) {
+		for(MultiPlayerSingleInstance pi : this.players) {
 			pi.release();
 		}
 		this.factory.release();
@@ -456,7 +456,7 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 
 	public boolean isPlaying() {
 		boolean result = false;
-		for(MultiPlayerInstance player : this.players) {
+		for(MultiPlayerSingleInstance player : this.players) {
 			if(!result) result = player.isPlaying();
 			else break;
 		}
@@ -465,7 +465,7 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 
 	public boolean isPlayable() {
 		boolean result = false;
-		for(MultiPlayerInstance player : this.players) {
+		for(MultiPlayerSingleInstance player : this.players) {
 			if(!result) result = player.isPlayable();
 			else break;
 		}
@@ -622,7 +622,7 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 	}
 	
 	private boolean isRunningState() {
-		for(MultiPlayerInstance player : this.players) {
+		for(MultiPlayerSingleInstance player : this.players) {
 			if(player.isRunningState()) return true;
 		}
 		return false;
@@ -630,7 +630,7 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 	
 	public libvlc_state_t getMediaPlayerState() {
 		libvlc_state_t result = null;
-		for(MultiPlayerInstance player : this.players){
+		for(MultiPlayerSingleInstance player : this.players){
 			result = player.getMediaState();
 			if(result != null && ( 
 					result.toString().equalsIgnoreCase("libvlc_Playing") ||
@@ -641,7 +641,7 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 	}
 	
 	public boolean isRecording(){
-		for(MultiPlayerInstance player: this.players){
+		for(MultiPlayerSingleInstance player: this.players){
 			if(player.isRecording()) return true;
 		}
 		return false;
@@ -693,7 +693,7 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 	}
 
 	public void stop() {
-		for(MultiPlayerInstance player : this.players){
+		for(MultiPlayerSingleInstance player : this.players){
 			player.stop();
 			if(player.isRecording()) player.stopRecord();
 		}
@@ -707,7 +707,7 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 	
 	public float getRate() {
 		float result = 0;
-		for(MultiPlayerInstance player : this.players) {
+		for(MultiPlayerSingleInstance player : this.players) {
 			if(result < player.getRate()) result = player.getRate();
 		}
 		return result;
@@ -715,7 +715,7 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 
 	public boolean isPaused() {
 		boolean result = false;
-		for(MultiPlayerInstance player : this.players) {
+		for(MultiPlayerSingleInstance player : this.players) {
 			if(player.isPaused()) {
 				result = true;
 				break;
@@ -827,7 +827,7 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 	}
 
 	public void getSnapshots() {
-		for( MultiPlayerInstance player : this.players){
+		for( MultiPlayerSingleInstance player : this.players){
 			if(player.isPlaying())
 				this.snapshotTaken(player.mediaPlayer(), player.getMediaPath());
 		}
@@ -868,13 +868,13 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 	}
 
 	public void setScale(float zoom) {
-		for(MultiPlayerInstance player : this.players) {
+		for(MultiPlayerSingleInstance player : this.players) {
 			player.setScale(zoom);
 		}
 	}
 
 	public void setAspectRatio(String aspectRatio) {
-		for(MultiPlayerInstance player : this.players) {
+		for(MultiPlayerSingleInstance player : this.players) {
 			player.setAspectRatio(aspectRatio);
 		}
 	}
@@ -922,7 +922,7 @@ public class MultiScreensHandler extends EmbeddedMediaPlayerComponent implements
 
 	public boolean isScreenRecordable(int screen) {
 		boolean result = false;
-		MultiPlayerInstance player;
+		MultiPlayerSingleInstance player;
 		if(screen >= 0 && screen < application().getScreenQtt()) {
 			player = this.players.get(screen);
 			result = player.isPlayable() && player.isRunningState();

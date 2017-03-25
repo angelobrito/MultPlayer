@@ -6,7 +6,7 @@ import java.util.Date;
 
 import javax.swing.JPanel;
 
-import multiplayer.MultiPlayerInstance;
+import multiplayer.MultiPlayerSingleInstance;
 import static uk.co.caprica.vlcjplayer.Application.application;
 import uk.co.caprica.vlcj.component.EmbeddedMediaPlayerComponent;
 import uk.co.caprica.vlcj.player.MediaMeta;

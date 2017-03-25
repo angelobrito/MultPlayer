@@ -47,7 +47,7 @@ import uk.co.caprica.vlcjplayer.event.StoppedEvent;
 /**
  * A single player instance and associated video surface.
  */
-public class MultiPlayerInstance extends MediaPlayerEventAdapter implements Runnable, MouseListener {
+public class MultiPlayerSingleInstance extends MediaPlayerEventAdapter implements Runnable, MouseListener {
 
 
     private final Canvas videoSurface;
@@ -68,7 +68,7 @@ public class MultiPlayerInstance extends MediaPlayerEventAdapter implements Runn
 	private String recordDestination;
 
 
-    public MultiPlayerInstance(String screenName, MediaPlayerFactory factory, FullScreenStrategy fullScreenStrategy) {
+    public MultiPlayerSingleInstance(String screenName, MediaPlayerFactory factory, FullScreenStrategy fullScreenStrategy) {
     	this.screenName = screenName;
     	this.mediaPath = "";
     	this.mediaFactory = factory;
