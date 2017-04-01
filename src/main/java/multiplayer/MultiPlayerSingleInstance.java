@@ -365,7 +365,10 @@ public class MultiPlayerSingleInstance extends MediaPlayerEventAdapter implement
 			String MRL  = this.mediaPlayer.mrl();
 			int bits    = 2048;
 			String[] substrings = this.mediaPath.split("\\.");
+			
 			for(int i = 0; i >= 0 && i <= 500; i++) {
+				
+				// As requested the record destination changes to userHomeFolder/ocorrencias/filename_ocorrenciax.type
 				recordDestination = substrings[0] + "-record" + i + "." + substrings[substrings.length-1];
 				File testFile = new File(recordDestination);
 				if(!testFile.exists()) break;
