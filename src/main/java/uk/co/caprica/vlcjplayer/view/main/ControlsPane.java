@@ -74,6 +74,10 @@ final class ControlsPane extends BasePanel {
 	private final Icon volumeHighIcon = newIcon("volume-high");
 
 	private final Icon volumeMutedIcon = newIcon("volume-muted");
+	
+	private final Icon startRecord = newIcon("record");
+	
+	private final Icon stopRecord = newIcon("stopRecord");
 
 	private final JButton previousButton;
 	
@@ -125,6 +129,7 @@ final class ControlsPane extends BasePanel {
 
 		recordButton = new ToggleButton();
 		recordButton.setAction(mediaPlayerActions.playbackRecordAction());
+		recordButton.setIcon(stopRecord);
 		
 		nextButton = new StandardButton();
         nextButton.setIcon(nextIcon);
@@ -234,7 +239,7 @@ final class ControlsPane extends BasePanel {
 		effectsButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				System.out.println("Effects Button");
+				System.out.println("DEBUG Effects Button");
 				application().post(ShowEffectsEvent.INSTANCE);
 			}
 		});
@@ -349,7 +354,7 @@ final class ControlsPane extends BasePanel {
 		positionPane.setEnabled(newState);
 		nextButton.setEnabled(newState && application().hasNextToPlay() && false); //FIXME
 		stopButton.setEnabled(newState);
-		recordButton.setEnabled(newState);
+		recordButton.setEnabled(newState); // FIXME
 		previousButton.setEnabled(newState && application().hasPreviousToPlay() && false); //FIXME
 		fullscreenButton.setEnabled(newState && false); // FIXME
 		effectsButton.setEnabled(newState);
@@ -360,5 +365,10 @@ final class ControlsPane extends BasePanel {
 			muteButton.setIcon(volumeMutedIcon);
 		else 
 			muteButton.setIcon(volumeHighIcon);
+	}
+
+	public void changeRecordButton() {
+		if(!application().getMediaPlayerComponent().isRecording()) this.recordButton.setIcon(startRecord);
+		else this.recordButton.setIcon(stopRecord);
 	}
 }

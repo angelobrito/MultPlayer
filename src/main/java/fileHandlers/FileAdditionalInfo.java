@@ -8,8 +8,12 @@ import java.util.Calendar;
 import java.util.regex.Pattern;
 import static uk.co.caprica.vlcjplayer.Application.application;
 
-public class FileAdditionalInfo {
+public class FileAdditionalInfo extends File {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private String nameSeparator = "[-_.]";  // FIXME could be -, /, ' ' or '' then ? works as wild card? 
 	private int channel;
 	private Calendar date;
@@ -20,6 +24,7 @@ public class FileAdditionalInfo {
 	private String fileRegex;
 	
 	public FileAdditionalInfo(String filePath) {
+		super(filePath);
 		this.channel = -1;
 		this.date = null;
 		this.type = "";
@@ -34,6 +39,7 @@ public class FileAdditionalInfo {
 	}
 	
 	public FileAdditionalInfo(File file) {
+		super(file.getAbsolutePath());
 		this.channel = -1;
 		this.date = null;
 		this.type = "";
@@ -41,8 +47,7 @@ public class FileAdditionalInfo {
 		this.fileRegex = "";
 		this.filePath = file.getAbsolutePath();
 		
-		Path path = Paths.get(this.filePath);
-		this.fileName = path.getFileName().toString();
+		this.fileName = file.getName();
 		
 		this.processFileName(this.fileName);
 	}
@@ -75,7 +80,7 @@ public class FileAdditionalInfo {
 		Pattern pattern3 = Pattern.compile("[cC][hH]\\d{1}"+nameSeparator+"\\d{4}\\d{2}\\d{2}\\d{2}\\d{2}\\d{2}"+nameSeparator+"\\d{3,4}"+nameSeparator+"[xX]"+nameSeparator+"\\d{3,4}"+nameSeparator+"\\d[.].{3}");
 		Pattern pattern4 = Pattern.compile("\\d{1,3}"+nameSeparator+"\\d{2}"+nameSeparator+"[R]"+nameSeparator+"\\d{2}\\d{2}\\d{4}\\d{2}\\d{2}\\d{2}[.].{3,4}");
 		
-		System.out.println("processFileName file=" + fileName);
+		//System.out.println("processFileName file=" + fileName);
 		if(pattern1.matcher(fileName).matches()) {
 			
 			// Pattern 1 fileName style: CHxx-YYYYMMDD-hhmmss.typ
@@ -104,7 +109,7 @@ public class FileAdditionalInfo {
 			if(sufix.length() < 6) sufix = substrings[1] + nameSeparator + substrings[2].substring(0, substrings[2].length() - sufix.length()) + sufix;
 			else sufix = substrings[1].substring(0, substrings[1].length() - sufix.length()) + sufix;
 			this.fileRegex = this.prefix + nameSeparator + sufix + nameSeparator + this.type;
-			System.out.println("Pattern1=" + this.toString());
+			//System.out.println("Pattern1=" + this.toString());
 		}
 		else if(pattern2.matcher(fileName).matches()) {
 			
@@ -137,7 +142,7 @@ public class FileAdditionalInfo {
 			// Try to fetch this file channel from the parent folder
 			this.getChannelFromParentFolders();
 			
-			System.out.println("Pattern2=" + this.toString());
+			//System.out.println("Pattern2=" + this.toString());
 		}
 		else if(pattern3.matcher(fileName).matches()) {
 			
@@ -158,7 +163,7 @@ public class FileAdditionalInfo {
 			this.date.set(year, (month-1), day, hours, minute, second);
 			
 			this.fileRegex = this.prefix + nameSeparator + this.getDateRegex(substrings[1]) + nameSeparator + substrings[2] + nameSeparator + substrings[3] + nameSeparator + substrings[4] + nameSeparator + substrings[5] + nameSeparator + substrings[6];
-			System.out.println("Pattern3=" + this.toString());
+			//System.out.println("Pattern3=" + this.toString());
 		}
 		else if(pattern4.matcher(fileName).matches()) {
 			
@@ -179,7 +184,7 @@ public class FileAdditionalInfo {
 			this.date.set(year, (month-1), day, hours, minute, second);
 			
 			this.fileRegex = this.prefix + nameSeparator + this.getDateRegex(substrings[3]) + nameSeparator + type;
-			System.out.println("Pattern4=" + this.toString());
+			//System.out.println("Pattern4=" + this.toString());
 		}
 		else {
 			
@@ -193,7 +198,7 @@ public class FileAdditionalInfo {
 			// Try to fetch this file channel from the parent folder
 			this.getChannelFromParentFolders();
 			
-			System.out.println("No Pattern=" + this.toString());
+			//System.out.println("No Pattern=" + this.toString());
 		}
 	}
 
@@ -208,43 +213,43 @@ public class FileAdditionalInfo {
 	public void getChannelFromParentFolders() {
 		File parentFile = new File(this.filePath).getParentFile();
 		if(parentFile == null){
-			System.out.println("First Parent folder does not identify a channel.");
+			//System.out.println("First Parent folder does not identify a channel.");
 		}
 		else if(parentFile.getName().contains("channel")) {
-			System.out.println("Parent file with channel" + parentFile.getName());
+			//System.out.println("Parent file with channel" + parentFile.getName());
 		}
 		else if(parentFile.getName().contains("camera")) {
 			String operation = parentFile.getName();
 			operation = operation.replace("camera", "");
 			this.channel = Integer.parseInt(operation);
-			System.out.println("Parent file with camera:" + parentFile.getName() + ", operation:" + operation);
+			//System.out.println("Parent file with camera:" + parentFile.getName() + ", operation:" + operation);
 		}
 		else if(parentFile.getName().contains("cam")) {
 			String operation = parentFile.getName();
 			operation = operation.replace("cam", "");
 			this.channel = Integer.parseInt(operation);
-			System.out.println("Parent file with cam:" + parentFile.getName() + ", operation:" + operation);
+			//System.out.println("Parent file with cam:" + parentFile.getName() + ", operation:" + operation);
 		}
 		else if(parentFile.getName().contains("Camera")) {
 			String operation = parentFile.getName();
 			operation = operation.replace("Camera", "");
 			this.channel = Integer.parseInt(operation);
-			System.out.println("Parent file with Camera:" + parentFile.getName() + ", operation:" + operation);
+			//System.out.println("Parent file with Camera:" + parentFile.getName() + ", operation:" + operation);
 		}
 		else if(parentFile.getName().contains("Cam")) {
 			String operation = parentFile.getName();
 			operation = operation.replace("Cam", "");
 			this.channel = Integer.parseInt(operation);
-			System.out.println("Parent file with Cam:" + parentFile.getName() + ", operation:" + operation);
+			//System.out.println("Parent file with Cam:" + parentFile.getName() + ", operation:" + operation);
 		}
 		else if(parentFile.getName().contains("CAM")) {
 			String operation = parentFile.getName();
 			operation = operation.replace("CAM", "");
 			this.channel = Integer.parseInt(operation);
-			System.out.println("Parent file with CAM:" + parentFile.getName() + ", operation:" + operation);
+			//System.out.println("Parent file with CAM:" + parentFile.getName() + ", operation:" + operation);
 		}
 		else {
-			System.out.println("First Parent folder does not identify a channel.");
+			//System.out.println("First Parent folder does not identify a channel.");
 		}
 	}
 
@@ -256,9 +261,8 @@ public class FileAdditionalInfo {
 		return this.channel;
 	}
 
-	public String getDate() {
-		DateFormat formatDate = DateFormat.getDateInstance();
-		return formatDate.format(this.date.getTime());
+	public Calendar getDate() {
+		return this.date;
 	}
 	
 	public String getTime() {
@@ -283,6 +287,10 @@ public class FileAdditionalInfo {
 		else return 0;
 	}
 	
+	public File getFile(){
+		return new File(this.filePath);
+	}
+	
 	@Override
 	public String toString() {
 		return "{FileName:" + this.fileName + ", Channel:" + this.channel + ", Timestamp:" + this.getTimestamp() + ", Regex:" + this.fileRegex  + ", Path:" + this.filePath + "}";
@@ -295,5 +303,20 @@ public class FileAdditionalInfo {
 		else if(this.fileRegex.equals(toTest.getFileRegex())) return false;
 		else if(this.type.equals(toTest.getType()))           return false;
 		else                                                  return true;
+	}
+
+	@Override
+	public int compareTo(File arg0) {
+		int result = 0;
+		FileAdditionalInfo arg = new FileAdditionalInfo(arg0);
+		if(this.date != null) {
+			result = this.date.compareTo(arg.date);
+			//System.out.println(this.getFileName()+".compareToByDates("+arg.getFileName()+")="+result);
+		}
+		else {
+			result = this.fileName.compareTo(arg.fileName);
+			//System.out.println(this.getFileName()+".compareToByName("+arg.getFileName()+")="+result);
+		}
+		return result;
 	}
 }

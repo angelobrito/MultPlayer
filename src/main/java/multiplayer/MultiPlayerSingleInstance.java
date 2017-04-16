@@ -366,13 +366,9 @@ public class MultiPlayerSingleInstance extends MediaPlayerEventAdapter implement
 			int bits    = 2048;
 			String[] substrings = this.mediaPath.split("\\.");
 			
-			for(int i = 0; i >= 0 && i <= 500; i++) {
-				
-				// As requested the record destination changes to userHomeFolder/ocorrencias/filename_ocorrenciax.type
-				recordDestination = substrings[0] + "-record" + i + "." + substrings[substrings.length-1];
-				File testFile = new File(recordDestination);
-				if(!testFile.exists()) break;
-			};
+			// Generate the Record Output File
+			selectRecordFileName(substrings[0], substrings[substrings.length-1]);
+			
 			//String SOUT = ":sout=#transcode{vcodec=mp4v,acodec=mpga,vb=%d,start-time=%f,stop-time=%f,run-time=%f}:file{dst=%s}";
 			String forcedDemuxerOption = "";
 			if(substrings[substrings.length-1].equals("h264")) forcedDemuxerOption = ":demux=h264";
@@ -455,6 +451,16 @@ public class MultiPlayerSingleInstance extends MediaPlayerEventAdapter implement
 		}
 	}
 
+	public void selectRecordFileName(String fileName, String fileType) {
+		
+		// The record destination changes to userHomeFolder/ocorrencias/filename_ocorrencia-x.type
+		for(int i = 1; i > 0; i++) {
+			recordDestination = System.getProperty("user.home") + "/ocorrencias/" + fileName + "_ocorrencia-" + i + "." + fileType;
+			File testFile = new File(recordDestination);
+			if(!testFile.exists()) break;
+		};
+	}
+	
 	public void updateVideoSurface() {
 		this.setVideoSurface(this.mediaFactory.newVideoSurface(this.videoSurface()));
 	}

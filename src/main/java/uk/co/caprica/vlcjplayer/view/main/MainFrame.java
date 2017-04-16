@@ -711,7 +711,7 @@ public final class MainFrame extends BaseFrame {
 //		}
 	}
 	
-	public void record() {
+	public void clikedRecord() {
 		
 		if(!application().getMediaPlayerComponent().isRecording()) {
 			
@@ -725,7 +725,12 @@ public final class MainFrame extends BaseFrame {
 			this.multiMediaPlayerComponent.unpauseScreens();
 
 			// Finally record
-			if(selected > 0 && selected <= application().getScreenQtt()) this.multiMediaPlayerComponent.record(selected-1);
+			if(selected > 0 && selected <= application().getScreenQtt()){
+				this.multiMediaPlayerComponent.record(selected-1);
+				
+				// Also change the record button
+				this.controlsPane.changeRecordButton();
+			}
 		}
 		else {
 			this.multiMediaPlayerComponent.stopRecord();

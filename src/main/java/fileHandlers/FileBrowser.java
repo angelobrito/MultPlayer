@@ -2,11 +2,13 @@ package fileHandlers;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 
 import javax.swing.filechooser.FileSystemView;
 
@@ -54,7 +56,7 @@ public class FileBrowser {
 		File[] files = directory.listFiles();
 		
 		// Return the sorted Arraylist since listFiles and related methods doesn't guarantee order
-		Arrays.sort(files);
+		Arrays.sort(files, new FileAdditionalComparator());
 		return files;
 	}
 	
@@ -85,7 +87,7 @@ public class FileBrowser {
 	public static ArrayList<FileAdditionalInfo> getRelatedFiles(File workingDirectory, String fileName) {
 
 		ArrayList<FileAdditionalInfo> result = new ArrayList<FileAdditionalInfo>();
-		System.out.println("getRelatedFiles(" + fileName + ")");
+		//System.out.println("getRelatedFiles(" + fileName + ")");
 		
 		String fileRegex = FileBrowser.getFileRegex(fileName);
 		ArrayList<String> filesPaths = new ArrayList<String>();
@@ -104,7 +106,7 @@ public class FileBrowser {
 		for(String filePath : filesPaths) {
 			result.add(new FileAdditionalInfo(filePath));
 			filesCounter++;
-			System.out.println("Found RelatedFile[" + filesCounter + "]={" + filePath + "}");
+			//System.out.println("Found RelatedFile[" + filesCounter + "]={" + filePath + "}");
 		}
 		return result;
 	}
@@ -113,7 +115,7 @@ public class FileBrowser {
 		
 		FileAdditionalInfo processedFile = new FileAdditionalInfo(fileName);
 		String fileRegex = processedFile.getFileRegex();
-		System.out.println("getFileRegex: Channel=#" + processedFile.getChannel() + ", Regex=" + fileRegex);
+		//System.out.println("getFileRegex: Channel=#" + processedFile.getChannel() + ", Regex=" + fileRegex);
 		return fileRegex;
 	}
 }

@@ -22,7 +22,7 @@ final class RecordAction extends MediaPlayerAction {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		((MainFrame) application().getMainFrame()).record();
+		((MainFrame) application().getMainFrame()).clikedRecord();
 		application().updateEnabledControlls();
 	}
 }

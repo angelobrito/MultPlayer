@@ -163,7 +163,7 @@ public class PlaylistPane extends FileBrowser {
 		tree.setExpandsSelectedPaths(true);
 		tree.addTreeSelectionListener(treeSelectionListener);
 		tree.setCellRenderer(new FileTreeCellRenderer());
-		tree.expandRow(0);
+		tree.expandRow(1);
 		tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
 		treeScroll.setViewportView(tree);
 
@@ -201,7 +201,7 @@ public class PlaylistPane extends FileBrowser {
 				File file = (File) node.getUserObject();
 				if (file.isDirectory()) {
 					File[] files = getFiles(file);
-					List<File> videoFiles = new ArrayList<File>();
+					ArrayList<File> videoFiles = new ArrayList<File>();
 					if (node.isLeaf()) {
 
 						// First run once to include all Folders
@@ -209,8 +209,6 @@ public class PlaylistPane extends FileBrowser {
 						int i = 0;
 						for (File child : files) {
 							i++;
-							System.out.println("File[" + i + "]={" + child.getAbsolutePath() + "}");
-
 							if (child.isDirectory()) {
 								publish(child);
 							}

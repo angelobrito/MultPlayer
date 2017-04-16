@@ -14,7 +14,7 @@
     <ROW Property="ProductCode" Value="1033:{FB103AA0-EAD8-4116-8447-FB0231320E25} 1046:{4B280AC1-14FE-4834-83FC-43CBC3DC9DF1} " Type="16"/>
     <ROW Property="ProductLanguage" Value="1033"/>
     <ROW Property="ProductName" Value="Mult Tecnologia Player"/>
-    <ROW Property="ProductVersion" Value="1.1.8" Type="32"/>
+    <ROW Property="ProductVersion" Value="1.1.10" Type="32"/>
     <ROW Property="REBOOT" MultiBuildValue="DefaultBuild:ReallySuppress"/>
     <ROW Property="SecureCustomProperties" Value="OLDPRODUCTS;AI_NEWERPRODUCTFOUND;AI_SETUPEXEPATH;SETUPEXEDIR"/>
     <ROW Property="UpgradeCode" Value="{2DC6DBB5-EF53-4D22-A727-EE9720F815B5}"/>
