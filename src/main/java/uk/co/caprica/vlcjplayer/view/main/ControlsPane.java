@@ -354,7 +354,7 @@ final class ControlsPane extends BasePanel {
 		positionPane.setEnabled(newState);
 		nextButton.setEnabled(newState && application().hasNextToPlay() && false); //FIXME
 		stopButton.setEnabled(newState);
-		recordButton.setEnabled(newState); // FIXME
+		recordButton.setEnabled(newState && false); // FIXME
 		previousButton.setEnabled(newState && application().hasPreviousToPlay() && false); //FIXME
 		fullscreenButton.setEnabled(newState && false); // FIXME
 		effectsButton.setEnabled(newState);
